@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "19.0.0",
     "react-native": "0.78.0",
+    "react-native-permissions": "^5.2.6",
     "react-native-webview": "^13.13.4"
   },
   "devDependencies": {
