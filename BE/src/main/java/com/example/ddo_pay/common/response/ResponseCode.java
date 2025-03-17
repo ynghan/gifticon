@@ -11,9 +11,15 @@ public enum ResponseCode {
 
 
     SUCCESS_SOCIAL_LOGIN(200, HttpStatus.OK, "인가 코드를 통해 액세스 토큰 요청이 성공했습니다."),
-    SUCCESS_SOCIAL_LOGIN1(200, HttpStatus.OK, "인가 코드를 통해 액세스 토큰 요청이 성공했습니다."),
-    SUCCESS_SOCIAL_LOGIN2(200, HttpStatus.OK, "인가 코드를 통해 액세스 토큰 요청이 성공했습니다."),
     SUCCESS_LOGIN(successCode(), HttpStatus.OK, "로그인이 성공적으로 완료되었습니다."),
+
+    // Restaurant
+    SUCCESS_CREATE_RESTAURANT(201, HttpStatus.CREATED, "맛집 등록 성공."),
+    SUCCESS_REMOVE_RESTAURANT(200, HttpStatus.OK, "맛집으로 등록된 가게를 해제했습니다."),
+    SUCCESS_GET_RESTAURANT_LIST(200, HttpStatus.OK, "등록된 맛집 리스트 조회 성공."),
+    SUCCESS_GET_SIMPLE_RESTAURANT(200, HttpStatus.OK, "간단한 맛집 정보 조회되었습니다."),
+    SUCCESS_CREATE_CUSTOM_MENU(200, HttpStatus.OK, "커스텀 메뉴 등록에 성공했습니다."),
+    SUCCESS_DELETE_CUSTOM_MENU(200, HttpStatus.OK, "커스텀 메뉴 삭제되었습니다."),;
 
     // 페이 도메인
     SUCCESS_BALANCE_CHECK(successCode(), HttpStatus.OK, "잔액조회가 성공적으로 완료되었습니다."),
@@ -31,7 +37,6 @@ public enum ResponseCode {
     SUCCESS_LIST_GIFTICON(200, HttpStatus.OK, "받은 기프티콘 리스트가 조회되었습니다."),
     SUCCESS_DETAIL_GIFTICON(200, HttpStatus.OK, "기프티콘 상세 정보가 조회되었습니다."),
     SUCCESS_CHECK_GIFTICON(200, HttpStatus.OK, "기프티콘 사용여부가 조회되었습니다.");
-
 
     private int code;
     private HttpStatus httpStatus;
