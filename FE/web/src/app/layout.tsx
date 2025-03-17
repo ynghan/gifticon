@@ -2,6 +2,12 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { BottomBar } from '@/features/bottomBar';
+import { MSWProvider } from '@/shared/msw';
+
+if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+  const { server } = require('@/mock/http');
+  server.listen();
+}
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,8 +32,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw h-[92dvh]`}>
-        {children}
-        <BottomBar />
+        <MSWProvider>
+          {children}
+          <BottomBar />
+        </MSWProvider>
       </body>
     </html>
   );
