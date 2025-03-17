@@ -11,4 +11,5 @@ public class DdoPayApplication {
 		SpringApplication.run(DdoPayApplication.class, args);
 	}
 
+
 }
