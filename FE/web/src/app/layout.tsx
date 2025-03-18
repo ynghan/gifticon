@@ -5,7 +5,7 @@ import { BottomBar } from '@/features/bottomBar';
 import { MSWProvider } from '@/shared/msw';
 
 if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
-  const { server } = require('@/mock/http');
+  const { server } = require('@/shared/msw/mock/http');
   server.listen();
 }
 
