@@ -1,1 +1,1 @@
-export * from './BottomBar';
+export * from './ui/BottomBar';

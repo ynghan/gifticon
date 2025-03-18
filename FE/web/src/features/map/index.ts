@@ -1,1 +1,1 @@
-export * from './KakaoMap';
+export * from './ui/KakaoMap';
