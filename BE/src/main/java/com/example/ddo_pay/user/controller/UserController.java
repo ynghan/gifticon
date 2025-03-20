@@ -13,6 +13,7 @@ import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_GET_USER_
 import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_LOGOUT;
 import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_SOCIAL_LOGIN;
 import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_UPDATE_USER_INFO;
+import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.user.dto.request.SocialLoginRequestDto;
 import com.example.ddo_pay.user.dto.request.UserInfoRequestDto;
 import com.example.ddo_pay.user.dto.response.SocialLoginResponseDto;
@@ -40,7 +41,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getUserInfo() {
         UserInfoResponseDto infoDto = new UserInfoResponseDto();
-        infoDto.setUserName("test_user");
+        infoDto.setUserName(SecurityUtil.getUserId().toString());
         infoDto.setEmail("testemail@test.net");
         infoDto.setPhoneNum("010-2222-3333");
         infoDto.setBirth("2000-02-14");
