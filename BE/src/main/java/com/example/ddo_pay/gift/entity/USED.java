@@ -8,5 +8,5 @@ import lombok.Getter;
 public enum USED {
     BEFORE_USE(1), AFTER_USE(2), EXPIRED(3);
 
-    private int state;
+    private final  int state;
 }
