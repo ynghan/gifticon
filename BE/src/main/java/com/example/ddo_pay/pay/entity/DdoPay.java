@@ -21,9 +21,9 @@ public class DdoPay {
     private int point; // 페이 포인트
     private String payPassword; // 결제 비밀번호
 
-    @OneToMany(mappedBy = "ddopay", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ddoPay", cascade = CascadeType.ALL)
     private List<Account> accountList = new ArrayList<>();
-    @OneToMany(mappedBy = "ddopay", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ddoPay", cascade = CascadeType.ALL)
     private List<History> historyList = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
