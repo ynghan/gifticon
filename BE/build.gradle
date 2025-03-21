@@ -33,9 +33,17 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Selenium
+	implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
+
+	// WebDriverManager (자동 버전 맞춤)
+	implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
+
 	
 	// security 의존성, 시큐리티 이슈 발생 시 아래 의존성 주석처리
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {
