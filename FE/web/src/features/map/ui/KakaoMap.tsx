@@ -7,7 +7,7 @@ import useDebounce from '@/shared/utils/useDebounce';
 import Places from './Places';
 import { Coordinates, Marker } from '../model/marker';
 
-export const KakaoMap: React.FC = () => {
+export const KakaoMap = () => {
   useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_KEY!,
     libraries: ['services', 'clusterer', 'drawing'],
@@ -35,7 +35,9 @@ export const KakaoMap: React.FC = () => {
 
   const handleCenterChanged = useDebounce(async () => {
     if (!map) return;
-    searchStores();
+    if (category === 'FD6') {
+      searchStores();
+    }
   }, 500);
 
   const searchStores = () => {
@@ -53,7 +55,7 @@ export const KakaoMap: React.FC = () => {
           const bounds = new kakao.maps.LatLngBounds();
           const markers: Marker[] = [];
           for (let i = 0; i < data.length; i++) {
-            const { x, y, address_name, category_group_name, id, place_url, place_name } = data[i];
+            const { x, y, address_name, id, place_url, place_name } = data[i];
 
             markers.push({
               id,
@@ -63,7 +65,6 @@ export const KakaoMap: React.FC = () => {
               },
               place_name,
               address_name,
-              category_group_name,
               place_url,
             });
             bounds.extend(new kakao.maps.LatLng(Number(y), Number(x)));
@@ -89,10 +90,10 @@ export const KakaoMap: React.FC = () => {
         onCreate={setMap}
         onCenterChanged={handleCenterChanged}
       >
-        <Button className="absolute top-2 right-2 z-10" onClick={handleCategory}>
-          Store
+        <Button className="absolute top-16 right-2 z-10" onClick={handleCategory}>
+          근처 가게
         </Button>
-        <Places markers={markers} changeCenter={changeCenter} />
+        {markers.length > 0 && <Places markers={markers} changeCenter={changeCenter} />}
       </Map>
     </div>
   );

@@ -9,5 +9,4 @@ export type Marker = {
   place_name: string;
   address_name: string;
   place_url: string;
-  category_group_name: string;
 };
