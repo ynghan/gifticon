@@ -10,10 +10,10 @@ import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.restaurant.dto.request.CustomMenuRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantCreateRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantDeleteRequestDto;
+import com.example.ddo_pay.restaurant.dto.response.ResponsePositionDto;
 import com.example.ddo_pay.restaurant.dto.response.RestaurantListItemResponseDto;
 import com.example.ddo_pay.restaurant.dto.response.RestaurantSimpleResponseDto;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,12 +57,13 @@ public class RestaurantController {
 	@PostMapping
 	public ResponseEntity<?> create(@RequestBody RestaurantCreateRequestDto requestDto) {
 		return ResponseEntity
-			.status(ResponseCode.SUCCESS_CREATE_RESTAURANT.getHttpStatus())
+			.status(ResponseCode.SUCCESS_CREATE_RESTAURANT.getHttpStatus()) // -> 204
 			.body(Response.create(ResponseCode.SUCCESS_CREATE_RESTAURANT, null));
 	}
 
 	@DeleteMapping
 	public ResponseEntity<?> removeRestaurant(@RequestBody RestaurantDeleteRequestDto requestDto) {
+		Long restaurantId = requestDto.getRestaurantId();
 		// 실제 삭제 로직: e.g. restaurantService.deleteRestaurant(requestDto.getRestaurantId());
 
 		// 200 OK
@@ -76,20 +77,31 @@ public class RestaurantController {
 		List<RestaurantListItemResponseDto> dummyList = new ArrayList<>();
 
 		RestaurantListItemResponseDto r1 = new RestaurantListItemResponseDto();
-		r1.setRestaurantName("김밥천국");
+		r1.setId(1L);
+		r1.setPlaceName("김밥천국");
 		r1.setRestaurantImage("http://example.com/images/kimbab.jpg");
-		r1.setAddress("서울 종로구 어딘가");
-		r1.setLatitude(37.1234);
-		r1.setLongitude(127.5678);
+		r1.setAddressName("서울 종로구 어딘가");
 		r1.setVisitedCount(0);
 
+		// position 생성 후 lat,lng 설정
+		ResponsePositionDto pos1 = new ResponsePositionDto();
+		pos1.setLat(37.1234);
+		pos1.setLng(127.5678);
+		r1.setPosition(pos1);
+
+
+
 		RestaurantListItemResponseDto r2 = new RestaurantListItemResponseDto();
-		r2.setRestaurantName("식당B");
+		r2.setId(2L);
+		r2.setPlaceName("식당B");
 		r2.setRestaurantImage("http://example.com/images/restaurant_b.jpg");
-		r2.setAddress("서울 강남구 어딘가");
-		r2.setLatitude(37.5678);
-		r2.setLongitude(127.1234);
+		r2.setAddressName("서울 강남구 어딘가");
 		r2.setVisitedCount(3);
+
+		ResponsePositionDto pos2 = new ResponsePositionDto();
+		pos2.setLat(37.1234);
+		pos2.setLng(127.5678);
+		r2.setPosition(pos2);
 
 		dummyList.add(r1);
 		dummyList.add(r2);
@@ -101,18 +113,26 @@ public class RestaurantController {
 	}
 
 	@GetMapping("/{restaurantId}")
-	public ResponseEntity<?> getRestaurantSimple(@PathVariable Long restaurantId) {
-		// 실제 로직: e.g. restaurantService.getRestaurantSimple(restaurantId)
-		// 여기서는 임시 mock 데이터 예시
-		RestaurantSimpleResponseDto dto = new RestaurantSimpleResponseDto();
-		dto.setRestaurantName("김밥천국");
-		dto.setRestaurantAddress("서울 종로구 어딘가");
-		dto.setRestaurantLatitude(37.1234);
-		dto.setRestaurantLongitude(127.5678);
+	public ResponseEntity<?> getSimpleRestaurantInfo(@PathVariable int restaurantId) {
+
+		// 실제 DB 엔티티나, 크롤링, 임시 mock 데이터를 만든다고 가정
+		// 예: RestaurantEntity entity = restaurantService.findById(restaurantId);
+
+		// DTO 생성
+		RestaurantSimpleResponseDto detail = new RestaurantSimpleResponseDto();
+		detail.setId((long) restaurantId);  // DB PK라면 entity.getId() 등
+		detail.setPlaceName("김밥천국");
+		detail.setAddressName("서울 종로구 어딘가");
+
+		ResponsePositionDto pos = new ResponsePositionDto();
+		pos.setLat(37.1234);
+		pos.setLng(127.5678);
+		detail.setPosition(pos);
 
 		return ResponseEntity
-			.status(SUCCESS_GET_SIMPLE_RESTAURANT.getHttpStatus()) // 200
-			.body(Response.create(SUCCESS_GET_SIMPLE_RESTAURANT, dto));
+			.ok(
+				Response.create(ResponseCode.SUCCESS_GET_SIMPLE_RESTAURANT, detail)
+			);
 	}
 
 	@PostMapping("/custom")
