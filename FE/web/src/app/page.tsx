@@ -1,5 +1,5 @@
 import { KakaoMap } from '@/features/map';
-import { SearchBar } from '@/features/searchBar';
+import { SearchBar } from '@/widgets/searchBar';
 
 export default function Home() {
   return (
