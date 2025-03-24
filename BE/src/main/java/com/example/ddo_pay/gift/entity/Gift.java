@@ -23,6 +23,7 @@ public class Gift {
     private String message; // 메세지 내용
     private String image; // 사진
     private LocalDateTime period; // 유효기간
+    @Enumerated(EnumType.STRING)
     private USED usedStatus; // 사용 여부
 
     @ManyToOne(fetch = FetchType.LAZY)
