@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public interface GiftService {
     // 기프티콘 발행하기
-    void create(GiftCreateRequestDto dto);
+    void create(GiftCreateRequestDto dto, Integer userId);
 
     // 기프티콘 양도하기
     void assignment(GiftUpdateRequestDto dto);

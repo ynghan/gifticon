@@ -1,6 +1,7 @@
 package com.example.ddo_pay.gift.controller;
 
 import com.example.ddo_pay.common.response.Response;
+import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
@@ -29,7 +30,8 @@ public class GiftController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody GiftCreateRequestDto dto) {
 
-        giftService.create(dto);
+        Integer userId = SecurityUtil.getUserId();
+        giftService.create(dto, userId);
 
         return new ResponseEntity<>(Response.create(SUCCESS_CREATE_GIFTICON, null), SUCCESS_CREATE_GIFTICON.getHttpStatus());
     }

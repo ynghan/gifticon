@@ -3,6 +3,7 @@ package com.example.ddo_pay.gift.entity;
 import com.example.ddo_pay.restaurant.entity.Restaurant;
 import com.example.ddo_pay.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
@@ -25,6 +27,7 @@ public class Gift {
     private String message; // 메세지 내용
     private String image; // 사진
     private LocalDateTime period; // 유효기간
+    private String menuCombination;
     @Enumerated(EnumType.STRING)
     private USED usedStatus; // 사용 여부
 
@@ -41,7 +44,7 @@ public class Gift {
     private Restaurant restaurant; // 맛집과 다 대 1
 
     @Builder
-    public Gift(Long id, String title, Integer amount, String phoneNum, String message, String image, LocalDateTime period, USED usedStatus, User user, GiftBox giftBox, Restaurant restaurant) {
+    public Gift(Long id, String title, Integer amount, String phoneNum, String message, String image, LocalDateTime period, USED usedStatus, String menuCombination, User user, GiftBox giftBox, Restaurant restaurant) {
         this.id = id;
         this.title = title;
         this.amount = amount;
@@ -50,6 +53,7 @@ public class Gift {
         this.image = image;
         this.period = period;
         this.usedStatus = usedStatus;
+        this.menuCombination = menuCombination;
         this.user = user;
         this.giftBox = giftBox;
         this.restaurant = restaurant;
@@ -59,5 +63,8 @@ public class Gift {
         this.phoneNum = newPhoneNum;
     }
 
+    public void setGiftBox(GiftBox giftBox) {
+        this.giftBox = giftBox;
+    }
 }
 
