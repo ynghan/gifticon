@@ -1,4 +1,4 @@
-package com.example.ddo_pay.gift.Repository;
+package com.example.ddo_pay.gift.repository;
 
 import com.example.ddo_pay.gift.entity.Gift;
 import org.springframework.data.jpa.repository.JpaRepository;
