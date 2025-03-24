@@ -51,7 +51,7 @@ public class GiftController {
         return new ResponseEntity<>(Response.create(SUCCESS_LIST_GIFTICON, dtos), SUCCESS_LIST_GIFTICON.getHttpStatus());
     }
 
-    @GetMapping("/detail/${giftId}")
+    @GetMapping("/detail/{giftId}")
     public ResponseEntity<?> selectDetail(@PathVariable int giftId) {
         GiftDetailResponseDto dto = giftService.selectDetail(giftId);
         return new ResponseEntity<>(Response.create(SUCCESS_DETAIL_GIFTICON, dto), SUCCESS_DETAIL_GIFTICON.getHttpStatus());
