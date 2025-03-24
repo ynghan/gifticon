@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { BottomBar } from "@/features/bottomBar";
-import { MSWProvider } from "@/shared/msw";
-import { NextAuthProvider } from "@/features/kakaoLogin/index";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import { BottomBar } from '@/widgets/bottomBar';
+import { MSWProvider } from '@/shared/msw';
+import CustomQueryClientProvider from '@/shared/reactQuery/CustomQueryClientProvider';
+import { NextAuthProvider } from "@/features/kakaoLogin";
 
 if (
   process.env.NEXT_RUNTIME === "nodejs" &&
@@ -35,13 +36,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw h-[92dvh]`}
-      >
-        <MSWProvider>
-          <NextAuthProvider>{children}</NextAuthProvider>
-          <BottomBar />
-        </MSWProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw h-[92dvh]`}>
+        <CustomQueryClientProvider>
+          <MSWProvider>
+          <NextAuthProvider>
+            {children}
+            <BottomBar />
+            </NextAuthProvider>
+          </MSWProvider>
+        </CustomQueryClientProvider>          
       </body>
     </html>
   );
