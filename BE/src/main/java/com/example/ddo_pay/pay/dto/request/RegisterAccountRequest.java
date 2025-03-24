@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RegisterAccountRequest {
     private String accountNumber;
+
+    private int userId;
 }
