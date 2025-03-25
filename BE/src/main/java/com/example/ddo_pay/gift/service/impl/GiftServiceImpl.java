@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -110,8 +111,16 @@ public class GiftServiceImpl implements GiftService {
     }
 
     @Override
-    public List<GiftSelectResponseDto> selectMyList() {
-        return null;
+    public List<GiftSelectResponseDto> selectMyList(Long userId) {
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        List<Gift> findList = giftRepository.findByUser(findUser);
+        List<GiftSelectResponseDto> dtoList = new ArrayList<>();
+
+        for (Gift gift : findList) {
+            GiftSelectResponseDto dto = GiftSelectResponseDto.from(gift);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
     @Override

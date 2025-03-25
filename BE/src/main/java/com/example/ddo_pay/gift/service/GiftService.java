@@ -19,7 +19,7 @@ public interface GiftService {
     void assignment(GiftUpdateRequestDto dto, Long userId);
 
     // 받은 기프티콘 리스트 조회하기
-    List<GiftSelectResponseDto> selectMyList();
+    List<GiftSelectResponseDto> selectMyList(Long userId);
 
     // giftId를 가진 기프티콘 상세보기
     GiftDetailResponseDto selectDetail(int giftId);
