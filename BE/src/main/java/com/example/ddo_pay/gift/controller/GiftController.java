@@ -46,7 +46,8 @@ public class GiftController {
 
     @GetMapping
     public ResponseEntity<?> selectUserGiftList() {
-        List<GiftSelectResponseDto> dtos = giftService.selectMyList();
+        Long userId = SecurityUtil.getUserId();
+        List<GiftSelectResponseDto> dtos = giftService.selectMyList(userId);
 
         return new ResponseEntity<>(Response.create(SUCCESS_LIST_GIFTICON, dtos), SUCCESS_LIST_GIFTICON.getHttpStatus());
     }
