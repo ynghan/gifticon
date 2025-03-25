@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.ddo_pay.common.response.ResponseCode.*;
@@ -30,7 +29,7 @@ public class GiftController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody GiftCreateRequestDto dto) {
 
-        Integer userId = SecurityUtil.getUserId();
+        Long userId = SecurityUtil.getUserId();
         giftService.create(dto, userId);
 
         return new ResponseEntity<>(Response.create(SUCCESS_CREATE_GIFTICON, null), SUCCESS_CREATE_GIFTICON.getHttpStatus());
@@ -39,7 +38,8 @@ public class GiftController {
     @PutMapping
     public ResponseEntity<?> assignment(@RequestBody GiftUpdateRequestDto dto) {
 
-        giftService.assignment(dto);
+        Long userId = SecurityUtil.getUserId();
+        giftService.assignment(dto, userId);
 
         return new ResponseEntity<>(Response.create(SUCCESS_ASSIGNMENT_GIFTICON, null), SUCCESS_ASSIGNMENT_GIFTICON.getHttpStatus());
     }
