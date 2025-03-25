@@ -19,12 +19,12 @@ import com.example.ddo_pay.restaurant.entity.Restaurant;
 import com.example.ddo_pay.restaurant.repository.RestaurantRepository;
 import com.example.ddo_pay.user.entity.User;
 import com.example.ddo_pay.user.service.impl.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,9 +38,9 @@ public class GiftServiceImpl implements GiftService {
 
     private final PayService payService;
 
-
+    /* 맛집 기반으로 기프티콘을 생성할 수 있다. 현재 생성할 때, 같이 이뤄져야 할 결제 로직 빠져있다. */
     @Override
-    public void create(GiftCreateRequestDto dto, Integer userId) {
+    public void create(GiftCreateRequestDto dto, Long userId) {
 
         // 1. 맛집의 메뉴들의 정보와 사용자 커스텀 정보를 받아서 DB에 저장한다.
 
@@ -90,8 +90,23 @@ public class GiftServiceImpl implements GiftService {
 
 
     @Override
-    public void assignment(GiftUpdateRequestDto dto) {
+    public void assignment(GiftUpdateRequestDto dto, Long userId) {
+        /* 받은 기프티콘을 다른 사람에게 양도할 수 있다. */
+        /* 다른 User가 우리 회원인 경우에는 회원이 알아서 조회해야 하나? */
+        Gift gift = giftRepository.findById(dto.getGiftId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
 
+        // GiftBox가 존재하면 해당 엔티티 삭제
+        Optional<GiftBox> giftBox = Optional.ofNullable(gift.getGiftBox());
+        if(giftBox.isPresent()) {
+            giftBoxRepository.delete(gift.getGiftBox());
+        }
+
+        // newUser가 있다면 GiftBox 엔티티 생성 후 저장
+        Optional<User> optionalNewUser = userRepository.findByPhoneNum(dto.getPhoneNum());
+        if(optionalNewUser.isPresent()) {
+            GiftBox newGiftBox = new GiftBox(optionalNewUser.get(), gift);
+            giftBoxRepository.save(newGiftBox);
+        }
     }
 
     @Override

@@ -58,7 +58,8 @@ public enum ResponseCode {
     SUCCESS_LIST_GIFTICON(200, HttpStatus.OK, "받은 기프티콘 리스트가 조회되었습니다."),
     SUCCESS_DETAIL_GIFTICON(200, HttpStatus.OK, "기프티콘 상세 정보가 조회되었습니다."),
     SUCCESS_CHECK_GIFTICON(200, HttpStatus.OK, "기프티콘 사용여부가 조회되었습니다."),
-
+    NO_EXIST_GIFTICON(400, HttpStatus.BAD_REQUEST, "등록된 기프티콘이 아닙니다."),
+    NO_EXIST_GIFTBOX(400, HttpStatus.BAD_REQUEST, "받은 기프티콘이 아닙니다."),
     // enum 마지막. 복붙하는 과정에서 ,/; 차이에서 오는 충돌 이슈를 방지하기 위해 만들어놓음
     FINAL_FINAL(0, null, "enum 마지막 입니다. 쓰지 마세요");
 

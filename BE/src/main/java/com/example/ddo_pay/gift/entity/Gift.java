@@ -1,5 +1,6 @@
 package com.example.ddo_pay.gift.entity;
 
+import com.example.ddo_pay.gift.dto.update.GiftUpdateRequestDto;
 import com.example.ddo_pay.restaurant.entity.Restaurant;
 import com.example.ddo_pay.user.entity.User;
 import jakarta.persistence.*;
@@ -59,8 +60,8 @@ public class Gift {
         this.restaurant = restaurant;
     }
 
-    public void changePhoneNum(String newPhoneNum) {
-        this.phoneNum = newPhoneNum;
+    public void changePhoneNum(GiftUpdateRequestDto dto) {
+        this.phoneNum = dto.getPhoneNum();
     }
 
     public void setGiftBox(GiftBox giftBox) {

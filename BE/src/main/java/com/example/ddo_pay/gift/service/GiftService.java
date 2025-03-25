@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 public interface GiftService {
     // 기프티콘 발행하기
-    void create(GiftCreateRequestDto dto, Integer userId);
+    void create(GiftCreateRequestDto dto, Long userId);
 
     // 기프티콘 양도하기
-    void assignment(GiftUpdateRequestDto dto);
+    void assignment(GiftUpdateRequestDto dto, Long userId);
 
     // 받은 기프티콘 리스트 조회하기
     List<GiftSelectResponseDto> selectMyList();
