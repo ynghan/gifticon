@@ -9,7 +9,7 @@ export const BottomBar: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <div className="absolute bottom-0 flex justify-evenly items-center w-full h-[8dvh] z-50 bg-white border-t-2">
+    <div className="absolute bottom-0 flex justify-evenly items-center w-full h-20 z-50 bg-white border-t-2">
       <Link href={'/'}>
         <Map size={32} className={`${pathname === '/' && 'text-amber-300'}`} />
       </Link>
