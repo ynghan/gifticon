@@ -36,7 +36,6 @@ public class GiftServiceImpl implements GiftService {
     private final GiftBoxRepository giftBoxRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
-
     private final PayService payService;
 
     /* 맛집 기반으로 기프티콘을 생성할 수 있다. 현재 생성할 때, 같이 이뤄져야 할 결제 로직 빠져있다. */
@@ -64,7 +63,7 @@ public class GiftServiceImpl implements GiftService {
                 .user(user)
                 .restaurant(restaurant)
                 .usedStatus(USED.BEFORE_USE)
-                .period(LocalDateTime.now().plusMonths(3))
+                .expirationDate(LocalDateTime.now().plusMonths(3))
                 .build();
 
         // 기프티콘 저장
@@ -130,6 +129,54 @@ public class GiftServiceImpl implements GiftService {
 
     @Override
     public GiftCheckResponseDto usedCheck(GiftCheckRequestDto dto) {
-        return null;
+        // 1. 기프티콘 조회
+        Gift gift = giftRepository.findById(dto.getGiftId())
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+
+        // 2. 기프티콘 유효기간 및 사용 가능 여부 확인
+        boolean isUsable = isGiftUsable(gift, dto);
+
+        // 3. 응답 DTO 생성
+        return GiftCheckResponseDto
+                .builder()
+                .available(isUsable).build();
     }
+
+    // 기프티콘 사용 가능 여부 검증 메서드
+    private boolean isGiftUsable(Gift gift, GiftCheckRequestDto dto) {
+        // 1. 유효기간 만료 확인
+        if (gift.getExpirationDate().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        // 2. 연관된 맛집 조회
+        Restaurant restaurant = gift.getRestaurant();
+        if (restaurant == null) {
+            return false;
+        }
+
+        // 3. 위치 거리 계산
+        double distance = calculateDistance(
+                Double.parseDouble(dto.getLatitude()),
+                Double.parseDouble(dto.getLongitude()),
+                restaurant.getLatitude(),
+                restaurant.getLongitude()
+        );
+
+        // 4. 거리 검증 (반경 15m 이내)
+        return distance <= 15.0;
+    }
+
+    // Haversine 공식을 이용한 거리 계산 메서드
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371; // 지구 반경 (km)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c * 1000;
+    }
+
 }

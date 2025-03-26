@@ -27,7 +27,7 @@ public class Gift {
     private String phoneNum; // B 전화번호
     private String message; // 메세지 내용
     private String image; // 사진
-    private LocalDateTime period; // 유효기간
+    private LocalDateTime expirationDate; // 유효기간
     private String menuCombination;
     @Enumerated(EnumType.STRING)
     private USED usedStatus; // 사용 여부
@@ -45,14 +45,14 @@ public class Gift {
     private Restaurant restaurant; // 맛집과 다 대 1
 
     @Builder
-    public Gift(Long id, String title, Integer amount, String phoneNum, String message, String image, LocalDateTime period, USED usedStatus, String menuCombination, User user, GiftBox giftBox, Restaurant restaurant) {
+    public Gift(Long id, String title, Integer amount, String phoneNum, String message, String image, LocalDateTime expirationDate, USED usedStatus, String menuCombination, User user, GiftBox giftBox, Restaurant restaurant) {
         this.id = id;
         this.title = title;
         this.amount = amount;
         this.phoneNum = phoneNum;
         this.message = message;
         this.image = image;
-        this.period = period;
+        this.expirationDate = expirationDate;
         this.usedStatus = usedStatus;
         this.menuCombination = menuCombination;
         this.user = user;
