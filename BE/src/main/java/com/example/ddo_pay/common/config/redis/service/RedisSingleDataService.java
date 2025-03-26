@@ -6,7 +6,7 @@ import java.time.Duration;
 /**
  * Redis 단일 데이터를 처리하는 비즈니스 로직 인터페이스입니다.
  */
-@Service
+
 public interface RedisSingleDataService {
 
     // Redis 단일 데이터 값을 등록/수정합니다.

@@ -1,48 +1,37 @@
 package com.example.ddo_pay.common.config.redis.handler;
 
-import com.example.ddo_pay.common.config.redis.config.RedisConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+@Slf4j // 로그 객체 자동 생성
 @Component
 @RequiredArgsConstructor
 public class RedisHandler {
 
-    private final RedisConfig redisConfig;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    /**
-     * 리스트에 접근하여 다양한 연산을 수행합니다.
-     *
-     * @return ListOperations<String, Object>
-     */
     public ListOperations<String, Object> getListOperations() {
-        return redisConfig.redisTemplate().opsForList();
+        return redisTemplate.opsForList();
     }
 
-    /**
-     * 단일 데이터에 접근하여 다양한 연산을 수행합니다.
-     *
-     * @return ValueOperations<String, Object>
-     */
+    public Boolean deleteKey(String key) {
+        return redisTemplate.delete(key);
+    }
+
     public ValueOperations<String, Object> getValueOperations() {
-        return redisConfig.redisTemplate().opsForValue();
+        return redisTemplate.opsForValue();
     }
 
-
-    /**
-     * Redis 작업중 등록, 수정, 삭제에 대해서 처리 및 예외처리를 수행합니다.
-     *
-     * @param operation
-     * @return
-     */
     public int executeOperation(Runnable operation) {
         try {
             operation.run();
             return 1;
         } catch (Exception e) {
-            System.out.println("Redis 작업 오류 발생 :: " + e.getMessage());
+            log.error("Redis 작업 오류 발생", e);
             return 0;
         }
     }
