@@ -124,7 +124,8 @@ public class GiftServiceImpl implements GiftService {
 
     @Override
     public GiftDetailResponseDto selectDetail(int giftId) {
-        return null;
+        Gift gift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+        return GiftDetailResponseDto.from(gift);
     }
 
     @Override
