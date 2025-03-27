@@ -5,9 +5,12 @@ import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.RedisHandler;
 import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
+import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.entity.Account;
 import com.example.ddo_pay.pay.entity.DdoPay;
 import com.example.ddo_pay.pay.finance_api.FinanceClient;
+import com.example.ddo_pay.pay.repository.AccountRepository;
 import com.example.ddo_pay.pay.repository.DdoPayRepository;
 import com.example.ddo_pay.pay.service.PayService;
 import com.example.ddo_pay.user.entity.User;
@@ -18,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.IOException;
 import java.time.Duration;
 
@@ -32,6 +34,7 @@ public class PayServiceImpl implements PayService {
     private final ObjectMapper objectMapper;
     private final DdoPayRepository ddoPayRepository;
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
 
     // 유효 계좌 인증
@@ -55,7 +58,7 @@ public class PayServiceImpl implements PayService {
 
         try {
 
-            JsonNode root = objectMapper.readTree(objectMapper.writeValueAsString(response.getBody()));
+            JsonNode root = objectMapper.readTree((String) response.getBody());
             String responseCode = root.path("Header").path("responseCode").asText();
 
             System.out.println("금융망 응답 코드: " + responseCode);
@@ -86,6 +89,59 @@ public class PayServiceImpl implements PayService {
     private String generateRandomMemo() {
         String[] response = restTemplate.getForObject("https://random-word-api.herokuapp.com/word", String[].class);
         return (response != null && response.length > 0) ? response[0] : "default";
+    }
+
+    // 랜덤 단어 확인 후 계좌 등록
+    @Override
+    public void registerAccount(Long userId, RegisterAccountRequest request) {
+        String inputWord  = request.getRandomWord();
+        String redisKey = "userId:" + userId;
+
+        String redisValue = (String) redisHandler.getValueOperations().get(redisKey);
+        if (redisValue == null) {
+            throw new CustomException(ResponseCode.REDIS_NOT_FOUND);
+        }
+
+        System.out.println("입력받은 단어 = " + inputWord);
+
+        String[] parts = redisValue.split(",");
+        String storedWord = null;
+        String storedAccountNo = null;
+        for (String part : parts) {
+            if (part.startsWith("word:")) {
+                storedWord = part.substring("word:".length());
+            } else if (part.startsWith("accountNo:")) {
+                storedAccountNo = part.substring("accountNo:".length());
+            }
+        }
+
+        if (storedWord == null || storedAccountNo == null) {
+            throw new CustomException(ResponseCode.INVALID_REDIS_FORMAT);
+        }
+
+        // 단어 비교
+        if (!storedWord.equalsIgnoreCase(inputWord.trim())) {
+            throw new CustomException(ResponseCode.NOT_VERIFIED_ACCOUNT);
+        }
+
+        // 사용자 & 또페이 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+
+        DdoPay ddoPay = ddoPayRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
+
+        // 계좌 저장
+        Account account = Account.builder()
+                .accountNum(storedAccountNo)
+                .ddoPay(ddoPay)
+                .build();
+
+        accountRepository.save(account);
+
+        // 6. Redis 삭제
+        redisHandler.deleteKey(redisKey);
+
     }
 
 
@@ -122,6 +178,7 @@ public class PayServiceImpl implements PayService {
 
         ddoPayRepository.save(ddoPay);
     }
+
 
 
 }

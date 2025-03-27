@@ -4,6 +4,7 @@ import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
+import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
 import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,18 @@ public class PayController {
         return new ResponseEntity<>(Response.create(responseCode, null), responseCode.getHttpStatus());
     }
 
+    // 본인 계좌 인증 후 계좌 연동
+    @PostMapping("/account")
+    public ResponseEntity<?> registerAccount(@RequestBody RegisterAccountRequest request) {
+        Long userId = SecurityUtil.getUserId();
+        payService.registerAccount(userId, request);
+
+        return ResponseEntity.ok(
+                Response.create(ResponseCode.SUCCESS_REGISTER_ACCOUNT, null)
+        );
+    }
+
+
     // 비밀번호 등록 및 또페이 생성
     @PostMapping("/password")
     public ResponseEntity<?> registerPassword(@RequestBody RegisterPasswordRequest request) {
@@ -42,6 +55,7 @@ public class PayController {
         payService.registerPayPassword(userId, request);
         return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_REGISTER_DDOPAY, null));
     }
+
 
 
 

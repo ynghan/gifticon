@@ -20,4 +20,9 @@ public class Account {
     @ManyToOne(fetch = FetchType.LAZY)
     private DdoPay ddoPay;
 
+    @Builder
+    public Account(String accountNum, DdoPay ddoPay) {
+        this.accountNum = accountNum;
+        this.ddoPay = ddoPay;
+    }
 }
