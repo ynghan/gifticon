@@ -2,10 +2,13 @@ package com.example.ddo_pay.restaurant.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.ddo_pay.common.exception.CustomException;
+import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.restaurant.dto.request.CustomMenuRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantCrawlingRequestDto;
@@ -50,65 +53,102 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Transactional
 	public void createRestaurant(RestaurantCreateRequestDto requestDto) {
 
+		if (requestDto.getUserId() == null) {
+			throw new CustomException(
+				ResponseCode.NO_EXIST_USER,
+				"userId",
+				"user_id가 누락되었습니다."
+			);
+		}
+
 		// 1) 사용자 조회
 		User user = userRepo.findById((long) requestDto.getUserId())
-				.orElseThrow(() -> new RuntimeException("해당 user가 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_USER,
+				"userId",
+				"해당 user가 존재하지 않습니다."
+			));
 
-		// 2) Restaurant 엔티티 빌더로 생성
-		//    resName → placeName
-		//    resAddress → addressName
-		//    resLat/resLng → lat/lng
-		//    resImage → mainImageUrl
-		Restaurant restaurant = Restaurant.builder()
-				.placeName(requestDto.getPlaceName())      // 변경
-				.addressName(requestDto.getAddressName())  // 변경
-				.lat(requestDto.getPosition().getLat())    // 변경
-				.lng(requestDto.getPosition().getLng())    // 변경
-				.mainImageUrl(requestDto.getMainImageUrl()) // 변경
-				.userIntro(requestDto.getUserIntro())      // 기존 그대로 사용
-				.starRating(requestDto.getStarRating())    // 기존 그대로 사용
+		// 2) (placeName, addressName)로 Restaurant 조회
+		Optional<Restaurant> existingRestaurantOpt = restaurantRepository.findByPlaceNameAndAddressName(
+			requestDto.getPlaceName(),
+			requestDto.getAddressName()
+		);
+
+		Restaurant restaurant;
+		if (existingRestaurantOpt.isPresent()) {
+			// 이미 같은 식당 존재 → 재사용
+			restaurant = existingRestaurantOpt.get();
+		} else {
+			// 새로운 식당 엔티티 생성
+			restaurant = Restaurant.builder()
+				.placeName(requestDto.getPlaceName())
+				.addressName(requestDto.getAddressName())
+				.lat(requestDto.getPosition().getLat())
+				.lng(requestDto.getPosition().getLng())
+				.mainImageUrl(requestDto.getMainImageUrl())
+				.userIntro(requestDto.getUserIntro())
+				.starRating(requestDto.getStarRating())
 				.build();
 
-		Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+			restaurantRepository.save(restaurant);
+		}
 
-		// 3) UserRestaurant 빌더
+		// 3) UserRestaurant 중복 체크: 같은 user + 같은 restaurant id?
+		Optional<UserRestaurant> existingUserRes = userRestaurantRepository
+			.findByUser_IdAndRestaurant_Id(user.getId(), restaurant.getId());
+
+		if (existingUserRes.isPresent()) {
+			// 이미 이 유저가 해당 식당을 등록한 상태
+			throw new CustomException(
+				ResponseCode.DATA_ALREADY_EXISTS,
+				"userId,restaurantId",
+				"이미 등록된 맛집입니다."
+			);
+		}
+
+		// 4) UserRestaurant 새로 생성
 		UserRestaurant userRestaurant = UserRestaurant.builder()
-				.user(user)
-				.restaurant(savedRestaurant)
-				.visitedCount(requestDto.getVisitedCount()) // 기본값 0
-				.build();
+			.user(user)
+			.restaurant(restaurant)
+			.visitedCount(requestDto.getVisitedCount()) // 기본값 0
+			.build();
 
-		UserRestaurant savedUserRestaurant = userRestaurantRepository.save(userRestaurant);
+		userRestaurantRepository.save(userRestaurant);
 
-		// 4) Menu 목록 등록
+		// 5) Menu 목록 등록
+		//   만약 “Restaurant가 처음 생겼을 때만 Menu를 추가”한다면,
+		//   “if (!existingRestaurantOpt.isPresent()) { ... }” 조건으로 분기할 수도 있음.
 		if (requestDto.getMenu() != null && !requestDto.getMenu().isEmpty()) {
 			requestDto.getMenu().forEach(menuDto -> {
 				Menu menu = Menu.builder()
-						.menuName(menuDto.getMenuName())
-						.menuPrice(menuDto.getMenuPrice())
-						.menuImage(menuDto.getMenuImage())
-						.restaurant(savedRestaurant)
-						.build();
+					.menuName(menuDto.getMenuName())
+					.menuPrice(menuDto.getMenuPrice())
+					.menuImage(menuDto.getMenuImage())
+					.restaurant(restaurant) // 재사용 or 새로 만든 Restaurant
+					.build();
 				menuRepository.save(menu);
 			});
 		}
 
-		// 5) CustomMenu 목록 등록
+		// 6) CustomMenu 목록 등록
+		//   마찬가지로 “if userRestaurant가 새로 생겼을 때만” 등 정책에 따라 분기 가능
 		if (requestDto.getCustomMenu() != null && !requestDto.getCustomMenu().isEmpty()) {
 			requestDto.getCustomMenu().forEach(customDto -> {
 				CustomMenu customMenu = CustomMenu.builder()
-						.customMenuName(customDto.getCustomMenuName())
-						.customMenuPrice(customDto.getCustomMenuPrice())
-						.customMenuImage(customDto.getCustomMenuImage())
-						.userRestaurant(savedUserRestaurant)
-						.build();
+					.customMenuName(customDto.getCustomMenuName())
+					.customMenuPrice(customDto.getCustomMenuPrice())
+					.customMenuImage(customDto.getCustomMenuImage())
+					.userRestaurant(userRestaurant)
+					.build();
 				customMenuRepository.save(customMenu);
 			});
 		}
 
 		log.info("맛집 등록 완료. restaurantId={}, userId={}",
-				savedRestaurant.getId(), user.getId());
+			restaurant.getId(), user.getId());
 	}
+
 
 	/**
 	 * 맛집 해제(삭제) 로직
@@ -119,12 +159,20 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 		// 1) 사용자 조회
 		User user = userRepo.findById((long) requestDto.getUserId())
-				.orElseThrow(() -> new RuntimeException("해당 user가 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_USER,
+				"userId",
+				"해당 user가 존재하지 않습니다."
+			));
 
 		// 2) userId + restaurantId 로 UserRestaurant 조회
 		UserRestaurant userRestaurant = userRestaurantRepository
-				.findByUser_IdAndRestaurant_Id(user.getId(), requestDto.getRestaurantId())
-				.orElseThrow(() -> new RuntimeException("등록된 맛집 정보가 없습니다."));
+			.findByUser_IdAndRestaurant_Id(user.getId(), requestDto.getRestaurantId())
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_RESTAURANT,
+				"restaurantId",
+				"등록된 맛집 정보가 없습니다."
+			));
 
 		// 3) 관계 해제 + DB에서 삭제
 		userRestaurantRepository.delete(userRestaurant);
@@ -186,7 +234,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 	public RestaurantDetailResponseDto getRestaurantDetail(Long restaurantId) {
 		// 1) Restaurant 엔티티 조회
 		Restaurant restaurant = restaurantRepository.findById(restaurantId)
-				.orElseThrow(() -> new RuntimeException("해당 맛집이 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_RESTAURANT,  // 예) 400, "등록된 식당이 아닙니다."
+				"restaurantId",
+				"해당 맛집이 존재하지 않습니다."
+			));
 
 		// 2) DTO 변환
 		RestaurantDetailResponseDto detailDto = new RestaurantDetailResponseDto();
@@ -243,7 +295,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 		// 예) userId + restaurantId 로 UserRestaurant 조회
 		UserRestaurant userRestaurant = userRestaurantRepository
 				.findByUser_IdAndRestaurant_Id(requestDto.getUserId(), requestDto.getRestaurantId())
-				.orElseThrow(() -> new RuntimeException("등록되지 않은 맛집입니다."));
+				.orElseThrow(() -> new CustomException(
+					ResponseCode.NO_EXIST_RESTAURANT,
+					"restaurantId",
+					"등록되지 않은 맛집입니다."
+				));
 
 		CustomMenu customMenu = CustomMenu.builder()
 				.customMenuName(requestDto.getCustomMenuName())
@@ -263,8 +319,15 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Transactional
 	public void deleteCustomMenu(Long customId) {
 		if (!customMenuRepository.existsById(customId)) {
-			throw new RuntimeException("해당 커스텀 메뉴가 존재하지 않습니다.");
+			// 기존: throw new RuntimeException("해당 커스텀 메뉴가 존재하지 않습니다.");
+			// 수정 후:
+			throw new CustomException(
+				ResponseCode.NO_EXIST_CUSTOM_MENU,  // 혹은 다른 적절한 코드
+				"customId",
+				"해당 커스텀 메뉴가 존재하지 않습니다."
+			);
 		}
+
 		customMenuRepository.deleteById(customId);
 		log.info("커스텀 메뉴 삭제 완료. customId={}", customId);
 	}

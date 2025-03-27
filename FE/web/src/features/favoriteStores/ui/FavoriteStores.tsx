@@ -2,7 +2,8 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFetchFavoriteStores } from '../api/useFetchFavoriteStores';
+import { useFetchFavoriteStores } from '@/entity/store/api/useFetchFavoriteStores';
+import Image from 'next/image';
 
 export const FavoriteStores = () => {
   const { favoriteStores } = useFetchFavoriteStores();
@@ -19,7 +20,9 @@ export const FavoriteStores = () => {
                   <p>가게명: {place_name}</p>
                   <p>주소: {address_name}</p>
                   <p>방문 횟수: {visited_count}</p>
-                  <div>이미지 주소: {main_image_url}</div>
+                  <div>
+                    <Image src={main_image_url} width={200} height={200} alt="이미지" />
+                  </div>
                 </div>
               </div>
             </Label>

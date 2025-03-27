@@ -1,4 +1,4 @@
-export type FavoriteStores = {
+export type TFavoriteStores = {
   id: number;
   place_name: string;
   main_image_url: string;

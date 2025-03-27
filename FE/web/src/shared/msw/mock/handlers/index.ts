@@ -1,6 +1,7 @@
+import { giftHandlers } from './gift';
 import { storeHandlers } from './store';
 
-export const handlers = [...storeHandlers];
+export const handlers = [...storeHandlers, ...giftHandlers];
 
 // 예제
 // export const handlers = [
