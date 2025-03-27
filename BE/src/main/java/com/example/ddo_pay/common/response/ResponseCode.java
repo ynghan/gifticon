@@ -61,6 +61,10 @@ public enum ResponseCode {
     SUCCESS_REGISTER_DDOPAY(successCode(), HttpStatus.OK, "또페이 생성 및 비밀번호 등록이 완료되었습니다."),
     INVALID_PAY_PASSWORD(3000, HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호의 형식이 올바르지 않습니다."),
     ALREADY_REGISTERED_DDOPAY(1004, HttpStatus.BAD_REQUEST, "이미 또페이가 등록되어 있습니다."),
+    REDIS_NOT_FOUND(400, HttpStatus.BAD_REQUEST, "Redis에 값이 존재하지 않습니다."),
+    INVALID_REDIS_FORMAT(1004, HttpStatus.BAD_REQUEST, "Redis에 저장된 형식이 올바르지 않습니다."),
+    NOT_VERIFIED_ACCOUNT(1005, HttpStatus.BAD_REQUEST, "계좌 인증이 완료되지 않았습니다."),
+    NO_EXIST_DDOPAY(1500, HttpStatus.BAD_REQUEST, "연결된 또페이를 찾을 수 없습니다."),
 
     // 기프티콘
     SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),

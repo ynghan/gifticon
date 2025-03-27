@@ -1,15 +1,18 @@
 package com.example.ddo_pay.pay.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// 사용자가 계좌 등록 시 작성한 계좌를 담아서 보냄
+
+// 계좌 인증 후 랜덤 단어 확인 요청
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountVerifyRequest {
+@Builder
+public class RandomWordRequest {
     private Long userId;
-    private String accountNo;
+    private String randomWord;
 }
