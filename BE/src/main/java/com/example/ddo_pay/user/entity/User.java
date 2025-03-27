@@ -57,6 +57,12 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private DdoPay ddoPay; // 또페이와 1 대 1
 
+    public void changeDdoPay(DdoPay ddoPay) {
+        this.ddoPay = ddoPay;
+        ddoPay.setUser(this);
+    }
+
+
     public void changePrivateInfo(UserDto userDto) {
         if (userDto.getName() != null) {
             this.name = userDto.getName();

@@ -2,6 +2,7 @@ package com.example.ddo_pay.pay.entity;
 
 import com.example.ddo_pay.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,16 @@ public class DdoPay {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder
+    public DdoPay(Long id, int balance, int point, String payPassword, User user) {
+        this.id = id;
+        this.balance = balance;
+        this.point = point;
+        this.payPassword = payPassword;
+        this.user = user;
+    }
+
+    public void setUser(User user) {
+    }
 }

@@ -6,16 +6,15 @@ import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.BalanceChargeRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
+import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
 import com.example.ddo_pay.pay.dto.response.BalanceResponse;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
-import com.example.ddo_pay.pay.dto.response.RegisterPasswordRequest;
 import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_VERIFY_ACCOUNT;
 
 @RestController
 @RequestMapping("/api/pay")
@@ -50,7 +49,13 @@ public class PayController {
     }
 
 
-
+    // 비밀번호 등록 및 또페이 생성
+    @PostMapping("/password")
+    public ResponseEntity<?> registerPassword(@RequestBody RegisterPasswordRequest request) {
+        Long userId = SecurityUtil.getUserId();
+        payService.registerPayPassword(userId, request);
+        return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_REGISTER_DDOPAY, null));
+    }
 
 
 
@@ -144,13 +149,7 @@ public class PayController {
 
     }
 
-    // 결제 비밀번호 등록
-    @PostMapping({"/password"})
-    public ResponseEntity<?> registerPassword(@RequestBody RegisterPasswordRequest request) {
-        Response<?> response = Response.create(ResponseCode.SUCCESS_REGISTER_PASSWORD, null);
-        return ResponseEntity.status(200).body(response);
 
-    }
 
     // 잔액 충전 (PATCH /api/pay/balance)
     @PatchMapping("/balance")

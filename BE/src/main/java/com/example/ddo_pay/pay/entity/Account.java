@@ -1,6 +1,7 @@
 package com.example.ddo_pay.pay.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
