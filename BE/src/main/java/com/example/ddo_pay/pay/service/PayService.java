@@ -12,4 +12,6 @@ public interface PayService {
 
     // 비밀번호 등록 및 또페이 생성
     void registerPayPassword(Long userId, RegisterPasswordRequest request);
+
+
 }
