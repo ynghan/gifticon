@@ -11,6 +11,8 @@ import { SquareMenu } from 'lucide-react';
 import { useMapStore } from '@/store/useMapStore';
 import MyStores from './MyStores';
 import { useMarkersStore } from '@/store/useMarkerStore';
+import { TCategory } from '../model/category';
+import MyGifts from './MyGifts';
 
 export const KakaoMap = () => {
   useKakaoLoader({
@@ -20,14 +22,16 @@ export const KakaoMap = () => {
 
   const { map, setMap } = useMapStore();
   const { markers, setMarkers } = useMarkersStore();
-  const [category, setCategory] = useState<string | null>(null);
+  const [category, setCategory] = useState<TCategory>(null);
   const [center, setCenter] = useState<Coordinates>({ lat: 35.095326, lng: 128.855668 });
 
-  const handleCategory = () => {
+  const handleCategory = (value: TCategory) => {
     //FIXME - 추후 토글이나 다른 방식으로 변경경
-    if (category !== 'FD6') {
-      setCategory('FD6');
-      searchStores();
+    if (category !== value) {
+      setCategory(value);
+      if (value === 'FD6') {
+        searchStores();
+      }
     } else {
       setCategory(null);
       setMarkers([]);
@@ -87,11 +91,6 @@ export const KakaoMap = () => {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isShow, setIsShow] = useState(false);
-
-  const handleMyStore = () => {
-    setIsShow(true);
-  };
 
   return (
     <div className="relative w-full h-full">
@@ -115,23 +114,27 @@ export const KakaoMap = () => {
           <CollapsibleContent className="flex flex-col space-y-2">
             <Button
               className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm"
-              onClick={handleMyStore}
+              onClick={() => handleCategory('store')}
             >
               나만의 또갈집
             </Button>
             <Button
               className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm"
-              onClick={handleCategory}
+              onClick={() => handleCategory('FD6')}
             >
               근처 가게
             </Button>
-            <Button className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+            <Button
+              className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm"
+              onClick={() => handleCategory('gift')}
+            >
               기프티콘 가게
             </Button>
           </CollapsibleContent>
         </Collapsible>
         {markers.length > 0 && <Places markers={markers} changeCenter={changeCenter} />}
-        {isShow && <MyStores changeCenter={changeCenter} />}
+        {category === 'store' && <MyStores changeCenter={changeCenter} />}
+        {category === 'gift' && <MyGifts changeCenter={changeCenter} />}
       </Map>
     </div>
   );

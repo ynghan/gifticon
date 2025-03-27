@@ -35,7 +35,8 @@ public class UserRestaurant  {
 
 
     @Builder
-    public UserRestaurant(Integer visitedCount, User user, Restaurant restaurant) {
+    public UserRestaurant(Long id,Integer visitedCount, User user, Restaurant restaurant) {
+        this.id = id;
         this.visitedCount = visitedCount;
         this.user = user;
         this.restaurant = restaurant;

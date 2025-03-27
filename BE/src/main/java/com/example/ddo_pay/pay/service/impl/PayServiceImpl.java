@@ -1,11 +1,17 @@
 package com.example.ddo_pay.pay.service.impl;
 
+import com.example.ddo_pay.common.exception.CustomException;
+import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.RedisHandler;
 import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
-import com.example.ddo_pay.pay.dto.request.RandomWordRequest;
+import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.entity.DdoPay;
 import com.example.ddo_pay.pay.finance_api.FinanceClient;
+import com.example.ddo_pay.pay.repository.DdoPayRepository;
 import com.example.ddo_pay.pay.service.PayService;
+import com.example.ddo_pay.user.entity.User;
+import com.example.ddo_pay.user.service.impl.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +30,9 @@ public class PayServiceImpl implements PayService {
     private final FinanceClient financeClient;
     private final RedisHandler redisHandler;
     private final ObjectMapper objectMapper;
+    private final DdoPayRepository ddoPayRepository;
+    private final UserRepository userRepository;
+
 
     // 유효 계좌 인증
     @Override
@@ -72,6 +81,7 @@ public class PayServiceImpl implements PayService {
         }
     }
 
+
     // 랜덤 영단어 api 호출
     private String generateRandomMemo() {
         String[] response = restTemplate.getForObject("https://random-word-api.herokuapp.com/word", String[].class);
@@ -79,12 +89,38 @@ public class PayServiceImpl implements PayService {
     }
 
 
-    // 계좌 등록 로직
+    // 비밀번호 등록 및 또페이 생성
     @Override
-    public void registerAccount(Long userId, RandomWordRequest request) {
-        String randomWord = request.getRandomWord(); // 사용자가 작성해서 보낸 단어
+    public void registerPayPassword(Long userId, RegisterPasswordRequest request) {
+        String password = request.getPassword();
 
 
+        // 비밀번호 6자리 숫자인지 검증
+        if (!password.matches("^\\d{6}$")) {
+            throw new CustomException(ResponseCode.INVALID_PAY_PASSWORD);
+        }
+
+        // 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+
+        // 이미 또페이가 등록되어 있다면 예외 처리
+        if (ddoPayRepository.existsByUser(user)) {
+            throw new CustomException(ResponseCode.ALREADY_REGISTERED_DDOPAY);
+        }
+
+        // 또페이 생성
+        DdoPay ddoPay = DdoPay.builder()
+                .user(user)
+                .balance(0)
+                .point(0)
+                .payPassword(password)
+                .build();
+
+        // 양방향 연관 관계 설정
+        user.changeDdoPay(ddoPay);
+
+        ddoPayRepository.save(ddoPay);
     }
 
 

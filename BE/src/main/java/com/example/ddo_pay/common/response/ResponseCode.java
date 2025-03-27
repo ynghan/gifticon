@@ -40,6 +40,8 @@ public enum ResponseCode {
     SUCCESS_DELETE_CUSTOM_MENU(200, HttpStatus.OK, "커스텀 메뉴 삭제되었습니다."),
     SUCCESS_CRAWLING_RESTAURANT(200, HttpStatus.OK, "가게 상세 정보 조회(크롤링) 성공."),
     NO_EXIST_RESTAURANT(400, HttpStatus.BAD_REQUEST, "등록된 사용자가 아닙니다."),
+    DATA_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 데이터가 존재합니다."),
+    NO_EXIST_CUSTOM_MENU(400, HttpStatus.BAD_REQUEST, "해당 커스텀 메뉴가 존재하지 않습니다."),
 
 
     // 페이 도메인
@@ -56,8 +58,9 @@ public enum ResponseCode {
     FINANCE_API_ERROR(1500, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 요청 실패"),
     FINANCE_PARSING_ERROR(1501, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 응답 파싱 중 오류가 발생했습니다."),
     UNKNOWN_ERROR(1999, HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다."),
-
-
+    SUCCESS_REGISTER_DDOPAY(successCode(), HttpStatus.OK, "또페이 생성 및 비밀번호 등록이 완료되었습니다."),
+    INVALID_PAY_PASSWORD(3000, HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호의 형식이 올바르지 않습니다."),
+    ALREADY_REGISTERED_DDOPAY(1004, HttpStatus.BAD_REQUEST, "이미 또페이가 등록되어 있습니다."),
 
     // 기프티콘
     SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),
