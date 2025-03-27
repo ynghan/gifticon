@@ -1,5 +1,3 @@
-import { BottomBar } from '@/widgets/bottomBar';
-
 export default function NoLayout({
   children,
 }: Readonly<{
