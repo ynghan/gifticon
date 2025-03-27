@@ -76,7 +76,7 @@ public class GiftServiceImpl implements GiftService {
         GiftBox giftBox = new GiftBox(user, gift);
         giftBoxRepository.save(giftBox);
 
-        gift.setGiftBox(giftBox);
+        gift.changeGiftBox(giftBox);
         giftRepository.save(gift);
 
 
@@ -113,13 +113,35 @@ public class GiftServiceImpl implements GiftService {
         }
     }
 
+    /**
+     * 1. 시큐리티에서 userId 꺼내기
+     * 2. userId로 DB 조회, user Entity 조회
+     * 3. user.getGiftBoxList()
+     * 4. iter giftbox entitiy
+     * 5. 만료 기간, 현재시간 비교
+     * 6. 상태 변경
+     * 7. db 저장
+     * 8. 응답
+     */
     @Override
     public List<GiftSelectResponseDto> selectMyList(Long userId) {
-        User findUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
-        List<Gift> findList = giftRepository.findByUser(findUser);
-        List<GiftSelectResponseDto> dtoList = new ArrayList<>();
 
-        for (Gift gift : findList) {
+        // 1. userId로 DB 조회, user Entity 조회
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        // 2. user.getGiftBoxList()
+        List<GiftBox> giftBoxList = findUser.getGiftBoxList();
+
+        // 3. iter giftbox entitiy
+        List<GiftSelectResponseDto> dtoList = new ArrayList<>();
+        for (GiftBox giftBox : giftBoxList) {
+            Gift gift = giftBox.getGift();
+            // 4. 만료 기간, 현재시간 비교
+            if(!isGiftOver(gift)) { // 만료일이 지난 경우
+                // 5. 상태 변경
+                gift.changeUsedStatus();
+                // 6. DB 저장
+                giftRepository.save(gift);
+            }
             GiftSelectResponseDto dto = GiftSelectResponseDto.from(gift);
             dtoList.add(dto);
         }
@@ -147,10 +169,15 @@ public class GiftServiceImpl implements GiftService {
                 .available(isUsable).build();
     }
 
+    // 기프티콘 만료 확인 메서드
+    private boolean isGiftOver(Gift gift) {
+        return gift.getExpirationDate().isBefore(LocalDateTime.now());
+    }
+
     // 기프티콘 사용 가능 여부 검증 메서드
     private boolean isGiftUsable(Gift gift, GiftCheckRequestDto dto) {
         // 1. 유효기간 만료 확인
-        if (gift.getExpirationDate().isBefore(LocalDateTime.now())) {
+        if (isGiftOver(gift)) {
             return false;
         }
 
