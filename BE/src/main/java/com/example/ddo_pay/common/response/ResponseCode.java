@@ -58,8 +58,9 @@ public enum ResponseCode {
     FINANCE_API_ERROR(1500, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 요청 실패"),
     FINANCE_PARSING_ERROR(1501, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 응답 파싱 중 오류가 발생했습니다."),
     UNKNOWN_ERROR(1999, HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다."),
-
-
+    SUCCESS_REGISTER_DDOPAY(successCode(), HttpStatus.OK, "또페이 생성 및 비밀번호 등록이 완료되었습니다."),
+    INVALID_PAY_PASSWORD(3000, HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호의 형식이 올바르지 않습니다."),
+    ALREADY_REGISTERED_DDOPAY(1004, HttpStatus.BAD_REQUEST, "이미 또페이가 등록되어 있습니다."),
 
     // 기프티콘
     SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),

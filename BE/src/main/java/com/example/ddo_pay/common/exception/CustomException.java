@@ -26,11 +26,11 @@ public class CustomException extends NestedRuntimeException {
 
     public ErrorResponse toErrorResponse() {
         return ErrorResponse.builder()
-            .errorCode(String.valueOf(responseCode.getCode()))
-            .message(content != null ? content.getMessage() : responseCode.getMessage())
-            .field(content != null ? content.getField() : null)
-            .timestamp(LocalDateTime.now())
-            .build();
+                .errorCode(String.valueOf(responseCode.getCode()))
+                .message(content != null ? content.getMessage() : responseCode.getMessage())
+                .field(content != null ? content.getField() : null)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
 
