@@ -5,7 +5,7 @@ import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.BalanceChargeRequest;
-import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
+import com.example.ddo_pay.pay.dto.request.RandomWordRequest;
 import com.example.ddo_pay.pay.dto.response.BalanceResponse;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
@@ -14,8 +14,6 @@ import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static com.example.ddo_pay.common.response.ResponseCode.SUCCESS_VERIFY_ACCOUNT;
 
 @RestController
 @RequestMapping("/api/pay")
@@ -26,7 +24,7 @@ public class PayController {
 
 
     /*
-    * 유효한 계좌인지 인증 api
+    * 유효한 계좌 인증 api
     * 1. 사용자가 계좌번호를 작성한다
     * 2. 프론트에서 백으로 계좌번호를 보낸다.
     * 3. 백에서 랜덤한 단어를 이체 메모에 넣어서 1원 입금 계좌이체, redis에 랜덤한 단어와 userId, 계좌번호 담기
@@ -49,7 +47,18 @@ public class PayController {
         return new ResponseEntity<>(Response.create(responseCode, null), responseCode.getHttpStatus());
     }
 
+    /*
+    * 본인 계좌 확인 후 계좌 등록 api
+    * 1. 본인 계좌로 들어간 이체 내역의 메모를 확인한다.
+    * 2. 메모에 적힌 랜덤한 단어를 사용자가 작성하여 프론트가 백으로 보낸다
+    * 3. 레디스에서 userId로 조회하여 word를 가져와서 비교한다.
+    * 4. 같은 단어라면 DB에 계좌 등록 후 성공 코드 반환
+    * */
+    @PostMapping("/account")
+    public void registerAccount(@RequestBody RandomWordRequest request) {
+        Long userId = SecurityUtil.getUserId();
 
+    }
 
 
 
@@ -124,22 +133,6 @@ public class PayController {
     @DeleteMapping("/{accountId}")
     public ResponseEntity<?> deleteRegisteredAccount(@PathVariable("accountId") int accountId) {
         Response<?> response = Response.create(ResponseCode.SUCCESS_DELETE_ACCOUNT, null);
-        return ResponseEntity.status(200).body(response);
-
-    }
-
-    // 새로운 계좌 등록
-    @PostMapping({"/account"})
-    public ResponseEntity<?> registerNewAccount(@RequestBody RegisterAccountRequest request) {
-        Response<?> response = Response.create(ResponseCode.SUCCESS_REGISTER_ACCOUNT, null);
-        return ResponseEntity.status(200).body(response);
-
-    }
-
-    // 기프티콘 환불 요청
-    @PostMapping({"/refund"})
-    public ResponseEntity<?> refundGift(@RequestBody RegisterAccountRequest request) {
-        Response<?> response = Response.create(ResponseCode.SUCCESS_REFUND_GIFT, null);
         return ResponseEntity.status(200).body(response);
 
     }

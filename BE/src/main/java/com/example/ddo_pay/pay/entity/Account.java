@@ -14,7 +14,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String bank; // 은행 이름
     private String accountNum; // 계좌 번호
 
     @ManyToOne(fetch = FetchType.LAZY)

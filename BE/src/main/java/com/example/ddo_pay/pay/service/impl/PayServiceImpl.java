@@ -1,8 +1,9 @@
 package com.example.ddo_pay.pay.service.impl;
 
 import com.example.ddo_pay.common.util.RedisHandler;
-import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequestDto;
+import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
+import com.example.ddo_pay.pay.dto.request.RandomWordRequest;
 import com.example.ddo_pay.pay.finance_api.FinanceClient;
 import com.example.ddo_pay.pay.service.PayService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +31,7 @@ public class PayServiceImpl implements PayService {
         String accountNumber = request.getAccountNo();
         String randomMemo = generateRandomMemo(); // 랜덤 단어 생성
 
-        DepositAccountWithdrawRequestDto dto = DepositAccountWithdrawRequestDto.of(accountNumber, randomMemo);
+        DepositAccountWithdrawRequest dto = DepositAccountWithdrawRequest.of(accountNumber, randomMemo);
 
         ResponseEntity<?> response = financeClient.sendOneWonTransfer(dto);
 
@@ -71,11 +72,19 @@ public class PayServiceImpl implements PayService {
         }
     }
 
-
     // 랜덤 영단어 api 호출
     private String generateRandomMemo() {
         String[] response = restTemplate.getForObject("https://random-word-api.herokuapp.com/word", String[].class);
         return (response != null && response.length > 0) ? response[0] : "default";
+    }
+
+
+    // 계좌 등록 로직
+    @Override
+    public void registerAccount(Long userId, RandomWordRequest request) {
+        String randomWord = request.getRandomWord(); // 사용자가 작성해서 보낸 단어
+
+
     }
 
 
