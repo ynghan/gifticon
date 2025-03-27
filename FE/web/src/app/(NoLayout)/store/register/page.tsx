@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CustomMenuForm } from '@/features/menuForm/ui/CustomMenuForm';
+import { FadeUpContainer } from '@/widgets/fadeUpContainer';
 import { X } from 'lucide-react';
-import { motion } from 'motion/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -78,11 +78,7 @@ export default function page() {
   };
 
   return (
-    <motion.div
-      className="flex flex-col h-full items-center"
-      initial={{ transform: 'translateY(100%)' }}
-      animate={{ transform: 'translateY(0)' }}
-    >
+    <FadeUpContainer className="flex flex-col h-full items-center">
       <div className="relative w-full bg-amber-50">
         <Button variant={'ghost'} className="absolute top-4 left-4" onClick={() => router.back()}>
           <X className="size-6" />
@@ -129,6 +125,6 @@ export default function page() {
       <h2 className="font-semibold text-lg mb-2">나만의 메뉴 추가하기</h2>
       <CustomMenuForm addCustomMenu={addCustomMenu} />
       <Button className="fixed bottom-0 w-full h-20 ">등록하기</Button>
-    </motion.div>
+    </FadeUpContainer>
   );
 }
