@@ -40,6 +40,8 @@ public enum ResponseCode {
     SUCCESS_DELETE_CUSTOM_MENU(200, HttpStatus.OK, "커스텀 메뉴 삭제되었습니다."),
     SUCCESS_CRAWLING_RESTAURANT(200, HttpStatus.OK, "가게 상세 정보 조회(크롤링) 성공."),
     NO_EXIST_RESTAURANT(400, HttpStatus.BAD_REQUEST, "등록된 사용자가 아닙니다."),
+    DATA_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 데이터가 존재합니다."),
+    NO_EXIST_CUSTOM_MENU(400, HttpStatus.BAD_REQUEST, "해당 커스텀 메뉴가 존재하지 않습니다."),
 
 
     // 페이 도메인
