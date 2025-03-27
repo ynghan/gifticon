@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@s77rt/react-native-contacts": "^0.1.1",
     "react": "19.0.0",
     "react-native": "0.78.0",
     "react-native-permissions": "^5.2.6",

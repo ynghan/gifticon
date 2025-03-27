@@ -18,7 +18,7 @@ export default function page() {
       <Button className="absolute top-4 left-4" onClick={() => router.back()}>
         <X />
       </Button>
-      <GiftForm />
+      <GiftForm /> 
     </motion.div>
   );
 }

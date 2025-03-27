@@ -1,12 +1,17 @@
-import React, {useEffect} from 'react';
-import {WebView} from 'react-native-webview';
-import {checkCameraAndAudioPermissions} from './src/shared/utils/CheckCameraAndAudioPermissions';
-import checkContactsPermission from './src/shared/utils/CheckContactsPermission ';
-import checkLocationPermission from './src/shared/utils/CheckLocationPermission';
-import checkNotificationPermission from './src/shared/utils/CheckNotificationPermission';
-import checkStoragePermission from './src/shared/utils/CheckPhotoStoragePermission';
+import React, {useEffect, useRef, useCallback} from 'react';
+import {WebView, WebViewMessageEvent} from 'react-native-webview';
+import {
+  checkCameraAndAudioPermissions,
+  checkContactsPermission,
+  checkLocationPermission,
+  checkNotificationPermission,
+  checkStoragePermission,
+} from './src/shared/utils/';
+import {handleWebViewMessage} from './src/features/contactServices';
+
 function App() {
-  
+  const webViewRef = useRef<WebView>(null);
+
   useEffect(() => {
     const authorize = async () => {
       await checkLocationPermission();
@@ -17,9 +22,20 @@ function App() {
     };
     authorize();
   }, []);
+  const onMessage = useCallback((event: WebViewMessageEvent) => {
+    handleWebViewMessage(event, message => {
+      webViewRef.current?.postMessage(message);
+    });
+  }, []);
 
   return (
-    <WebView source={{uri: 'http://192.168.56.1:3000'}} style={{flex: 1}} />
+    <WebView
+      source={{uri: 'http://localhost:3001'}}
+      style={{flex: 1}}
+      javaScriptEnabled={true}
+      onMessage={onMessage}
+      ref={webViewRef}
+    />
   );
 }
 
