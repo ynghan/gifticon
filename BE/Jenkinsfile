@@ -25,6 +25,17 @@ pipeline {
             }
         }
 
+        stage('Copy Secret File') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
+                        // 리소스 경로에 application.yml 복사
+                        sh 'cp $APP_YML ./BE/ddo-pay/src/main/resources/application.yml'
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 dir("${WORKSPACE_DIR}") {
