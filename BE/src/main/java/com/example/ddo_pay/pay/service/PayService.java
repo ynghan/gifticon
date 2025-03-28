@@ -5,9 +5,12 @@ import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
 
+import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface PayService {
@@ -28,5 +31,6 @@ public interface PayService {
     // 포인트 조회
     GetPointResponse selectPoint(Long userId);
 
-
+    // 연결된 계좌 조회
+    List<GetAccountResponse> selectAccountList(Long userId);
 }

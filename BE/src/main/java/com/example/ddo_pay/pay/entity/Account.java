@@ -21,7 +21,8 @@ public class Account {
     private DdoPay ddoPay;
 
     @Builder
-    public Account(String accountNum, DdoPay ddoPay) {
+    public Account(Long id, String accountNum, DdoPay ddoPay) {
+        this.id = id;
         this.accountNum = accountNum;
         this.ddoPay = ddoPay;
     }
