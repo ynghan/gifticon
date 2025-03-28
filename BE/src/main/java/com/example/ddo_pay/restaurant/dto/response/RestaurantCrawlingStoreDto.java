@@ -1,6 +1,8 @@
 package com.example.ddo_pay.restaurant.dto.response;
 
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -14,7 +16,9 @@ public class RestaurantCrawlingStoreDto {
 	private String addressName;       // 3. 매장 주소
 	private ResponsePositionDto position; // 4. 매장 경도, 위도
 	private String storeInfo;     // 5. 매장 소개
-
+	private BigDecimal starRating;
+	private String userIntro;
+	private String placeId;
 	// 메뉴 탭 목록
 	private List<RestaurantCrawlingMenuDto> menus;
 }
