@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.ddo_pay.restaurant.dto.response.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +15,6 @@ import com.example.ddo_pay.restaurant.dto.request.CustomMenuRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantCrawlingRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantCreateRequestDto;
 import com.example.ddo_pay.restaurant.dto.request.RestaurantDeleteRequestDto;
-import com.example.ddo_pay.restaurant.dto.response.MenuResponseDto;
-import com.example.ddo_pay.restaurant.dto.response.ResponsePositionDto;
-import com.example.ddo_pay.restaurant.dto.response.RestaurantCrawlingResponseDto;
-import com.example.ddo_pay.restaurant.dto.response.RestaurantCrawlingStoreDto;
-import com.example.ddo_pay.restaurant.dto.response.RestaurantDetailResponseDto;
-import com.example.ddo_pay.restaurant.dto.response.RestaurantListItemResponseDto;
 import com.example.ddo_pay.restaurant.entity.CustomMenu;
 import com.example.ddo_pay.restaurant.entity.Menu;
 import com.example.ddo_pay.restaurant.entity.Restaurant;
@@ -332,35 +327,49 @@ public class RestaurantServiceImpl implements RestaurantService {
 		log.info("커스텀 메뉴 삭제 완료. customId={}", customId);
 	}
 
-	/**
-	 * 크롤링 정보 조회 (예시)
-	 */
 	@Override
-	@Transactional(readOnly = true)
-	public RestaurantCrawlingResponseDto getCrawlingInfo(List<RestaurantCrawlingRequestDto> requestList) {
+	@Transactional
+	public void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId) {
+		// 1) 유저 조회
+		User user = userRepo.findById(userId)
+				.orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
 
-		RestaurantCrawlingResponseDto response = new RestaurantCrawlingResponseDto();
-		List<RestaurantCrawlingStoreDto> stores = new ArrayList<>();
+		// 2) Restaurant 빌더로 생성/저장
+		Restaurant restaurant = Restaurant.builder()
+				.placeName(storeDto.getPlaceName())
+				.addressName(storeDto.getAddressName())
+				.mainImageUrl(storeDto.getMainImageUrl())
+				.lat(storeDto.getPosition() != null ? storeDto.getPosition().getLat() : null)
+				.lng(storeDto.getPosition() != null ? storeDto.getPosition().getLng() : null)
+				.userIntro(storeDto.getUserIntro())
+				.starRating(storeDto.getStarRating())
+				.build();
 
-		for (RestaurantCrawlingRequestDto req : requestList) {
-			// 가령, 외부 API(NaverCrawlingService 등) 호출해서 데이터 매핑
-			RestaurantCrawlingStoreDto store = new RestaurantCrawlingStoreDto();
+		restaurantRepository.save(restaurant);
 
-			// placeName, addressName은 req 객체의 필드를 바로 사용
-			store.setPlaceName(req.getPlaceName());
-			store.setAddressName(req.getAddressName());
+		// 3) 메뉴 목록
+		if (storeDto.getMenus() != null) {
+			for (RestaurantCrawlingMenuDto menuDto : storeDto.getMenus()) {
+				Menu menu = Menu.builder()
+						.menuName(menuDto.getMenuName())
+						// menuPrice, menuImage 등도 필요하면 세팅
+						.restaurant(restaurant)
+						.build();
 
-			// position에는 lat/lng만
-			ResponsePositionDto pos = new ResponsePositionDto();
-			pos.setLat(req.getPosition().getLat());
-			pos.setLng(req.getPosition().getLng());
-			store.setPosition(pos);
-
-			stores.add(store);
+				menuRepository.save(menu);
+			}
 		}
 
-		response.setStores(stores);
-		return response;
+		// 4) userRestaurant 빌더로 생성/저장
+		UserRestaurant userRestaurant = UserRestaurant.builder()
+				.user(user)
+				.restaurant(restaurant)
+				.build();
+
+		userRestaurantRepository.save(userRestaurant);
+
+		log.info("크롤링된 매장 저장 완료: {}, userId={}", restaurant.getPlaceName(), userId);
 	}
+
 
 }

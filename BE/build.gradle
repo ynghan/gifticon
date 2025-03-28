@@ -28,7 +28,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	// runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,18 +38,21 @@ dependencies {
 
 	// Selenium
 	implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
-
-	// WebDriverManager (자동 버전 맞춤)
 	implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
 
-	
 	// security 의존성, 시큐리티 이슈 발생 시 아래 의존성 주석처리
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// MapStruct 매퍼
+	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
+	// ★ 추가 1) OkHttp
+	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+	// ★ 추가 2) (선택) Jackson databind – 이미 spring-boot-starter-web이 Jackson을 포함하지만,
+	//          버전을 명시하거나 외부에서 사용을 명확히 하고 싶다면 아래처럼 추가.
+	// implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 }
 
 tasks.named('test') {
