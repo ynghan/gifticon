@@ -6,6 +6,8 @@ import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
+import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +58,22 @@ public class PayController {
         return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_REGISTER_DDOPAY, null));
     }
 
+    // 잔고 조회
+    @GetMapping("/balance")
+    public ResponseEntity<?> selectBalance() {
+        Long userId = SecurityUtil.getUserId();
+        GetBalanceResponse response = payService.selectBalance(userId);
+        return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_BALANCE_CHECK, response));
+    }
 
 
+    // 포인트 조회
+    @GetMapping("/point")
+    public ResponseEntity<?> selectPoint() {
+        Long userId = SecurityUtil.getUserId();
+        GetPointResponse response = payService.selectPoint(userId);
+        return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_POINT_CHECK, response));
+    }
 
 
 

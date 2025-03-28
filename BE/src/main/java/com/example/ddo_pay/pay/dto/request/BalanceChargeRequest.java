@@ -15,4 +15,6 @@ public class BalanceChargeRequest {
     private String accountAccount;
     private int amount;
     private String payPassword;
+
+    private int userId;
 }
