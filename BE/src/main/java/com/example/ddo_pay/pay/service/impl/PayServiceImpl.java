@@ -7,6 +7,7 @@ import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import com.example.ddo_pay.pay.entity.Account;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -198,6 +201,26 @@ public class PayServiceImpl implements PayService {
         int point = findUser.getDdoPay().getPoint();
         return new GetPointResponse(point);
     }
+
+    // 계좌 조회
+    @Override
+    public List<GetAccountResponse> selectAccountList(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+
+        // 사용자의 DdoPay 엔티티에서 계좌 목록 가져오기
+        List<Account> accountList = findUser.getDdoPay().getAccountList();
+
+        if (accountList.isEmpty()) {
+            throw new CustomException(ResponseCode.NO_EXIST_ACCOUNT); // NO_EXIST_ACCOUNT 코드가 ResponseCode에 정의되어 있어야 합니다.
+        }
+
+        // 각 Account를 GetAccountResponse로 변환하여 리스트 반환
+        return accountList.stream()
+                .map(GetAccountResponse::from)
+                .collect(Collectors.toList());
+    }
+
 
 
 }
