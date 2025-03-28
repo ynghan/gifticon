@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// 회원가입 후 결제 비밀번호 등록 시,
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class RegisterPasswordRequest {
-    private String password;
-
-    private int userId;
+    private Long userId;
+    private String password; // 6자리 숫자
 }

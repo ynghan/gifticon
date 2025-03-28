@@ -40,6 +40,8 @@ public enum ResponseCode {
     SUCCESS_DELETE_CUSTOM_MENU(200, HttpStatus.OK, "커스텀 메뉴 삭제되었습니다."),
     SUCCESS_CRAWLING_RESTAURANT(200, HttpStatus.OK, "가게 상세 정보 조회(크롤링) 성공."),
     NO_EXIST_RESTAURANT(400, HttpStatus.BAD_REQUEST, "등록된 사용자가 아닙니다."),
+    DATA_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 데이터가 존재합니다."),
+    NO_EXIST_CUSTOM_MENU(400, HttpStatus.BAD_REQUEST, "해당 커스텀 메뉴가 존재하지 않습니다."),
 
 
     // 페이 도메인
@@ -51,6 +53,18 @@ public enum ResponseCode {
     SUCCESS_REGISTER_PASSWORD(successCode(), HttpStatus.OK, "비밀번호 등록이 성공적으로 완료되었습니다."),
     SUCCESS_BALANCE_CHARGE(successCode(), HttpStatus.OK, "또페이 충전이 성공적으로 완료되었습니다."),
     SUCCESS_ACCOUNT_CHECK(successCode(), HttpStatus.OK, "계좌조회가 성공적으로 완료되었습니다."),
+    SUCCESS_VERIFY_ACCOUNT(200, HttpStatus.OK, "연결 가능한 계좌입니다."),
+    INVALID_ACCOUNT(1003, HttpStatus.OK, "유효하지 않은 계좌입니다."),
+    FINANCE_API_ERROR(1500, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 요청 실패"),
+    FINANCE_PARSING_ERROR(1501, HttpStatus.INTERNAL_SERVER_ERROR, "금융망 응답 파싱 중 오류가 발생했습니다."),
+    UNKNOWN_ERROR(1999, HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다."),
+    SUCCESS_REGISTER_DDOPAY(successCode(), HttpStatus.OK, "또페이 생성 및 비밀번호 등록이 완료되었습니다."),
+    INVALID_PAY_PASSWORD(3000, HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호의 형식이 올바르지 않습니다."),
+    ALREADY_REGISTERED_DDOPAY(1004, HttpStatus.BAD_REQUEST, "이미 또페이가 등록되어 있습니다."),
+    REDIS_NOT_FOUND(400, HttpStatus.BAD_REQUEST, "Redis에 값이 존재하지 않습니다."),
+    INVALID_REDIS_FORMAT(1004, HttpStatus.BAD_REQUEST, "Redis에 저장된 형식이 올바르지 않습니다."),
+    NOT_VERIFIED_ACCOUNT(1005, HttpStatus.BAD_REQUEST, "계좌 인증이 완료되지 않았습니다."),
+    NO_EXIST_DDOPAY(1500, HttpStatus.BAD_REQUEST, "연결된 또페이를 찾을 수 없습니다."),
 
     // 기프티콘
     SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),
@@ -60,8 +74,7 @@ public enum ResponseCode {
     SUCCESS_CHECK_GIFTICON(200, HttpStatus.OK, "기프티콘 사용여부가 조회되었습니다."),
     NO_EXIST_GIFTICON(400, HttpStatus.BAD_REQUEST, "등록된 기프티콘이 아닙니다."),
     NO_EXIST_GIFTBOX(400, HttpStatus.BAD_REQUEST, "받은 기프티콘이 아닙니다."),
-    // enum 마지막. 복붙하는 과정에서 ,/; 차이에서 오는 충돌 이슈를 방지하기 위해 만들어놓음
-    FINAL_FINAL(0, null, "enum 마지막 입니다. 쓰지 마세요");
+    EXPIRED_GIFTICON(400, HttpStatus.BAD_REQUEST, "기프티콘의 유효기간이 만료되었습니다.");
 
     private int code;
     private HttpStatus httpStatus;

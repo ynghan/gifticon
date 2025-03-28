@@ -1,44 +1,82 @@
-import React from 'react';
-import Form from 'next/form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { ArrowBigLeft } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+"use client";
+
+import React, { useState } from "react";
+import Form from "next/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { handleMessageToRn } from "../api/HandleContacts";
+import ContactList from "./ContactList";
 
 export const GiftForm = () => {
+  const [isShow, setIsShow] = useState(false);
+  const [selectedContact, setSelectedContact] = useState({
+    name: "누구에게 보낼까요?",
+    phoneNumber: "",
+  });
+  const handleContactBtn = () => {
+    handleMessageToRn();
+    setIsShow(true);
+  };
+
   return (
-    <section className="flex flex-col justify-between h-full">
-      <div className="relative flex justify-center h-8">
-        <ArrowBigLeft className="absolute left-4" />
+    <section className="flex flex-col justify-between w-full h-full">
+      <div className="flex justify-center h-8 mt-8">
         <h1>선물하기</h1>
       </div>
-      <Form action={''} className="h-full">
+      <Form action={""} className="h-full">
         <Input type="file" />
         <div>
-          <Label htmlFor="title">제목 *</Label>
-          <Input type="text" id="title" name="title" placeholder="제목을 입력해주세요" required />
+          <Label htmlFor="title">나만의 메뉴명 *</Label>
+          <Input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="메뉴명을 입력해주세요"
+            required
+          />
         </div>
         <Separator />
         <div>
-          <Label htmlFor="receiver">받는 사람 *</Label>
-          <select id="receiver" name="receiver" required>
-            <option>선택</option>
-            <option>010-1111-2222</option>
-            <option>010-1111-2224</option>
-            <option>010-1111-2223</option>
-          </select>
+          <p>받는 사람:</p>
+          <Button onClick={handleContactBtn}>{selectedContact.name}</Button>
         </div>
-        <div>
-          <Label htmlFor="menu">메뉴 *</Label>
-          <div>맛집 등록 때 저장된 메뉴판</div>
-        </div>
-        <div>
-          <Label htmlFor="message">메세지 *</Label>
-          <textarea id="message" name="message" placeholder="메세지로 마음을 전하세요!" required />
-        </div>
+        {!isShow ? (
+          <>
+            <div>
+              <Label htmlFor="title">가게 검색 *</Label>
+              <Input
+                type="search"
+                id="title"
+                name="title"
+                placeholder="가게명을 입력해주세요"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="message">메세지 *</Label>
+              <textarea
+                id="message"
+                name="message"
+                placeholder="메세지로 마음을 전하세요!"
+                required
+              />
+            </div>
+            <div>
+              <Button onClick={() => {}}>메뉴 추가하기</Button>
+            </div>
+            <Button type="submit" className="w-full h-20 fixed bottom-0 ">
+              (돈 얼마) 결제하기
+            </Button>
+          </>
+        ) : (
+          <ContactList
+            setSelectedContact={setSelectedContact}
+            setIsShow={setIsShow}
+          />
+        )}
       </Form>
-      <Button type="submit">(돈 얼마) 결제하기</Button>
     </section>
   );
 };

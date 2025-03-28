@@ -10,4 +10,5 @@ export const URL = {
 
 export const API_URL = {
   favoriteStores: '/api/restaurants',
+  gift: '/api/gift',
 };
