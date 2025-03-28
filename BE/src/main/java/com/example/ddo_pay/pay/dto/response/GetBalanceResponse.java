@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BalanceResponse {
+public class GetBalanceResponse {
 
     @JsonIgnore
     private Long userId;
     private int payBalance;
 
-    public BalanceResponse(int balance) {
+    public GetBalanceResponse(int balance) {
         this.payBalance = balance;
     }
 }
