@@ -186,7 +186,7 @@ public class PayServiceImpl implements PayService {
     public GetBalanceResponse selectBalance(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
-        int balance = findUser.getDdoPay().getBalance();
+        int balance = findUser.getDdoPay().retrieveBalance();
         return new GetBalanceResponse(balance);
     }
 
@@ -195,7 +195,7 @@ public class PayServiceImpl implements PayService {
     public GetPointResponse selectPoint(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
-        int point = findUser.getDdoPay().getPoint();
+        int point = findUser.getDdoPay().retrievePoint();
         return new GetPointResponse(point);
     }
 

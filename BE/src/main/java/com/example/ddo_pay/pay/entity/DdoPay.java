@@ -40,6 +40,17 @@ public class DdoPay {
         this.user = user;
     }
 
+    public int retrieveBalance() {
+        // 잔고 관련 추가 로직이 필요한 경우 여기서 처리 가능
+        return this.balance;
+    }
+
+    public int retrievePoint() {
+        // 포인트 관련 추가 로직이 필요한 경우 여기서 처리 가능
+        return this.point;
+    }
+
+
     public void setUser(User user) {
     }
 }
