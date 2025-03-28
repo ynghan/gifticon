@@ -7,6 +7,7 @@ import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.dto.response.BalanceResponse;
 import com.example.ddo_pay.pay.entity.Account;
 import com.example.ddo_pay.pay.entity.DdoPay;
 import com.example.ddo_pay.pay.finance_api.FinanceClient;
@@ -139,7 +140,7 @@ public class PayServiceImpl implements PayService {
 
         accountRepository.save(account);
 
-        // 6. Redis 삭제
+        // Redis 삭제
         redisHandler.deleteKey(redisKey);
 
     }
@@ -177,6 +178,15 @@ public class PayServiceImpl implements PayService {
         user.changeDdoPay(ddoPay);
 
         ddoPayRepository.save(ddoPay);
+    }
+
+    // 잔고 조회
+    @Override
+    public BalanceResponse selectBalance(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        int balance = findUser.getDdoPay().getBalance();
+        return new BalanceResponse(balance);
     }
 
 
