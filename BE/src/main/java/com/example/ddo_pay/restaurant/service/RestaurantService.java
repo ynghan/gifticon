@@ -45,16 +45,7 @@ public interface RestaurantService {
 	 */
 	void deleteCustomMenu(Long customId);
 
-	/**
-	 * (7) 음식점 상세 정보 조회 (크롤링)
-	 *  GET /api/restaurants/crawling
-	 *
-	 *  - 실제 GET 요청에서는 List<RestaurantCrawlingRequestDto>를
-	 *    QueryParam이나 body로 받기 애매하므로
-	 *    상황에 맞춰 method signature를 바꾸셔도 됩니다.
-	 *
-	 *  예시) Request: List<RestaurantCrawlingRequestDto>
-	 *       Response: RestaurantCrawlingResponseDto
-	 */
-	RestaurantCrawlingResponseDto getCrawlingInfo(List<RestaurantCrawlingRequestDto> requestList);
+	// 크롤링된 StoreDto를 DB에 저장
+	void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId);
+
 }

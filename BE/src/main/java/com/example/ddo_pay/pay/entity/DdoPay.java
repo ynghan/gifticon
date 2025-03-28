@@ -39,6 +39,7 @@ public class DdoPay {
         this.payPassword = payPassword;
         this.user = user;
     }
+    
 
     public void setUser(User user) {
     }

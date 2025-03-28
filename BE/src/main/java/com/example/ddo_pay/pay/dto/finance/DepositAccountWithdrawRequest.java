@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DepositAccountWithdrawRequestDto {
+public class DepositAccountWithdrawRequest {
 
     @Builder.Default
     @JsonProperty("Header")
@@ -34,7 +34,7 @@ public class DepositAccountWithdrawRequestDto {
     @JsonProperty("withdrawalTransactionSummary")
     private String withdrawalTransactionSummary;
 
-    public static DepositAccountWithdrawRequestDto of(String depositAccountNo, String memo) {
+    public static DepositAccountWithdrawRequest of(String depositAccountNo, String memo) {
         LocalDateTime now = LocalDateTime.now();
         String date = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String time = now.format(DateTimeFormatter.ofPattern("HHmmss"));
@@ -51,7 +51,7 @@ public class DepositAccountWithdrawRequestDto {
         header.put("apiKey", "bcc132cc5c0e43fc9cf9ffb61369c224");
         header.put("userKey", "f6c4be2f-823e-4341-83aa-bd19240c564f");
 
-        return DepositAccountWithdrawRequestDto.builder()
+        return DepositAccountWithdrawRequest.builder()
                 .Header(header)
                 .depositAccountNo(depositAccountNo)
                 .depositTransactionSummary("(수시입출금) : 입금(" + memo + ")")
