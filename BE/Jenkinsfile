@@ -6,10 +6,12 @@ pipeline {
         IMAGE_NAME = "daum4572/s12p21e106"
         TAG = "latest"
         CONTAINER_NAME = "s12p21e106-backend"
-        WORKSPACE_DIR = "BE"
+        WORKSPACE_DIR = "."  // gradlew가 Jenkinsfile과 같은 BE 폴더 안에 있음
+        CONFIG_PATH = "./src/main/resources/application.yml"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM',
@@ -19,8 +21,6 @@ pipeline {
                         credentialsId: 'gitlab-credentials'
                     ]]
                 ])
-
-                // Git 상태 업데이트는 clone 후에 실행
                 updateGitlabCommitStatus name: 'build', state: 'pending'
             }
         }
@@ -29,8 +29,9 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
-                        // 리소스 경로에 application.yml 복사
-                        sh 'cp $APP_YML ./BE/src/main/resources/application.yml'
+                        sh 'mkdir -p ./src/main/resources'
+                        sh 'cp $APP_YML ${CONFIG_PATH}'
+                        sh 'ls -al ./src/main/resources'
                     }
                 }
             }
@@ -38,30 +39,37 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir("${WORKSPACE_DIR}") {
+                dir('BE') {
+                    echo "[DEBUG] Build 단계 진입"
+                    sh "ls -l ./gradlew"
                     sh "chmod +x ./gradlew"
                     sh "./gradlew clean build -x test"
                 }
             }
         }
 
+
+
+
+
         stage('Docker Build & Push') {
             steps {
                 script {
-                    dir("${WORKSPACE_DIR}") {
+                    dir('BE') {
                         sh "docker build -t ${IMAGE_NAME}:${TAG} ."
                     }
-
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        '''
+                    withCredentials([usernamePassword(
+                        credentialsId: 'docker-hub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
                     }
-
                     sh "docker push ${IMAGE_NAME}:${TAG}"
                 }
             }
         }
+
 
         stage('Deploy') {
             steps {
@@ -83,16 +91,15 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
         success {
             script {
                 sh '''
-                curl -X POST -H 'Content-Type: application/json' --data '{
-                    "text": "✅ [Spring Boot] Jenkins Build & Deployment Success! 🎉\n🔹 프로젝트: S12P21E106\n🔹 서비스: Backend (Spring Boot + Docker)\n🔹 상태: 성공 ✅"
-                }' ${MATTERMOST_WEBHOOK}
+                    curl -X POST -H 'Content-Type: application/json' --data '{
+                        "text": "✅ [Spring Boot] Jenkins Build & Deployment Success! 🎉\n🔹 프로젝트: S12P21E106\n🔹 서비스: Backend (Spring Boot + Docker)\n🔹 상태: 성공 ✅"
+                    }' ${MATTERMOST_WEBHOOK}
                 '''
                 updateGitlabCommitStatus name: 'build', state: 'success'
             }
@@ -100,9 +107,9 @@ pipeline {
         failure {
             script {
                 sh '''
-                curl -X POST -H 'Content-Type: application/json' --data '{
-                    "text": "❌ [Spring Boot] Jenkins Build Failed! 🔥\n🔹 프로젝트: S12P21E106\n🔹 서비스: Backend (Spring Boot + Docker)\n🔹 상태: 실패 ❌"
-                }' ${MATTERMOST_WEBHOOK}
+                    curl -X POST -H 'Content-Type: application/json' --data '{
+                        "text": "❌ [Spring Boot] Jenkins Build Failed! 🔥\n🔹 프로젝트: S12P21E106\n🔹 서비스: Backend (Spring Boot + Docker)\n🔹 상태: 실패 ❌"
+                    }' ${MATTERMOST_WEBHOOK}
                 '''
                 updateGitlabCommitStatus name: 'build', state: 'failed'
             }
