@@ -33,4 +33,8 @@ public interface PayService {
 
     // 연결된 계좌 조회
     List<GetAccountResponse> selectAccountList(Long userId);
+
+    // 기프티콘 생성 시 잔액 확인 후 출금
+    void withdrawDdoPay(Long userId, int amount);
+
 }
