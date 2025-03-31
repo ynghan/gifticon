@@ -38,8 +38,7 @@ pipeline {
                         sh 'ls -al /home/ubuntu/Project/S12P21E106/BE/config'
 
                         // ✅ 권한 자동 설정
-                        sh 'sudo chown jenkins:jenkins ${DOCKER_CONFIG_PATH}'
-                        sh 'sudo chmod 644 ${DOCKER_CONFIG_PATH}'
+                        sh 'chmod 644 ${DOCKER_CONFIG_PATH}'
 
                         sh 'cat ${DOCKER_CONFIG_PATH}'
                     }
