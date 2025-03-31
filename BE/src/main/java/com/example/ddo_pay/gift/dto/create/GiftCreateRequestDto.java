@@ -8,31 +8,24 @@ import java.util.List;
 public class GiftCreateRequestDto {
 
     // 기프티콘 커스텀 DATA
-    private String giftTitle;
+    private String title;
     private int amount;
     private String message;
     private String image;
 
+    private String menuName;
+
     // 대상자의 phoneNum
     private String phoneNum;
 
-    // 생성하는 사용자 ID
-    private Long userId;
-
     // 담을 맛집의 메뉴들에 대한 정보
-    private RestaurantDto restaurant;
+    private int resId;
+
+    private Position position;
 
     @Data
-    public static class RestaurantDto {
-        private Long id;
-        private List<MenuInfoDto> menu;
-    }
-
-    @Data
-    public static class MenuInfoDto {
-        private Long id;
-        private String menuName;
-        private int menuAmount;
-        private int menuCount;
+    private static class Position {
+        private double lat;
+        private double lng;
     }
 }

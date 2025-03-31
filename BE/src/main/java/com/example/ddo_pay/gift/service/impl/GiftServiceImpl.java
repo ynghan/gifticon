@@ -47,22 +47,18 @@ public class GiftServiceImpl implements GiftService {
 
         // 1. 맛집의 메뉴들의 정보와 사용자 커스텀 정보를 받아서 DB에 저장한다.
 
-        User user = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
-        Restaurant restaurant = restaurantRepository.findById(dto.getRestaurant().getId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_RESTAURANT));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        Restaurant restaurant = restaurantRepository.findById((long) dto.getResId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_RESTAURANT));
 
-        String menuComb = dto.getRestaurant().getMenu().stream()
-                .map(menu -> menu.getMenuName() + "(" + menu.getMenuCount() + "개)")
-                .collect(Collectors.joining(", "));
-
-        log.info("메뉴 조합 : " + menuComb);
+        log.info("메뉴 조합 : " + dto.getMenuName());
 
         Gift gift = Gift.builder()
-                .title(dto.getGiftTitle())
+                .title(dto.getTitle())
                 .amount(dto.getAmount())
                 .message(dto.getMessage())
                 .image(dto.getImage())
                 .phoneNum(dto.getPhoneNum())
-                .menuCombination(menuComb)
+                .menuCombination(dto.getMenuName())
                 .user(user)
                 .restaurant(restaurant)
                 .usedStatus(USED.BEFORE_USE)
@@ -79,16 +75,13 @@ public class GiftServiceImpl implements GiftService {
         gift.changeGiftBox(giftBox);
         giftRepository.save(gift);
 
+        Restaurant findRestaurant = restaurantRepository.findById((long) dto.getResId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_RESTAURANT));
 
         // 3. 맛집 메뉴들의 총액을 계산 후, 결제자의 또페이 잔고에서 출금한다.
-        int totalMenuAmount = dto.getRestaurant().getMenu().stream()
-                .mapToInt(menu -> menu.getMenuAmount() * menu.getMenuCount())
-                .sum();
-        log.info("메뉴 총 금액 : " + totalMenuAmount);
+        log.info("메뉴 총 금액 : " + dto.getAmount());
 
         // 해당 유저의 또페이 계정의 잔고에서 출금되는 로직이라고 가정.
-//        payService.Withdrawal(user, totalMenuAmount);
-
+//        payService.Withdrawal(user, dto.getAmount());
 
     }
 
