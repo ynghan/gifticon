@@ -50,7 +50,7 @@ public class DdoPay {
     }
 
     public void increaseBalance(int amount) {
-        this.balance += amount;
+        this.balance = (int)(this.balance + (amount * 0.9f));
     }
 
     // 결제가 가능하다면, true 아니면 false

@@ -227,7 +227,7 @@ public class PayServiceImpl implements PayService {
     // 기프티콘 생성 시 또페이 잔액 조회 후 출금(잔액 변경)
     @Override
     public void withdrawDdoPay(Long userId, int amount) {
-        DdoPay ddoPay = (DdoPay) ddoPayRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
+        DdoPay ddoPay = ddoPayRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
 
         if (!ddoPay.isAvailableToPay(amount)) {
             throw new CustomException(ResponseCode.INSUFFICIENT_BALANCE);
@@ -239,7 +239,15 @@ public class PayServiceImpl implements PayService {
     }
 
     // 기프티콘 취소 환불 시 90% 금액 환불
+    @Override
+    public void depositDdoPay(Long userId, int amount) {
+        DdoPay ddoPay = ddoPayRepository.findByUserId(userId).orElseThrow(()
+                -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
 
+        ddoPay.increaseBalance(amount);
+        ddoPayRepository.save(ddoPay);
+
+    }
 
 
 }
