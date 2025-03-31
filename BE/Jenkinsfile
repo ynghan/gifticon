@@ -84,7 +84,7 @@ pipeline {
                           -p 8082:8080 \
                           --network s12p21e106-network \
                           -v /home/ubuntu/Project/S12P21E106/BE/config:/config \
-                          -e SPRING_CONFIG_ADDITIONAL_LOCATION=file:/config/ \
+                          -e SPRING_CONFIG_LOCATION=classpath:/,file:/config/application.yml
                           ${IMAGE_NAME}:${TAG}
                     """
                 }
