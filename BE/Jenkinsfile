@@ -80,12 +80,12 @@ pipeline {
                         docker pull ${IMAGE_NAME}:${TAG}
                         docker network inspect s12p21e106-network >/dev/null 2>&1 || docker network create s12p21e106-network
                         docker run -d \
-                            --name ${CONTAINER_NAME} \
-                            -p 8082:8080 \
-                            --network s12p21e106-network \
-                            -v /home/ubuntu/Project/S12P21E106/BE/config:/config \
-                            -e SPRING_CONFIG_LOCATION=file:/config/application.yml \
-                            ${IMAGE_NAME}:${TAG}
+                          --name ${CONTAINER_NAME} \
+                          -p 8082:8080 \
+                          --network s12p21e106-network \
+                          -v /home/ubuntu/Project/S12P21E106/BE/config:/config \
+                          -e SPRING_CONFIG_ADDITIONAL_LOCATION=file:/config/ \
+                          ${IMAGE_NAME}:${TAG}
                     """
                 }
             }
