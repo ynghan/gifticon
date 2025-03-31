@@ -1,9 +1,13 @@
 package com.example.ddo_pay.restaurant.service;
 
+import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.restaurant.dto.request.*;
 import com.example.ddo_pay.restaurant.dto.response.*;
 import com.example.ddo_pay.restaurant.dto.response.RestaurantDetailResponseDto;
+import com.example.ddo_pay.restaurant.entity.Restaurant;
+import com.example.ddo_pay.restaurant.entity.UserRestaurant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface RestaurantService {
@@ -27,6 +31,13 @@ public interface RestaurantService {
 	List<RestaurantListItemResponseDto> getRegisteredRestaurantList();
 
 	/**
+	 * ─────────────────────────────────────────────
+	 *  새로 추가: 위치 기반 맛집 조회
+	 * ─────────────────────────────────────────────
+	 */
+	List<RestaurantListItemResponseDto> getRegisteredRestaurantListByPosition(Double lat, Double lng);
+
+	/**
 	 * (4) 맛집 상세 조회
 	 *  GET /api/restaurants/{restaurantId}
 	 *  - 메뉴 + 커스텀 메뉴 + 나머지 상세 정보
@@ -47,5 +58,6 @@ public interface RestaurantService {
 
 	// 크롤링된 StoreDto를 DB에 저장
 	void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId);
+
 
 }

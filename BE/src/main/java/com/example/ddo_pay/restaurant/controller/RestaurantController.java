@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 실제 DB 연동: Service 호출을 통해 비즈니스 로직 수행
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/restaurants")
 @RequiredArgsConstructor
@@ -46,8 +49,8 @@ public class RestaurantController {
 		restaurantService.createRestaurant(requestDto);
 
 		return ResponseEntity
-				.status(SUCCESS_CREATE_RESTAURANT.getHttpStatus())  // 204, 혹은 201 등
-				.body(Response.create(SUCCESS_CREATE_RESTAURANT, null));
+			.status(SUCCESS_CREATE_RESTAURANT.getHttpStatus())  // 204, 혹은 201 등
+			.body(Response.create(SUCCESS_CREATE_RESTAURANT, null));
 	}
 
 	/**
@@ -59,8 +62,8 @@ public class RestaurantController {
 		restaurantService.removeRestaurant(requestDto);
 
 		return ResponseEntity
-				.status(SUCCESS_REMOVE_RESTAURANT.getHttpStatus())  // 200
-				.body(Response.create(SUCCESS_REMOVE_RESTAURANT, null));
+			.status(SUCCESS_REMOVE_RESTAURANT.getHttpStatus())  // 200
+			.body(Response.create(SUCCESS_REMOVE_RESTAURANT, null));
 	}
 
 	/**
@@ -68,18 +71,42 @@ public class RestaurantController {
 	 */
 	@GetMapping
 	public ResponseEntity<?> getRegisteredRestaurantList(
-			@RequestParam(required = false) Double lat,
-			@RequestParam(required = false) Double lng
+		@RequestParam(required = false) Double lat,
+		@RequestParam(required = false) Double lng
 	) {
-		// lat, lng가 넘어오는 경우 사용
-		// 넘어오지 않을 경우엔 null 이므로, 추가 처리나 기본값 설정 가능
+		// lat, lng가 null이면 전체 목록(=유저 등록 목록 전부)을 간단 조회
+		if (lat == null && lng == null) {
+			List<RestaurantListItemResponseDto> list = restaurantService.getRegisteredRestaurantList();
 
-		// 실제 DB 연동
-		List<RestaurantListItemResponseDto> list = restaurantService.getRegisteredRestaurantList();
+			// ===== 원하는 JSON 구조 만들기 =====
+			Map<String, Object> status = new HashMap<>();
+			status.put("code", 200);
+			status.put("message", "등록된 맛집 리스트 조회 성공.");
 
-		return ResponseEntity
-				.status(SUCCESS_GET_RESTAURANT_LIST.getHttpStatus())
-				.body(Response.create(SUCCESS_GET_RESTAURANT_LIST, list));
+			// list를 곧바로 content로 넣어도 되고, DTO 변환 중에 user_intro, star_rating 등을 세팅할 수도 있음
+			Map<String, Object> responseBody = new HashMap<>();
+			responseBody.put("status", status);
+			responseBody.put("content", list);
+
+			return ResponseEntity.ok(responseBody);
+
+		} else {
+			// lat, lng가 있는 경우: 추가 로직 또는 필터링/정렬
+			// 예: 위치 기반으로 가까운 맛집만, 혹은 거리 순으로 정렬 등등
+			// 필요 없다면 동일하게 list 반환하셔도 됩니다.
+			List<RestaurantListItemResponseDto> list = restaurantService.getRegisteredRestaurantListByPosition(lat,
+				lng);
+
+			Map<String, Object> status = new HashMap<>();
+			status.put("code", 200);
+			status.put("message", "위치 기반 맛집 리스트 조회 성공.");
+
+			Map<String, Object> responseBody = new HashMap<>();
+			responseBody.put("status", status);
+			responseBody.put("content", list);
+
+			return ResponseEntity.ok(responseBody);
+		}
 	}
 
 
@@ -95,9 +122,9 @@ public class RestaurantController {
 		RestaurantDetailResponseDto detail = restaurantService.getRestaurantDetail(restaurantId);
 
 		return ResponseEntity
-				.ok(
-						Response.create(ResponseCode.SUCCESS_GET_SIMPLE_RESTAURANT, detail)
-				);
+			.ok(
+				Response.create(ResponseCode.SUCCESS_GET_SIMPLE_RESTAURANT, detail)
+			);
 	}
 
 	/**
@@ -109,8 +136,8 @@ public class RestaurantController {
 		restaurantService.createCustomMenu(requestDto);
 
 		return ResponseEntity
-				.status(SUCCESS_CREATE_CUSTOM_MENU.getHttpStatus())  // 200
-				.body(Response.create(SUCCESS_CREATE_CUSTOM_MENU, null));
+			.status(SUCCESS_CREATE_CUSTOM_MENU.getHttpStatus())  // 200
+			.body(Response.create(SUCCESS_CREATE_CUSTOM_MENU, null));
 	}
 
 	/**
@@ -122,8 +149,8 @@ public class RestaurantController {
 		restaurantService.deleteCustomMenu(customId);
 
 		return ResponseEntity
-				.status(SUCCESS_DELETE_CUSTOM_MENU.getHttpStatus())  // 200
-				.body(Response.create(SUCCESS_DELETE_CUSTOM_MENU, null));
+			.status(SUCCESS_DELETE_CUSTOM_MENU.getHttpStatus())  // 200
+			.body(Response.create(SUCCESS_DELETE_CUSTOM_MENU, null));
 	}
 
 	/**
@@ -140,12 +167,12 @@ public class RestaurantController {
 		RestaurantCrawlingRequestDto requestDto = parseJsonToDto(decodedJson);
 
 		// 3) 크롤링 수행
-		List<RestaurantCrawlingStoreDto> crawlingResult = naverCrawlingService.getCrawlingInfo(requestDto);
+		List<RestaurantCrawlingStoreDto> result = naverCrawlingService.getOrLoadCrawlingResult(requestDto);
 
 		// (A) placeId 가져오기 (예: 첫 번째 store)
 		String placeId = null;
-		if (!crawlingResult.isEmpty()) {
-			placeId = crawlingResult.get(0).getPlaceId();
+		if (!result.isEmpty()) {
+			placeId = result.get(0).getPlaceId();
 		}
 		// 만약 여러 매장이 있을 수 있고, 각각에 placeId가 다르다면,
 		// 필요에 맞춰 로직 작성 (여기서는 1개만 처리)
@@ -154,7 +181,7 @@ public class RestaurantController {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonList;
 		try {
-			jsonList = objectMapper.writeValueAsString(crawlingResult);
+			jsonList = objectMapper.writeValueAsString(result);
 		} catch (JsonProcessingException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body("JSON 직렬화 에러: " + e.getMessage());
@@ -174,7 +201,7 @@ public class RestaurantController {
 		// 6) 응답: cacheKey + 실제 크롤링 결과
 		Map<String, Object> response = new HashMap<>();
 		response.put("cacheKey", key);
-		response.put("stores", crawlingResult);
+		response.put("stores", result);
 		return ResponseEntity.ok(response);
 	}
 
@@ -189,38 +216,63 @@ public class RestaurantController {
 	 */
 	@PostMapping("/register")
 	public ResponseEntity<?> registerRestaurant(@RequestBody RegisterCrawledStoreRequest registerRequest) {
+		// 1) Getter 확인
+		log.debug(">>> registerRequest.getCacheKey() = '{}'", registerRequest.getCacheKey());
+		log.debug(">>> registerRequest.toString() = {}", registerRequest); // Lombok @ToString 결과
+
+		// 2) 변수 할당
 		String cacheKey = registerRequest.getCacheKey();
 		int storeIndex = registerRequest.getStoreIndex();
 		Long userId = registerRequest.getUserId();
 
-		// 1) Redis에서 문자열(JSON) 꺼내기
+		log.debug("Incoming registerRequest = {}", registerRequest);
+		log.debug("cacheKey = '{}'", cacheKey);
+
+		// 2-1) ASCII 로 체크 (cacheKey가 null이 아닌 경우)
+		if (cacheKey == null) {
+			log.warn("cacheKey is null!!");
+		} else {
+			System.out.println("[" + cacheKey + "] length=" + cacheKey.length());
+			for (int i = 0; i < cacheKey.length(); i++) {
+				char c = cacheKey.charAt(i);
+				System.out.println("char #" + i + " = '" + c + "' (ASCII: " + (int)c + ")");
+			}
+			// 필요하면 trim 후에 다시 로그:
+			// cacheKey = cacheKey.trim();
+			// log.debug("After trim, cacheKey='{}'", cacheKey);
+		}
+
+		// 3) Redis에서 문자열(JSON) 꺼내기
 		String jsonStored = redisTemplate.opsForValue().get(cacheKey);
 		if (jsonStored == null) {
+			// 여기서 에러가 터지면, Redis에 해당 키가 없다는 뜻
 			throw new RuntimeException("유효하지 않은 캐싱 정보 (Redis에 없음)");
 		}
 
-		// 2) JSON → List<RestaurantCrawlingStoreDto>
+		// 4) JSON → List<RestaurantCrawlingStoreDto> 역직렬화
 		ObjectMapper objectMapper = new ObjectMapper();
 		List<RestaurantCrawlingStoreDto> cachedList;
 		try {
-			cachedList = objectMapper.readValue(
-					jsonStored, new TypeReference<List<RestaurantCrawlingStoreDto>>() {}
-			);
+			cachedList = objectMapper.readValue(jsonStored, new TypeReference<List<RestaurantCrawlingStoreDto>>() {});
 		} catch (Exception e) {
 			throw new RuntimeException("JSON 파싱 실패", e);
 		}
 
-		// 3) 유효성 검사
+		// 4-1) 역직렬화된 결과 로그
+		log.debug("List from Redis = {}", cachedList);
+
+		// 5) 유효성 검사
 		if (storeIndex < 0 || storeIndex >= cachedList.size()) {
 			throw new RuntimeException("storeIndex 범위 초과");
 		}
 
-		// 4) 선택 매장 + DB 저장
+		// 6) 최종 DB 저장
 		RestaurantCrawlingStoreDto selectedStore = cachedList.get(storeIndex);
 		restaurantService.saveCrawlingStoreData(selectedStore, userId);
 
 		return ResponseEntity.ok("등록 완료");
 	}
+
 
 	/**
 	 * private: JSON 파싱 유틸
@@ -234,3 +286,4 @@ public class RestaurantController {
 	}
 
 }
+

@@ -29,6 +29,7 @@ public class Restaurant {
     private Double lng; // 가게 경도
     private String mainImageUrl; // 가게 이미지
     private String userIntro; // 나만의 소개
+    private String placeId;
 
     @Column(name = "star_rating", precision = 3, scale = 2)
     private BigDecimal starRating; // 별점
@@ -51,6 +52,7 @@ public class Restaurant {
                       Double lng,
                       String mainImageUrl,
                       String userIntro,
+                      String placeId,
                       BigDecimal starRating,
                       List<Menu> menuList) {
         this.placeName = placeName;
@@ -59,6 +61,7 @@ public class Restaurant {
         this.lng = lng;
         this.mainImageUrl = mainImageUrl;
         this.userIntro = userIntro;
+        this.placeId = placeId;
         this.starRating = starRating;
         this.menuList = menuList;
     }

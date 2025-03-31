@@ -173,8 +173,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 		userRestaurantRepository.delete(userRestaurant);
 
 		log.info("맛집 해제 완료. userId={}, restaurantId={}",
-				user.getId(),
-				requestDto.getRestaurantId());
+			user.getId(),
+			requestDto.getRestaurantId());
 	}
 
 	/**
@@ -216,6 +216,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 			dto.setPosition(pos);
 
 			result.add(dto);
+			dto.setUserIntro(r.getUserIntro());    // DB나 다른 테이블에 있다면 적절히 가져와서 set
+			dto.setStarRating(r.getStarRating());  // DB에 별점 컬럼이 있을 경우
+			dto.setVisitedCount(ur.getVisitedCount());
 		}
 
 		return result;
@@ -250,9 +253,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 		// 별점 (BigDecimal → double 변환)
 		detailDto.setStarRating(
-				restaurant.getStarRating() != null
-						? restaurant.getStarRating().doubleValue()
-						: 0.0
+			restaurant.getStarRating() != null
+				? restaurant.getStarRating().doubleValue()
+				: 0.0
 		);
 
 		// userIntro
@@ -289,19 +292,19 @@ public class RestaurantServiceImpl implements RestaurantService {
 	public void createCustomMenu(CustomMenuRequestDto requestDto) {
 		// 예) userId + restaurantId 로 UserRestaurant 조회
 		UserRestaurant userRestaurant = userRestaurantRepository
-				.findByUser_IdAndRestaurant_Id(requestDto.getUserId(), requestDto.getRestaurantId())
-				.orElseThrow(() -> new CustomException(
-					ResponseCode.NO_EXIST_RESTAURANT,
-					"restaurantId",
-					"등록되지 않은 맛집입니다."
-				));
+			.findByUser_IdAndRestaurant_Id(requestDto.getUserId(), requestDto.getRestaurantId())
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_RESTAURANT,
+				"restaurantId",
+				"등록되지 않은 맛집입니다."
+			));
 
 		CustomMenu customMenu = CustomMenu.builder()
-				.customMenuName(requestDto.getCustomMenuName())
-				.customMenuPrice(requestDto.getCustomMenuPrice())
-				.customMenuImage(requestDto.getCustomMenuImage())
-				.userRestaurant(userRestaurant)
-				.build();
+			.customMenuName(requestDto.getCustomMenuName())
+			.customMenuPrice(requestDto.getCustomMenuPrice())
+			.customMenuImage(requestDto.getCustomMenuImage())
+			.userRestaurant(userRestaurant)
+			.build();
 
 		customMenuRepository.save(customMenu);
 		log.info("커스텀 메뉴 등록 완료. userId={}, restaurantId={}", requestDto.getUserId(), requestDto.getRestaurantId());
@@ -330,12 +333,28 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId) {
-		// 1) 유저 조회
+		// 1) 사용자 조회
 		User user = userRepo.findById(userId)
-				.orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+			.orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
 
-		// 2) Restaurant 빌더로 생성/저장
-		Restaurant restaurant = Restaurant.builder()
+		// 2) storeDto에서 placeId 추출
+		String placeId = storeDto.getPlaceId();
+		if (placeId == null || placeId.isBlank()) {
+			placeId = "unknown";
+		}
+
+		// 3) DB에서 placeId로 식당 조회
+		Optional<Restaurant> existingOpt = restaurantRepository.findByPlaceId(placeId);
+
+		final Restaurant restaurant;
+		if (existingOpt.isPresent()) {
+			// 이미 동일 placeId로 저장된 식당 재사용
+			restaurant = existingOpt.get();
+			// 필요하면 기존 식당 정보 업데이트 (lat, lng, starRating 등)
+		} else {
+			// 없는 placeId → 새 식당 생성
+			restaurant = Restaurant.builder()
+				.placeId(placeId)
 				.placeName(storeDto.getPlaceName())
 				.addressName(storeDto.getAddressName())
 				.mainImageUrl(storeDto.getMainImageUrl())
@@ -345,31 +364,73 @@ public class RestaurantServiceImpl implements RestaurantService {
 				.starRating(storeDto.getStarRating())
 				.build();
 
-		restaurantRepository.save(restaurant);
+			restaurantRepository.save(restaurant);
 
-		// 3) 메뉴 목록
-		if (storeDto.getMenus() != null) {
-			for (RestaurantCrawlingMenuDto menuDto : storeDto.getMenus()) {
-				Menu menu = Menu.builder()
+			// 메뉴 목록 저장 (신규 식당에 한해 추가, 이미 있는 식당은 정책에 따라 추가 or 무시)
+			if (storeDto.getMenus() != null) {
+				for (RestaurantCrawlingMenuDto menuDto : storeDto.getMenus()) {
+					Menu menu = Menu.builder()
 						.menuName(menuDto.getMenuName())
-						// menuPrice, menuImage 등도 필요하면 세팅
+						// menuPrice, menuImage 등 필요에 맞게
 						.restaurant(restaurant)
 						.build();
-
-				menuRepository.save(menu);
+					menuRepository.save(menu);
+				}
 			}
 		}
 
-		// 4) userRestaurant 빌더로 생성/저장
-		UserRestaurant userRestaurant = UserRestaurant.builder()
-				.user(user)
-				.restaurant(restaurant)
-				.build();
+		// 4) (user, restaurant) 관계 중복 체크
+		boolean alreadyExists = userRestaurantRepository
+			.findByUser_IdAndRestaurant_Id(user.getId(), restaurant.getId())
+			.isPresent();
 
+		if (alreadyExists) {
+			// 이미 등록된 맛집이면 예외
+			throw new CustomException(ResponseCode.ALREADY_EXIST_RESTAURANT);
+		}
+
+		// 5) userRestaurant 새로 연결
+		UserRestaurant userRestaurant = UserRestaurant.builder()
+			.user(user)
+			.restaurant(restaurant)
+			.build();
 		userRestaurantRepository.save(userRestaurant);
 
-		log.info("크롤링된 매장 저장 완료: {}, userId={}", restaurant.getPlaceName(), userId);
+		log.info("크롤링 데이터로 DB 저장 완료: placeId={}, restaurantId={}, userId={}",
+			placeId, restaurant.getId(), userId);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<RestaurantListItemResponseDto> getRegisteredRestaurantListByPosition(Double lat, Double lng) {
+		// 위치 기반 로직 or 단순 전체 반환
+		Long userId = SecurityUtil.getUserId();
+		List<UserRestaurant> userResList = userRestaurantRepository.findByUser_Id(userId);
+
+		// TODO: 필요하다면 lat, lng를 이용해 거리 필터/정렬 로직 구현
+
+		List<RestaurantListItemResponseDto> result = new ArrayList<>();
+		for (UserRestaurant ur : userResList) {
+			Restaurant r = ur.getRestaurant();
+
+			RestaurantListItemResponseDto dto = new RestaurantListItemResponseDto();
+			dto.setId(r.getId());
+			dto.setPlaceName(r.getPlaceName());
+			dto.setAddressName(r.getAddressName());
+			dto.setMainImageUrl(r.getMainImageUrl());
+			dto.setVisitedCount(ur.getVisitedCount());
+
+			ResponsePositionDto pos = new ResponsePositionDto();
+			pos.setLat(r.getLat());
+			pos.setLng(r.getLng());
+			dto.setPosition(pos);
+
+			// 필요시 userIntro, starRating 등 추가 매핑
+			result.add(dto);
+		}
+
+		return result;
+	}
 
 }
+

@@ -1,5 +1,7 @@
 package com.example.ddo_pay.restaurant.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 @Data
