@@ -73,24 +73,31 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def imageWithTag = "${IMAGE_NAME}:${TAG}"
-                    sh """
-                        docker container rm -f ${CONTAINER_NAME} || true
-                        docker image rm -f ${imageWithTag} || true
-                        docker rmi -f \$(docker images -f "dangling=true" -q) || true
-                        docker pull ${imageWithTag}
-                        docker network inspect s12p21e106-network >/dev/null 2>&1 || docker network create s12p21e106-network
-                        docker run -d \
-                          --name ${CONTAINER_NAME} \
-                          -p 8082:8080 \
-                          --network s12p21e106-network \
-                          -v /home/ubuntu/Project/S12P21E106/BE/config:/config \
-                          -e SPRING_CONFIG_LOCATION=classpath:/,file:/config/application.yml \
-                          ${imageWithTag}
-                    """
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                    ]) {
+                        sh """
+                            docker container rm -f ${CONTAINER_NAME} || true
+                            docker image rm -f ${IMAGE_NAME}:${TAG} || true
+                            docker rmi -f \$(docker images -f "dangling=true" -q) || true
+                            docker pull ${IMAGE_NAME}:${TAG}
+                            docker network inspect s12p21e106-network >/dev/null 2>&1 || docker network create s12p21e106-network
+                            docker run -d \
+                                --name ${CONTAINER_NAME} \
+                                -p 8082:8080 \
+                                --network s12p21e106-network \
+                                -v /home/ubuntu/Project/S12P21E106/BE/config:/config \
+                                -e SPRING_CONFIG_LOCATION=classpath:/,file:/config/application.yml \
+                                -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                                -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                                ${IMAGE_NAME}:${TAG}
+                        """
+                    }
                 }
             }
         }
+
     }
 
     post {
