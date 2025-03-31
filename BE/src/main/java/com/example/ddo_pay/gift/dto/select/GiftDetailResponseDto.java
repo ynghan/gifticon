@@ -31,6 +31,7 @@ public class GiftDetailResponseDto {
         dto.usedStatus = gift.getUsedStatus();
         dto.restaurantId = gift.getRestaurant().getId();
         dto.restaurantName = gift.getRestaurant().getPlaceName();
+
         return dto;
     }
 }
