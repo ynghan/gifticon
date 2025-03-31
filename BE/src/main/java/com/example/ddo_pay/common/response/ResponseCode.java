@@ -66,6 +66,7 @@ public enum ResponseCode {
     INVALID_REDIS_FORMAT(1004, HttpStatus.BAD_REQUEST, "Redis에 저장된 형식이 올바르지 않습니다."),
     NOT_VERIFIED_ACCOUNT(1005, HttpStatus.BAD_REQUEST, "계좌 인증이 완료되지 않았습니다."),
     NO_EXIST_DDOPAY(1500, HttpStatus.BAD_REQUEST, "연결된 또페이를 찾을 수 없습니다."),
+    INSUFFICIENT_BALANCE(4001, HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
 
     // 기프티콘
     SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),

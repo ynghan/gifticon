@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class DdoPay {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ddopay_id")
     private Long id;
+
     private int balance; // 페이 잔고
     private int point; // 페이 포인트
     private String payPassword; // 결제 비밀번호
@@ -42,4 +44,20 @@ public class DdoPay {
 
     public void setUser(User user) {
     }
+
+    public void decreaseBalance(int amount) {
+        this.balance -= amount;
+    }
+
+    public void increaseBalance(int amount) {
+        this.balance += amount;
+    }
+
+    // 결제가 가능하다면, true 아니면 false
+    public boolean isAvailableToPay(int amount) {
+        return this.balance >= amount;
+    }
+
+
+
 }

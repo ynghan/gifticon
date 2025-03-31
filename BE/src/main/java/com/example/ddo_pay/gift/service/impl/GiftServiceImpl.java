@@ -46,9 +46,10 @@ public class GiftServiceImpl implements GiftService {
     public void create(GiftCreateRequestDto dto, Long userId) {
 
         // 1. 맛집의 메뉴들의 정보와 사용자 커스텀 정보를 받아서 DB에 저장한다.
-
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
         Restaurant restaurant = restaurantRepository.findById((long) dto.getResId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_RESTAURANT));
+
+
 
         log.info("메뉴 조합 : " + dto.getMenuName());
 
@@ -75,13 +76,12 @@ public class GiftServiceImpl implements GiftService {
         gift.changeGiftBox(giftBox);
         giftRepository.save(gift);
 
-        Restaurant findRestaurant = restaurantRepository.findById((long) dto.getResId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_RESTAURANT));
 
         // 3. 맛집 메뉴들의 총액을 계산 후, 결제자의 또페이 잔고에서 출금한다.
         log.info("메뉴 총 금액 : " + dto.getAmount());
 
         // 해당 유저의 또페이 계정의 잔고에서 출금되는 로직이라고 가정.
-//        payService.Withdrawal(user, dto.getAmount());
+        payService.withdrawDdoPay(userId, dto.getAmount());
 
     }
 

@@ -20,6 +20,7 @@ import com.example.ddo_pay.user.entity.User;
 import com.example.ddo_pay.user.service.impl.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PayServiceImpl implements PayService {
 
     private final RestTemplate restTemplate;
@@ -212,7 +214,7 @@ public class PayServiceImpl implements PayService {
         List<Account> accountList = findUser.getDdoPay().getAccountList();
 
         if (accountList.isEmpty()) {
-            throw new CustomException(ResponseCode.NO_EXIST_ACCOUNT); // NO_EXIST_ACCOUNT 코드가 ResponseCode에 정의되어 있어야 합니다.
+            throw new CustomException(ResponseCode.NO_EXIST_ACCOUNT);
         }
 
         // 각 Account를 GetAccountResponse로 변환하여 리스트 반환
@@ -220,6 +222,23 @@ public class PayServiceImpl implements PayService {
                 .map(GetAccountResponse::from)
                 .collect(Collectors.toList());
     }
+
+
+    // 기프티콘 생성 시 또페이 잔액 조회 후 출금(잔액 변경)
+    @Override
+    public void withdrawDdoPay(Long userId, int amount) {
+        DdoPay ddoPay = (DdoPay) ddoPayRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
+
+        if (!ddoPay.isAvailableToPay(amount)) {
+            throw new CustomException(ResponseCode.INSUFFICIENT_BALANCE);
+        }
+
+        ddoPay.decreaseBalance(amount);
+        ddoPayRepository.save(ddoPay);
+
+    }
+
+    // 기프티콘 취소 환불 시 90% 금액 환불
 
 
 
