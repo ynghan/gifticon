@@ -37,4 +37,8 @@ public interface PayService {
     // 기프티콘 생성 시 잔액 확인 후 출금
     void withdrawDdoPay(Long userId, int amount);
 
+
+    // 기프티콘 취소 환불
+    void depositDdoPay(Long userId, int amount);
+
 }

@@ -14,9 +14,9 @@ public class GetBalanceResponse {
 
     @JsonIgnore
     private Long userId;
-    private int payBalance;
+    private float payBalance;
 
-    public GetBalanceResponse(int balance) {
+    public GetBalanceResponse(float balance) {
         this.payBalance = balance;
     }
 }
