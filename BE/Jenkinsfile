@@ -7,7 +7,7 @@ pipeline {
         TAG = "latest"
         CONTAINER_NAME = "s12p21e106-backend"
         WORKSPACE_DIR = "."  // gradlew가 Jenkinsfile과 같은 BE 폴더 안에 있음
-        CONFIG_PATH = "./src/main/resources/application.yml"
+        CONFIG_PATH = "BE/src/main/resources/application.yml"
     }
 
     stages {
@@ -29,9 +29,9 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
-                        sh 'mkdir -p ./src/main/resources'
+                        sh 'mkdir -p BE/src/main/resources'
                         sh 'cp $APP_YML ${CONFIG_PATH}'
-                        sh 'ls -al ./src/main/resources'
+                        sh 'ls -al BE/src/main/resources'
                     }
                 }
             }
