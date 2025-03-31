@@ -3,6 +3,7 @@ package com.example.ddo_pay.gift.service.impl;
 import com.example.ddo_pay.common.exception.CustomException;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
+import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
@@ -19,6 +20,7 @@ import com.example.ddo_pay.restaurant.entity.Restaurant;
 import com.example.ddo_pay.restaurant.repository.RestaurantRepository;
 import com.example.ddo_pay.user.entity.User;
 import com.example.ddo_pay.user.service.impl.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -131,7 +133,7 @@ public class GiftServiceImpl implements GiftService {
             // 4. 만료 기간, 현재시간 비교
             if(!isGiftOver(gift)) { // 만료일이 지난 경우
                 // 5. 상태 변경
-                gift.changeUsedStatus();
+                gift.changeUsedExpired();
                 // 6. DB 저장
                 giftRepository.save(gift);
             }
@@ -203,5 +205,29 @@ public class GiftServiceImpl implements GiftService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c * 1000;
     }
+
+    @Transactional
+    public void refund(GiftRefundRequestDto dto, Long userId) {
+        // 1. giftId로 기프티콘 조회 (Long 그대로 사용)
+        Gift gift = giftRepository.findById(dto.getGiftId())
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+
+        // 2. 기프티콘 소유자(userId) 확인
+        if (!gift.getUser().getId().equals(userId)) {
+            throw new CustomException(ResponseCode.INVALID_GIFTICON_OWNER);
+        }
+
+        // 3. 사용 여부 및 상태 확인
+        if (!gift.isRefundable()) { // 예: 이미 사용, 만료, 취소된 경우 등
+            throw new CustomException(ResponseCode.NOT_REFUNDABLE_GIFTICON);
+        }
+
+        // 4. 상태 변경
+        gift.changeUsedCancle();
+
+        // 5. 페이 환불
+        payService.depositDdoPay(userId, gift.getAmount());
+    }
+
 
 }

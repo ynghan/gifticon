@@ -68,8 +68,20 @@ public class Gift {
         this.giftBox = giftBox;
     }
 
-    public void changeUsedStatus() {
-        this.usedStatus = USED.AFTER_USE;
+    public void changeUsedExpired() {
+        this.usedStatus = USED.EXPIRED;
+    }
+
+    public void changeUsedCancle() {
+        this.usedStatus = USED.CANCLE;
+    }
+
+    public boolean isRefundable() {
+        return this.getUsedStatus().isRefundable() && !this.isExpired();
+    }
+
+    public boolean isExpired() {
+        return this.expirationDate.isBefore(LocalDateTime.now());
     }
 }
 
