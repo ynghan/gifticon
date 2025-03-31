@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 	Optional<Restaurant> findByPlaceNameAndAddressName(String placeName, String addressName);
+	Optional<Restaurant> findByPlaceId(String placeId);
 }

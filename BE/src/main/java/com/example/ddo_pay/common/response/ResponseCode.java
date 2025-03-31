@@ -42,6 +42,7 @@ public enum ResponseCode {
     NO_EXIST_RESTAURANT(400, HttpStatus.BAD_REQUEST, "등록된 사용자가 아닙니다."),
     DATA_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 데이터가 존재합니다."),
     NO_EXIST_CUSTOM_MENU(400, HttpStatus.BAD_REQUEST, "해당 커스텀 메뉴가 존재하지 않습니다."),
+    ALREADY_EXIST_RESTAURANT(400, HttpStatus.BAD_REQUEST, "이미 맛집으로 등록한 식당입니다."),
 
 
     // 페이 도메인

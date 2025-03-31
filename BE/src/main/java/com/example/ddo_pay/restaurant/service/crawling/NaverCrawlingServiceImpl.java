@@ -4,6 +4,7 @@ import com.example.ddo_pay.restaurant.dto.request.RestaurantCrawlingRequestDto;
 import com.example.ddo_pay.restaurant.dto.response.ResponsePositionDto;
 import com.example.ddo_pay.restaurant.dto.response.RestaurantCrawlingMenuDto;
 import com.example.ddo_pay.restaurant.dto.response.RestaurantCrawlingStoreDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,6 +20,7 @@ import okhttp3.Response;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,9 +34,14 @@ import java.util.Map;
 @Slf4j
 public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 
-
+	private final RedisTemplate<String, String> redisTemplate;
 	private final OkHttpClient httpClient = new OkHttpClient();
 	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	// 생성자 주입
+	public NaverCrawlingServiceImpl(RedisTemplate<String, String> redisTemplate) {
+		this.redisTemplate = redisTemplate;
+	}
 	@Override
 	public List<RestaurantCrawlingStoreDto> getCrawlingInfo(RestaurantCrawlingRequestDto requestDto) {
 		// 1) placeName + addressName
@@ -80,11 +87,11 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 				WebElement shop = shopLinks.get(i);
 				clickElementWithWait(driver, shop, 5);
 
-				WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+				WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(7));
 				shortWait.until(d -> d.getCurrentUrl().contains("/place/"));
 
 				driver.switchTo().defaultContent();
-				new WebDriverWait(driver, Duration.ofSeconds(5))
+				new WebDriverWait(driver, Duration.ofSeconds(7))
 					.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.cssSelector("iframe#entryIframe")));
 
 				RestaurantCrawlingStoreDto dto = new RestaurantCrawlingStoreDto();
@@ -125,6 +132,51 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 		}
 
 		return results;
+	}
+
+	/**
+	 * (B) "캐시 우선" 메서드
+	 */
+	@Override
+	public List<RestaurantCrawlingStoreDto> getOrLoadCrawlingResult(RestaurantCrawlingRequestDto req) {
+		// 1) 우선 allSearch로 placeId만 구하기
+		//    (간단 버전: callAllSearch() 로직만 따로 추출 가능)
+		Map<String, Object> allSearch = callAllSearch( req.getPlaceName() + " " + req.getAddressName() );
+		String placeId = (String) allSearch.get("placeId");
+
+		if (placeId != null && !placeId.isBlank()) {
+			// 2) Redis 캐시 확인
+			String redisKey = "crawling:" + placeId;
+			String cachedJson = redisTemplate.opsForValue().get(redisKey);
+			if (cachedJson != null) {
+				// 캐싱 존재 → 역직렬화 후 바로 리턴
+				try {
+					return objectMapper.readValue(
+						cachedJson,
+						new TypeReference<List<RestaurantCrawlingStoreDto>>() {}
+					);
+				} catch (Exception e) {
+					log.warn("캐시 역직렬화 실패 → 새 크롤링 진행", e);
+					// 굳이 throw 안 하고 새 크롤링 진행
+				}
+			}
+		}
+
+		// 3) 캐시에 없거나 역직렬화 실패 시 "실제 크롤링"
+		List<RestaurantCrawlingStoreDto> result = this.getCrawlingInfo(req);
+
+		// 4) 크롤링 후 placeId가 제대로 들어왔으면 캐시에 저장
+		if (placeId != null && !placeId.isBlank() && !result.isEmpty()) {
+			String redisKey = "crawling:" + placeId;
+			try {
+				String toCache = objectMapper.writeValueAsString(result);
+				redisTemplate.opsForValue().set(redisKey, toCache, Duration.ofHours(4));
+			} catch (Exception e) {
+				log.warn("캐시 직렬화 실패", e);
+			}
+		}
+
+		return result;
 	}
 
 	// ====== 비공식 allSearch API ======
@@ -238,7 +290,7 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 
 	private void clickElementWithWait(WebDriver driver, WebElement element, int timeoutSeconds) {
 		new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
-				.until(ExpectedConditions.elementToBeClickable(element));
+			.until(ExpectedConditions.elementToBeClickable(element));
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
 	}
 
@@ -343,14 +395,14 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 			// 이제 foundMenuTab는 변경되지 않음 → effectively final
 			WebElement finalMenuTab = foundMenuTab;
 
-			clickElementWithWait(driver, finalMenuTab, 3);
+			clickElementWithWait(driver, finalMenuTab, 7);
 
-			new WebDriverWait(driver, Duration.ofSeconds(3)).until(d ->
+			new WebDriverWait(driver, Duration.ofSeconds(7)).until(d ->
 				"true".equals(finalMenuTab.getAttribute("aria-selected"))
 			);
 
 			// 4) 메뉴 목록이 표시될 때까지 대기
-			new WebDriverWait(driver, Duration.ofSeconds(5))
+			new WebDriverWait(driver, Duration.ofSeconds(7))
 				.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("li.E2jtL")));
 
 			// 4) 이제 li.E2jtL 파싱

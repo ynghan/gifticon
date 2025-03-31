@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,10 @@ public class UserRestaurant  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_restaurant_id")
     private Long id;
-    private Integer visitedCount; // 방문 횟수
+
+    @Setter
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private Integer visitedCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -37,7 +41,7 @@ public class UserRestaurant  {
     @Builder
     public UserRestaurant(Long id,Integer visitedCount, User user, Restaurant restaurant) {
         this.id = id;
-        this.visitedCount = visitedCount;
+        this.visitedCount = (visitedCount != null ? visitedCount : 0);
         this.user = user;
         this.restaurant = restaurant;
     }
