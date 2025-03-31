@@ -3,6 +3,7 @@ package com.example.ddo_pay.gift.controller;
 import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
+import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
@@ -64,6 +65,14 @@ public class GiftController {
         GiftCheckResponseDto respDto = giftService.usedCheck(dto);
         return new ResponseEntity<>(Response.create(SUCCESS_CHECK_GIFTICON, respDto), SUCCESS_CHECK_GIFTICON.getHttpStatus());
     }
+
+    @PostMapping("/refund")
+    public ResponseEntity<?> refund(@RequestBody GiftRefundRequestDto dto) {
+        Long userId = SecurityUtil.getUserId();
+        giftService.refund(dto, userId);
+        return new ResponseEntity<>(Response.create(SUCCESS_REFUND_GIFT, null), SUCCESS_REFUND_GIFT.getHttpStatus());
+    }
+
 
 }
 

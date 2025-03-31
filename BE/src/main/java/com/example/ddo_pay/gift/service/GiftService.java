@@ -1,6 +1,7 @@
 package com.example.ddo_pay.gift.service;
 
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
+import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
@@ -27,4 +28,5 @@ public interface GiftService {
     // 해당 기프티콘의 사용여부 확인하기
     GiftCheckResponseDto usedCheck(GiftCheckRequestDto dto);
 
+    void refund(GiftRefundRequestDto dto, Long userId);
 }

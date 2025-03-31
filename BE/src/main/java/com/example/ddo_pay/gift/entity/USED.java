@@ -9,4 +9,8 @@ public enum USED {
     AFTER_USE,
     EXPIRED,
     CANCLE;
+
+    public boolean isRefundable() {
+        return this == BEFORE_USE;
+    }
 }
