@@ -28,19 +28,9 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
-                        sh 'mkdir -p BE/src/main/resources'
-                        sh 'cp $APP_YML ${CONFIG_PATH}'
-                        sh 'ls -al BE/src/main/resources'
-
-                        // Docker에 마운트할 실제 config 경로에도 복사
-                        sh 'mkdir -p /home/ubuntu/Project/S12P21E106/BE/config'
-                        sh 'cp $APP_YML ${DOCKER_CONFIG_PATH}'
-                        sh 'ls -al /home/ubuntu/Project/S12P21E106/BE/config'
-
-                        // ✅ 권한 자동 설정
-                        sh 'chmod 644 ${DOCKER_CONFIG_PATH}'
-
-                        sh 'cat ${DOCKER_CONFIG_PATH}'
+                        dir('BE'){
+                            sh 'cp $APP_YML ./src/main/resources/'
+                        }
                     }
                 }
             }
