@@ -14,6 +14,7 @@ public class SsafyUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(name = "account_num", nullable = false, length = 50)
