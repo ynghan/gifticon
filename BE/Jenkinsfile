@@ -29,7 +29,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
                         dir('BE'){
-                            sh 'cp $APP_YML ./src/main/resources/'
+                            sh 'cp $APP_YML ./src/main/resources/application.yml'
                         }
                     }
                 }
