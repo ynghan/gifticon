@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/bank")
+@RequestMapping("/bank")
 public class BankController {
 
     private final BankService bankService;
 
+    // 계정 생성 및 계좌 생성
     @PostMapping("/create-account")
     public Response<Object> createUserKey(@RequestBody EmailRequestDto request) {
         bankService.createUserKey(request.getEmail());
