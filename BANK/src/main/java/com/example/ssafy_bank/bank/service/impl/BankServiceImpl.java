@@ -41,6 +41,8 @@ public class BankServiceImpl implements BankService {
     public void createUserKey(String email) {
         Optional<SsafyUser> existingUser = bankRepository.findByEmail(email);
 
+        log.info("CreateUserKey 메서드 시작");
+
         if (existingUser.isPresent()) {
             log.info("이미 존재하는 사용자: {}", email);
             throw new CustomException(ResponseCode.ALREADY_EXIST_USER, "email", "이미 존재하는 이메일입니다.");
@@ -109,6 +111,8 @@ public class BankServiceImpl implements BankService {
                 .bodyToMono(String.class)  // 입금 응답은 추후 DTO로 매핑할 수 있음
                 .doOnNext(res -> log.info("입금 응답: {}", res))
                 .block();
+
+        log.info("CreateUserKey 메서드 종료");
     }
 
 
