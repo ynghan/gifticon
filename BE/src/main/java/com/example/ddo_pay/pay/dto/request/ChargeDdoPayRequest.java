@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RefundGiftRequest {
-    private int giftId;
-
+public class ChargeDdoPayRequest {
     private Long userId;
+    private int amount;
+    private String password;
 }
