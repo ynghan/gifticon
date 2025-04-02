@@ -1,11 +1,7 @@
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-async function useFetchLogin(code: string) {
-  const router = useRouter();
-  const [login, setLogin] = useState(false);
+export async function fetchKakaoLogin(code: string) {
   try {
     const response = await fetch(
-      'http://localhost:8080/api/users/social/kakao/login',
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/social/kakao/login`,
       {
         method: 'POST',
         headers: {
@@ -14,17 +10,15 @@ async function useFetchLogin(code: string) {
         body: JSON.stringify({ code }),
       }
     );
-    const data = await response.json();
-    if (data.success) {
-      setLogin(true);
-      router.push('/');
-    } else {
-      console.error('로그인 실패:', data.message);
+
+    if (!response.ok) {
+      throw new Error('로그인 실패');
     }
+
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('로그인 처리 중 오류', error);
+    throw error;
   }
-  return { login, setLogin };
 }
-
-export default useFetchLogin;
