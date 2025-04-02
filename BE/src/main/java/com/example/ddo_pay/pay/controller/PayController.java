@@ -4,6 +4,7 @@ import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
+import com.example.ddo_pay.pay.dto.request.ChargeDdoPayRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
@@ -85,4 +86,15 @@ public class PayController {
         List<GetAccountResponse> dtos = payService.selectAccountList(userId);
         return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_ACCOUNT_CHECK, dtos));
     }
+
+    // 또페이 충전
+    @PostMapping("/charge")
+    public ResponseEntity<?> chageDdoPay(@RequestBody ChargeDdoPayRequest request) {
+        Long userId = SecurityUtil.getUserId();
+        payService.transferDdoPay(userId, request);
+        return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_BALANCE_CHARGE, "충전성공"));
+    }
+
+
+
 }

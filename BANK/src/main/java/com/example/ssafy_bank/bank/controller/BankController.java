@@ -1,6 +1,7 @@
 package com.example .ssafy_bank.bank.controller;
 
-import com.example.ssafy_bank.bank.dto.finance_request.SelectHistoryRequestDto;
+import com.example.ssafy_bank.bank.dto.ddopay_request.ChargeDdoPayRequestDto;
+import com.example.ssafy_bank.bank.dto.ddopay_response.BankChargeResponseDto;
 import com.example.ssafy_bank.bank.dto.request.EmailRequestDto;
 import com.example.ssafy_bank.bank.dto.request.TransactionSummaryDto;
 import com.example.ssafy_bank.bank.dto.request.UserIdRequestDto;
@@ -10,9 +11,11 @@ import com.example.ssafy_bank.bank.service.BankService;
 import com.example.ssafy_bank.common.response.Response;
 import com.example.ssafy_bank.common.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,12 +44,11 @@ public class BankController {
         return Response.create(ResponseCode.SUCCESS_SELECT_HISTORY, summaries);
     }
 
-    // 잔액 조회
-    @PostMapping("/balance")
-    public Response<Object> selectBalance(@RequestBody UserIdRequestDto request) {
-        BalanceResponseDto response = bankService.getBalance(request.getUserId());
-        return Response.create(ResponseCode.SUCCESS_SELECT_BALANCE, response);
+    // 또페이 충전 API 추가
+    @PostMapping("/charge-ddopay")
+    public ResponseEntity<BankChargeResponseDto> chargeDdoPay(@RequestBody ChargeDdoPayRequestDto request) {
+        BankChargeResponseDto response = bankService.chargeDdoPay(request);
+        return ResponseEntity.ok(response);
     }
-
 
 }
