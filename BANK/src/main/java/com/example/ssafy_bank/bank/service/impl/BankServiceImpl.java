@@ -12,13 +12,18 @@ import com.example.ssafy_bank.bank.entity.SsafyUser;
 import com.example.ssafy_bank.bank.repository.BankRepository;
 import com.example.ssafy_bank.bank.service.BankService;
 import com.example.ssafy_bank.common.exception.CustomException;
+import com.example.ssafy_bank.common.exception.SuccessfulAccountCreationException;
 import com.example.ssafy_bank.common.response.ResponseCode;
 import com.example.ssafy_bank.config.BankApiConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,12 +74,33 @@ public class BankServiceImpl implements BankService {
 
         CreateAccountResponseDto accountResponse = bankWebClient.post()
                 .uri("/edu/demandDeposit/createDemandDepositAccount")
+                .contentType(MediaType.APPLICATION_JSON)
                 .header("Content-Type", "application/json")
                 .bodyValue(accountRequest)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
+                        clientResponse.bodyToMono(String.class).flatMap(body -> {
+                            log.warn("400 Bad Request 응답 본문: {}", body);
+                            try {
+                                CreateAccountResponseDto dto = new ObjectMapper().readValue(body, CreateAccountResponseDto.class);
+                                if ("H0000".equals(dto.getHeader().getResponseCode())) {
+                                    return Mono.<Throwable>error(new SuccessfulAccountCreationException(dto));
+                                } else {
+                                    return Mono.<Throwable>error(new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "account", "계좌 생성 실패"));
+                                }
+                            } catch (Exception ex) {
+                                return Mono.<Throwable>error(new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "account", "계좌 생성 실패 - 응답 파싱 에러"));
+                            }
+                        })
+                )
                 .bodyToMono(CreateAccountResponseDto.class)
                 .doOnNext(res -> log.info("계좌 생성 응답: {}", res))
-                .doOnError(e -> log.error("계좌 생성 중 에러 발생: {}", e.getMessage()))
+                .onErrorResume(e -> {
+                    if (e instanceof SuccessfulAccountCreationException) {
+                        return Mono.just(((SuccessfulAccountCreationException) e).getDto());
+                    }
+                    return Mono.error(e);
+                })
                 .block();
 
         if (Objects.requireNonNull(accountResponse).getHeader() == null) {
@@ -108,6 +134,7 @@ public class BankServiceImpl implements BankService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(depositRequest)
                 .retrieve()
+
                 .bodyToMono(String.class)  // 입금 응답은 추후 DTO로 매핑할 수 있음
                 .doOnNext(res -> log.info("입금 응답: {}", res))
                 .block();
