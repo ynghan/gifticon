@@ -2,8 +2,10 @@ package com.example.ssafy_bank.bank.service.impl;
 
 import com.example.ssafy_bank.bank.dto.finance_request.CreateAccountRequestDto;
 import com.example.ssafy_bank.bank.dto.finance_request.CreateUserKeyRequestDto;
+import com.example.ssafy_bank.bank.dto.finance_request.Deposit1000RequestDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateAccountResponseDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateUserKeyResponseDto;
+import com.example.ssafy_bank.bank.dto.response.LoginResponseDto;
 import com.example.ssafy_bank.bank.entity.SsafyUser;
 import com.example.ssafy_bank.bank.repository.BankRepository;
 import com.example.ssafy_bank.bank.service.BankService;
@@ -12,7 +14,7 @@ import com.example.ssafy_bank.common.response.ResponseCode;
 import com.example.ssafy_bank.config.BankApiConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -90,8 +92,35 @@ public class BankServiceImpl implements BankService {
                 .build();
 
         bankRepository.save(user);
+
+        // 1000만원 입금하기
+        Deposit1000RequestDto depositRequest = Deposit1000RequestDto.of(accountNo, bankApiConfig.getApiKey());
+
+        bankWebClient.post()
+                .uri("/edu/demandDeposit/updateDemandDepositAccountDeposit")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(depositRequest)
+                .retrieve()
+                .bodyToMono(String.class)  // 입금 응답은 추후 DTO로 매핑할 수 있음
+                .doOnNext(res -> log.info("입금 응답: {}", res))
+                .block();
     }
 
+
+    // 이메일 로그인
+    @Override
+    public LoginResponseDto login(String email) {
+        Optional<SsafyUser> existingUser = bankRepository.findByEmail(email);
+        if (existingUser.isPresent()) {
+            SsafyUser user = existingUser.get();
+            log.info("로그인 성공: {}", email);
+            return new LoginResponseDto(user.getUserId(), user.getEmail());
+
+        } else {
+            log.error("존재하지 않는 이메일: {}", email);
+            throw new CustomException(ResponseCode.USER_NOT_FOUND, "email", "존재하지 않는 이메일입니다.");
+        }
+    }
 
 
 }

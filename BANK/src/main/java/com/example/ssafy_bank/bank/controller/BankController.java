@@ -1,6 +1,7 @@
-package com.example.ssafy_bank.bank.controller;
+package com.example .ssafy_bank.bank.controller;
 
 import com.example.ssafy_bank.bank.dto.request.EmailRequestDto;
+import com.example.ssafy_bank.bank.dto.response.LoginResponseDto;
 import com.example.ssafy_bank.bank.service.BankService;
 import com.example.ssafy_bank.common.response.Response;
 import com.example.ssafy_bank.common.response.ResponseCode;
@@ -22,6 +23,13 @@ public class BankController {
     public Response<Object> createUserKey(@RequestBody EmailRequestDto request) {
         bankService.createUserKey(request.getEmail());
         return Response.create(ResponseCode.SUCCESS_CREATE_USER_KEY, null);
+    }
+
+    // 이메일로 로그인
+    @PostMapping("/login")
+    public Response<Object> emailLogin(@RequestBody EmailRequestDto request) {
+        LoginResponseDto response = bankService.login(request.getEmail());
+        return Response.create(ResponseCode.SUCCESS_LOGIN, response);
     }
 
 }
