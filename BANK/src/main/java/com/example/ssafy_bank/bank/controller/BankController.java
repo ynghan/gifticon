@@ -1,15 +1,17 @@
 package com.example .ssafy_bank.bank.controller;
 
+import com.example.ssafy_bank.bank.dto.finance_request.SelectHistoryRequestDto;
 import com.example.ssafy_bank.bank.dto.request.EmailRequestDto;
+import com.example.ssafy_bank.bank.dto.request.TransactionSummaryDto;
+import com.example.ssafy_bank.bank.dto.request.UserIdRequestDto;
 import com.example.ssafy_bank.bank.dto.response.LoginResponseDto;
 import com.example.ssafy_bank.bank.service.BankService;
 import com.example.ssafy_bank.common.response.Response;
 import com.example.ssafy_bank.common.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +33,12 @@ public class BankController {
         LoginResponseDto response = bankService.login(request.getEmail());
         return Response.create(ResponseCode.SUCCESS_LOGIN, response);
     }
+    // 계좌 내역 조회
+    @PostMapping("/list")
+    public Response<Object> selectHistory(@RequestBody UserIdRequestDto request) {
+        List<TransactionSummaryDto> summaries = bankService.selectHistory(request.getUserId());
+        return Response.create(ResponseCode.SUCCESS_SELECT_HISTORY, summaries);
+    }
+
 
 }
