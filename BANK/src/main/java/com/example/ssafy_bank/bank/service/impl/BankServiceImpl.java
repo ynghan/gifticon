@@ -3,8 +3,11 @@ package com.example.ssafy_bank.bank.service.impl;
 import com.example.ssafy_bank.bank.dto.finance_request.CreateAccountRequestDto;
 import com.example.ssafy_bank.bank.dto.finance_request.CreateUserKeyRequestDto;
 import com.example.ssafy_bank.bank.dto.finance_request.Deposit1000RequestDto;
+import com.example.ssafy_bank.bank.dto.finance_request.SelectHistoryRequestDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateAccountResponseDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateUserKeyResponseDto;
+import com.example.ssafy_bank.bank.dto.finance_response.SelectHistoryResponseDto;
+import com.example.ssafy_bank.bank.dto.request.TransactionSummaryDto;
 import com.example.ssafy_bank.bank.dto.response.LoginResponseDto;
 import com.example.ssafy_bank.bank.entity.SsafyUser;
 import com.example.ssafy_bank.bank.repository.BankRepository;
@@ -18,8 +21,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -120,6 +126,52 @@ public class BankServiceImpl implements BankService {
             log.error("존재하지 않는 이메일: {}", email);
             throw new CustomException(ResponseCode.USER_NOT_FOUND, "email", "존재하지 않는 이메일입니다.");
         }
+    }
+
+    // 계좌 내역 조회
+    @Override
+    public List<TransactionSummaryDto> selectHistory(Long userId) {
+        Optional<SsafyUser> userOpt = bankRepository.findById(userId);
+        if(userOpt.isEmpty()) {
+            throw new CustomException(ResponseCode.USER_NOT_FOUND);
+        }
+        SsafyUser user = userOpt.get();
+
+        SelectHistoryRequestDto requestDto = SelectHistoryRequestDto.of(
+                bankApiConfig.getApiKey(),
+                user.getUserKey(),
+                user.getAccountNum()
+        );
+
+        SelectHistoryResponseDto historyResponse = bankWebClient.post()
+                .uri("/edu/demandDeposit/inquireTransactionHistoryList")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestDto)
+                .retrieve()
+                .bodyToMono(SelectHistoryResponseDto.class)
+                .doOnNext(res -> log.info("전체 거래 내역 응답: {}", res))
+                .block();
+
+        if(historyResponse == null || historyResponse.getHeader() == null) {
+            throw new CustomException(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        String responseCode = historyResponse.getHeader().getResponseCode();
+        log.info("계좌내역 응답 코드: {}", responseCode);
+        if (!"H0000".equals(responseCode)) {
+            throw new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "history", "거래 내역 조회 실패");
+        }
+
+        List<TransactionSummaryDto> summaries = historyResponse.getRec().getList().stream()
+                .map(detail -> new TransactionSummaryDto(
+                        detail.getTransactionTypeName(),
+                        detail.getTransactionAfterBalance(),
+                        detail.getTransactionDate(),
+                        detail.getTransactionTime()
+                ))
+                .collect(Collectors.toList());
+
+        return summaries;
     }
 
 
