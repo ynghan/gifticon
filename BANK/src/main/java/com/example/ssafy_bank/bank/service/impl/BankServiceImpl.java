@@ -75,7 +75,6 @@ public class BankServiceImpl implements BankService {
         CreateAccountResponseDto accountResponse = bankWebClient.post()
                 .uri("/edu/demandDeposit/createDemandDepositAccount")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Content-Type", "application/json")
                 .bodyValue(accountRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
