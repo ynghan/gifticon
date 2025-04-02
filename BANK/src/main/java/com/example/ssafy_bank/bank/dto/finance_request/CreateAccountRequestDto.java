@@ -25,7 +25,7 @@ public class CreateAccountRequestDto {
     @JsonProperty("accountTypeUniqueNo")
     private String accountTypeUniqueNo;
 
-    public static CreateAccountRequestDto of(String userKey) {
+    public static CreateAccountRequestDto of(String userKey, String apiKey) {
         LocalDateTime now = LocalDateTime.now();
         String date = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String time = now.format(DateTimeFormatter.ofPattern("HHmmss"));
@@ -39,7 +39,7 @@ public class CreateAccountRequestDto {
         header.put("fintechAppNo", "001");
         header.put("apiServiceCode", "createDemandDepositAccount");
         header.put("institutionTransactionUniqueNo", institutionTransactionUniqueNo);
-        header.put("apiKey", "bcc132cc5c0e43fc9cf9ffb61369c224");
+        header.put("apiKey", apiKey);
         header.put("userKey", userKey);
 
         return CreateAccountRequestDto.builder()

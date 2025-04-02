@@ -1,6 +1,8 @@
 package com.example.ssafy_bank.bank.service.impl;
 
+import com.example.ssafy_bank.bank.dto.finance_request.CreateAccountRequestDto;
 import com.example.ssafy_bank.bank.dto.finance_request.CreateUserKeyRequestDto;
+import com.example.ssafy_bank.bank.dto.finance_response.CreateAccountResponseDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateUserKeyResponseDto;
 import com.example.ssafy_bank.bank.entity.SsafyUser;
 import com.example.ssafy_bank.bank.repository.BankRepository;
@@ -10,6 +12,7 @@ import com.example.ssafy_bank.common.response.ResponseCode;
 import com.example.ssafy_bank.config.BankApiConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -47,15 +50,48 @@ public class BankServiceImpl implements BankService {
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(CreateUserKeyResponseDto.class)
-                .doOnNext(res -> log.info("✅ 성공 응답: {}", res))
+                .doOnNext(res -> log.info("성공 응답: {}", res))
                 .block();
 
+        String userKey = Objects.requireNonNull(response).getUserKey();
+
+        // 받아온 userKey로 계좌 생성
+        CreateAccountRequestDto accountRequest = CreateAccountRequestDto.of(userKey, bankApiConfig.getApiKey());
+
+        CreateAccountResponseDto accountResponse = bankWebClient.post()
+                .uri("/edu/demandDeposit/createDemandDepositAccount")
+                .header("Content-Type", "application/json")
+                .bodyValue(accountRequest)
+                .retrieve()
+                .bodyToMono(CreateAccountResponseDto.class)
+                .doOnNext(res -> log.info("계좌 생성 응답: {}", res))
+                .doOnError(e -> log.error("계좌 생성 중 에러 발생: {}", e.getMessage()))
+                .block();
+
+        if (Objects.requireNonNull(accountResponse).getHeader() == null) {
+            throw new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "header", "응답 헤더가 비어 있음");
+        }
+
+        log.info("전체 계좌 생성 응답 객체: {}", accountResponse);
+
+
+        String responseCode = Objects.requireNonNull(accountResponse).getHeader().getResponseCode();
+        log.info("계좌생성 응답 코드 : {}", responseCode);
+        if(!"H0000".equals(responseCode)) {
+            throw new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "account", "계좌 생성 실패");
+        }
+
+        String accountNo = accountResponse.getRec().getAccountNo();
+
         SsafyUser user = SsafyUser.builder()
-                .accountNum("0")
+                .accountNum(accountNo)
                 .userKey(Objects.requireNonNull(response).getUserKey())
                 .email(email)
                 .build();
 
         bankRepository.save(user);
     }
+
+
+
 }
