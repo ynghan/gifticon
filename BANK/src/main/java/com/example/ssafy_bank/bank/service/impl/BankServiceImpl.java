@@ -6,6 +6,7 @@ import com.example.ssafy_bank.bank.dto.finance_request.*;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateAccountResponseDto;
 import com.example.ssafy_bank.bank.dto.finance_response.CreateUserKeyResponseDto;
 import com.example.ssafy_bank.bank.dto.finance_response.SelectBalanceResponseDto;
+
 import com.example.ssafy_bank.bank.dto.finance_response.SelectHistoryResponseDto;
 import com.example.ssafy_bank.bank.dto.request.TransactionSummaryDto;
 import com.example.ssafy_bank.bank.dto.response.BalanceResponseDto;
@@ -205,6 +206,39 @@ public class BankServiceImpl implements BankService {
 
         return summaries;
     }
+
+    // 잔액 조회
+    @Override
+    public BalanceResponseDto getBalance(Long userId) {
+        Optional<SsafyUser> userOpt = bankRepository.findById(userId);
+        if(userOpt.isEmpty()) {
+            throw new CustomException(ResponseCode.USER_NOT_FOUND);
+        }
+        SsafyUser user = userOpt.get();
+
+        SelectBalanceRequestDto requestDto = SelectBalanceRequestDto.of(
+                bankApiConfig.getApiKey(),
+                user.getUserKey(),
+                user.getAccountNum()
+        );
+        SelectBalanceResponseDto balanceResponse = bankWebClient.post()
+                .uri("/edu/demandDeposit/inquireDemandDepositAccountBalance")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestDto)
+                .retrieve()
+                .bodyToMono(SelectBalanceResponseDto.class)
+                .doOnNext(res -> log.info("잔액 조회 응답: {}", res))
+                .block();
+
+        if (balanceResponse == null || balanceResponse.getRec() == null) {
+            throw new CustomException(ResponseCode.INTERNAL_SERVER_ERROR, "balance", "잔액 조회 실패");
+        }
+        String balance = balanceResponse.getRec().getAccountBalance();
+
+        return new BalanceResponseDto(balance);
+    }
+
+
 
     // 또페이 계좌이체 요청
     @Override

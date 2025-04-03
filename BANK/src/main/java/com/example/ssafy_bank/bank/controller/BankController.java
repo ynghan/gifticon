@@ -37,11 +37,19 @@ public class BankController {
         LoginResponseDto response = bankService.login(request.getEmail());
         return Response.create(ResponseCode.SUCCESS_LOGIN, response);
     }
+
     // 계좌 내역 조회
     @PostMapping("/list")
     public Response<Object> selectHistory(@RequestBody UserIdRequestDto request) {
         List<TransactionSummaryDto> summaries = bankService.selectHistory(request.getUserId());
         return Response.create(ResponseCode.SUCCESS_SELECT_HISTORY, summaries);
+    }
+
+    // 잔액 조회
+    @PostMapping("/balance")
+    public Response<Object> selectBalance(@RequestBody UserIdRequestDto request) {
+        BalanceResponseDto response = bankService.getBalance(request.getUserId());
+        return Response.create(ResponseCode.SUCCESS_SELECT_BALANCE, response);
     }
 
     // 또페이 충전 API 추가

@@ -1,7 +1,9 @@
 package com.example.ssafy_bank.common.exception;
 
 import com.example.ssafy_bank.bank.dto.finance_response.CreateAccountResponseDto;
+import lombok.Getter;
 
+@Getter
 public class SuccessfulAccountCreationException extends RuntimeException {
     private final CreateAccountResponseDto dto;
 
@@ -10,7 +12,4 @@ public class SuccessfulAccountCreationException extends RuntimeException {
         this.dto = dto;
     }
 
-    public CreateAccountResponseDto getDto() {
-        return dto;
-    }
 }
