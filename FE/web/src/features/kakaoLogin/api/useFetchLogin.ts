@@ -1,31 +1,24 @@
+import { axiosInstance } from '@/shared/api/axiosInstance';
+
 export async function fetchKakaoLogin(code: string) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/kakao/callback`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-      }
-    );
+    // console.log('카카오 로그인 시도 중...', code);
 
-    if (!response.ok) {
-      throw new Error('로그인 실패');
+    const response = await axiosInstance.post('/api/auth/kakao/callback', {
+      code,
+    });
+
+    // console.log('카카오 로그인 응답:', response.data);
+
+    // accessToken이 있는지 확인
+    if (!response.data.accessToken) {
+      console.error('토큰이 응답에 없습니다.');
+      throw new Error('토큰이 없습니다.');
     }
 
-    const data = await response.json();
-    console.log("Social login response:", data); // 응답 전체를 콘솔에 출력
-
-    // 예시: accessToken이 있는지 확인
-    if (!data.accessToken) {
-      throw new Error("토큰이 없습니다.");
-    }
-
-    return data;
-    } catch (error) {
-    console.error("로그인 처리 중 오류", error);
+    return response.data;
+  } catch (error) {
+    console.error('카카오 로그인 처리 중 오류:', error);
     throw error;
-    }
+  }
 }
