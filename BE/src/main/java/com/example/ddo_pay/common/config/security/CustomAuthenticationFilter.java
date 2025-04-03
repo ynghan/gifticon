@@ -28,7 +28,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // "/api/users/social/kakao/login"을 제외한 모든 요청 처리
-        if (!request.getRequestURI().equals("/api/users/social/kakao/login")) {
+        // /api/auth/kakao/callback 로 임시 변경
+        if (!request.getRequestURI().equals("/api/auth/kakao/callback")) {
             String token = request.getHeader("xx-auth");
 
             log.info("its : " + token);

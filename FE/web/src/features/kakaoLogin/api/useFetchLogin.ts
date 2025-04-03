@@ -1,7 +1,7 @@
 export async function fetchKakaoLogin(code: string) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/social/kakao/login`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/kakao/callback`,
       {
         method: 'POST',
         headers: {
@@ -16,9 +16,16 @@ export async function fetchKakaoLogin(code: string) {
     }
 
     const data = await response.json();
+    console.log("Social login response:", data); // 응답 전체를 콘솔에 출력
+
+    // 예시: accessToken이 있는지 확인
+    if (!data.accessToken) {
+      throw new Error("토큰이 없습니다.");
+    }
+
     return data;
-  } catch (error) {
-    console.error('로그인 처리 중 오류', error);
+    } catch (error) {
+    console.error("로그인 처리 중 오류", error);
     throw error;
-  }
+    }
 }
