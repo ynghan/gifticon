@@ -30,6 +30,8 @@ pipeline {
                     withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
                         dir('BE'){
                             sh 'cp $APP_YML ./src/main/resources/application.yml'
+                            sh 'echo "[DEBUG] application.yml 적용됨:"'
+                            sh 'cat ./src/main/resources/application.yml | grep ddl-auto'
                         }
                     }
                 }
@@ -39,8 +41,8 @@ pipeline {
         stage('Build') {
             steps {
                 dir('BE') {
-                    echo "[DEBUG] Build 단계 진입"
-                    sh "chmod +x ./gradlew"
+                    sh 'echo "[DEBUG] 빌드 전 application.yml 확인:"'
+                    sh 'cat ./src/main/resources/application.yml | grep ddl-auto' // ✅ 이거 꼭 넣자
                     sh "./gradlew clean build -x test"
                 }
             }
