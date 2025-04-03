@@ -37,25 +37,34 @@ public class SecurityConfig {
                                 .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 // http 요청의 엔드포인트 확인
-                                .authorizeHttpRequests((aHR) -> aHR
-                                                // 이 경로들은 인증받지 않음
-                                                .requestMatchers(
-                                                                new AntPathRequestMatcher(
-                                                                                "/api/users/social/kakao/login"))
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                // 그 외의 경로들은 인증
-                                                .anyRequest()
-                                                .authenticated())
-                                .addFilterBefore(new CustomAuthenticationFilter(),
-                                                UsernamePasswordAuthenticationFilter.class);
+//                                .authorizeHttpRequests((aHR) -> aHR
+//                                                // 이 경로들은 인증받지 않음
+//                                                .requestMatchers(
+//                                                                new AntPathRequestMatcher(
+//                                                                                "/api/users/social/kakao/login"))
+//                                                .permitAll()
+//                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                                                // 그 외의 경로들은 인증
+//                                                .anyRequest()
+//                                                .authenticated())
+//                                .addFilterBefore(new CustomAuthenticationFilter(),
+//                                                UsernamePasswordAuthenticationFilter.class);
+                                .authorizeHttpRequests(aHR -> aHR
+                                        // 변경: 프론트엔드에서 호출하는 경로를 허용
+                                        .requestMatchers(new AntPathRequestMatcher("/api/auth/kakao/callback")).permitAll()
+                                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                        .anyRequest().authenticated())
+                                .addFilterBefore(new CustomAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
 
                 return http.build();
         }
 
         // Cors 설정 부분
+        // 변경 부분: 빈 이름을 "corsConfigurationSource"로 변경해야 Spring Security가 자동 인식합니다.
+
         @Bean
-        public CorsConfigurationSource coreConfigurationSource() {
+        public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration corsconfig = new CorsConfiguration();
                 corsconfig.setAllowedOrigins(
                                 Arrays.asList("http://j12e106.p.ssafy.io",
@@ -66,6 +75,7 @@ public class SecurityConfig {
                 corsconfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsconfig
                                 .setAllowedHeaders(Arrays.asList("*", "xx-auth", "content-type", "authorization"));
+                corsconfig.setAllowCredentials(true);
 
                 // 엔드포인트 설정
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
