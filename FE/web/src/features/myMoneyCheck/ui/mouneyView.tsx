@@ -2,8 +2,6 @@
 
 import { useFetchMyMoney } from './api/useFetchMyMoney';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Tag } from 'lucide-react';
 import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 
@@ -27,9 +25,7 @@ export const MoneyView = () => {
   return (
     <div className='bg-yellow-400 rounded-xl p-6 text-center'>
       <div className='text-sm text-gray-700 mb-2'>또페이 머니</div>
-      <div className='text-2xl font-bold mb-4'>
-        {(myMoney?.payBalance ?? 0).toLocaleString()}원
-      </div>
+      <div className='text-2xl font-bold mb-4'>{(myMoney?.payBalance ?? 0).toLocaleString()}원</div>
       <div className='flex gap-2 justify-center'>
         <button
           onClick={handleCharge}

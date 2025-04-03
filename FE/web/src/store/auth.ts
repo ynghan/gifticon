@@ -1,59 +1,54 @@
-// src/store/auth.ts
+// authStore.ts
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
-// 사용자 정보 타입 정의
-export interface User {
-  id: number;
-  nickname?: string;
-  profileImage?: string;
-  email?: string;
-  // 백엔드에서 제공하는 사용자 정보에 맞게 조정
-}
-
-// 인증 상태 타입 정의
-export interface AuthState {
-  token: string | null;
-  user: User | null;
+interface AuthState {
+  accessToken: string | null;
   isAuthenticated: boolean;
-  setToken: (token: string | null) => void;
-  setUser: (user: User | null) => void;
+  userInfo: {
+    email?: string;
+    nickname?: string;
+    profileImage?: string;
+  } | null;
+  setTokens: (accessToken: string, refreshToken?: string) => void;
+  setUserInfo: (info: any) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
+export const useAuthStore = create(
+  persist<AuthState>(
     (set) => ({
-      token: null,
-      user: null,
+      accessToken: null,
       isAuthenticated: false,
+      userInfo: null,
 
-      setToken: (token) => set({
-        token,
-        isAuthenticated: !! token
-      }),
+      setTokens: (accessToken, refreshToken) => {
+        set({ accessToken, isAuthenticated: !!accessToken });
 
-      setUser: (user) => set({ user }),
+        // refreshToken은 HTTP-only 쿠키에서 관리되므로 여기서는 저장하지 않음
+      },
 
-      logout: () => set({
-        token: null,
-        user: null,
-        isAuthenticated: false
-      }),
+      setUserInfo: (info) => {
+        set({ userInfo: info });
+      },
+
+      logout: () => {
+        set({ accessToken: null, isAuthenticated: false, userInfo: null });
+        // 서버에 로그아웃 요청 보내기
+        fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      },
     }),
     {
       name: 'auth-storage',
-      // 브라우저 환경에서만 localStorage 접근
-      storage: createJSONStorage(() => {
-        if (typeof window !== 'undefined') {
-          return localStorage;
-        }
-        return {
-          getItem: () => null,
-          setItem: () => null,
-          removeItem: () => {}
-        };
-      })
+      // 민감한 정보는 persist에서 제외
+      partialize: (state: AuthState) => ({
+        userInfo: state.userInfo,
+        isAuthenticated: state.isAuthenticated,
+        accessToken: null,
+        setTokens: state.setTokens,
+        setUserInfo: state.setUserInfo,
+        logout: state.logout,
+      }),
     }
   )
 );
