@@ -91,7 +91,6 @@ pipeline {
                                 --name ${CONTAINER_NAME} \\
                                 -p 8082:8080 \\
                                 --network s12p21e106-network \\
-                                -v /home/ubuntu/Project/S12P21E106/BE/config:/config \\
                                 -v /etc/localtime:/etc/localtime:ro \\
                                 -v /etc/timezone:/etc/timezone:ro \\
                                 -e TZ=Asia/Seoul \\
