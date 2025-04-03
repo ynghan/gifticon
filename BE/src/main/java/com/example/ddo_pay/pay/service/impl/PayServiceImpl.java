@@ -5,6 +5,7 @@ import com.example.ddo_pay.common.exception.CustomException;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.RedisHandler;
 import com.example.ddo_pay.pay.dto.bank_request.BankDdoPayChargeRequest;
+import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
 import com.example.ddo_pay.pay.dto.bank_response.BankChargeResponseDto;
 import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
@@ -323,6 +324,11 @@ public class PayServiceImpl implements PayService {
 
 
 
+    }
+
+    @Override
+    public void posPayment(PosRequest request) {
+        
     }
 
 
