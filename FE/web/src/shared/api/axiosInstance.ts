@@ -6,6 +6,6 @@ export const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'XX-Auth': 'acc-tkn',
+    'xx-auth': 'acc-tkn',
   },
 });
