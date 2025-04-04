@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,8 +31,9 @@ public class GiftController {
     private final GiftService giftService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody GiftCreateRequestDto dto) {
+    public ResponseEntity<?> create(@RequestPart("request") GiftCreateRequestDto dto, @RequestPart("image")MultipartFile image) {
 
+        dto.setImage(image);
         Long userId = SecurityUtil.getUserId();
         giftService.create(dto, userId);
 

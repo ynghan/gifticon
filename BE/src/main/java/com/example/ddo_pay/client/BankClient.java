@@ -11,4 +11,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface BankClient {
     @PostMapping("/bank/charge-ddopay")
     ResponseEntity<BankChargeResponseDto> chargeDdoPay(@RequestBody BankDdoPayChargeRequest request);
+
 }

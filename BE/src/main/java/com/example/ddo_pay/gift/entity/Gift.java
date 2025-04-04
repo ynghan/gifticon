@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -70,6 +71,10 @@ public class Gift {
 
     public void changeUsedExpired() {
         this.usedStatus = USED.EXPIRED;
+    }
+
+    public void changeUsedAfter() {
+        this.usedStatus = USED.AFTER_USE;
     }
 
     public void changeUsedCancle() {

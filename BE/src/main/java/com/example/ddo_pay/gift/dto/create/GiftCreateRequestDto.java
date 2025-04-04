@@ -1,6 +1,7 @@
 package com.example.ddo_pay.gift.dto.create;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class GiftCreateRequestDto {
     private String title;
     private int amount;
     private String message;
-    private String image;
+    private MultipartFile image;
 
     private String menuName;
 

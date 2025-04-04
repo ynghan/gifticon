@@ -70,7 +70,7 @@ public class GiftServiceImpl implements GiftService {
                 .title(dto.getTitle())
                 .amount(dto.getAmount())
                 .message(dto.getMessage())
-                .image(dto.getImage())
+                .image(dto.getImage().toString())
                 .phoneNum(dto.getPhoneNum())
                 .menuCombination(dto.getMenuName())
                 .user(user)
@@ -170,9 +170,9 @@ public class GiftServiceImpl implements GiftService {
 
         // 2. 기프티콘 유효기간 및 사용 가능 여부 확인
         boolean isUsable = isGiftUsable(gift, dto);
-        if (!isUsable) {
-            throw new CustomException(ResponseCode.GIFT_NOT_USABLE); // 기프티콘 사용 불가 시 CustomException 발생
-        }
+//        if (!isUsable) {
+//            throw new CustomException(ResponseCode.GIFT_NOT_USABLE); // 기프티콘 사용 불가 시 CustomException 발생
+//        }
 
         // 3. 비밀번호 확인 로직
         if (!payService.verifyGiftPassword(userId, dto.getGiftUsePassword())) {
@@ -189,13 +189,14 @@ public class GiftServiceImpl implements GiftService {
 
     // 기프티콘 만료 확인 메서드
     private boolean isGiftOver(Gift gift) {
+        // 현재 시각이 만료일보다 이후 시각인 경우 true 반환
         return gift.getExpirationDate().isBefore(LocalDateTime.now());
     }
 
     // 기프티콘 사용 가능 여부 검증 메서드
     private boolean isGiftUsable(Gift gift, GiftCheckRequestDto dto) {
         // 1. 유효기간 만료 확인
-        if (isGiftOver(gift)) {
+        if (gift.isExpired()) {
             return false;
         }
 

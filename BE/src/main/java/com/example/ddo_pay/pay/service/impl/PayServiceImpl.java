@@ -4,8 +4,11 @@ import com.example.ddo_pay.client.BankClient;
 import com.example.ddo_pay.common.exception.CustomException;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.RedisHandler;
+import com.example.ddo_pay.gift.entity.Gift;
+import com.example.ddo_pay.gift.repository.GiftRepository;
 import com.example.ddo_pay.pay.dto.bank_request.BankDdoPayChargeRequest;
 import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
+import com.example.ddo_pay.pay.dto.bank_request.TokenEqualResponseDto;
 import com.example.ddo_pay.pay.dto.bank_response.BankChargeResponseDto;
 import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
@@ -23,20 +26,27 @@ import com.example.ddo_pay.pay.finance_api.FinanceClient;
 import com.example.ddo_pay.pay.repository.AccountRepository;
 import com.example.ddo_pay.pay.repository.DdoPayRepository;
 import com.example.ddo_pay.pay.service.PayService;
+import com.example.ddo_pay.sse.SseService;
 import com.example.ddo_pay.user.entity.User;
 import com.example.ddo_pay.user.service.impl.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,7 +62,10 @@ public class PayServiceImpl implements PayService {
     private final DdoPayRepository ddoPayRepository;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final GiftRepository giftRepository;
     private final BankClient bankClient;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final SseService sseService;
 
 
     // 유효 계좌 인증
@@ -326,9 +339,91 @@ public class PayServiceImpl implements PayService {
 
     }
 
+    // 같다면, 다음 로직 실행(계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE))
+    // 다르면, 프론트로 실패 응답(SSE) + pos로 실패 응답(REST)
     @Override
-    public void posPayment(PosRequest request) {
-        
+    public void posPayment(TokenEqualResponseDto request) throws JsonProcessingException {
+        // 계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE)
+        if(request.getResult()) {
+            BankDdoPayChargeRequest bankRequest = BankDdoPayChargeRequest.builder()
+                    .userAccountNum("9990627419918613") // 법인 계좌
+                    .corporationAccountNum(request.getStoreAccount()) // 가게 계좌
+                    .amount(Math.toIntExact(request.getPaymentAmount()))
+                    .build();
+
+            // 계좌 이체 요청
+            ResponseEntity<BankChargeResponseDto> response = bankClient.chargeDdoPay(bankRequest);
+
+            // 계좌 이체 성공 확인
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String paymentToken = request.getPaymentToken();
+                String key = "token:" + paymentToken;
+                String redisValue = (String) redisTemplate.opsForValue().get(key);
+
+                Long giftId = null;
+                Long userId = null;
+
+                if (redisValue != null) {
+                    String[] parts = redisValue.split(",");
+                    for (String part : parts) {
+                        if (part.startsWith("giftId:")) {
+                            giftId = Long.valueOf(part.split(":")[1]);
+                        }
+                        if (part.startsWith("userId:")) {
+                            userId = Long.valueOf(part.split(":")[1]);
+                        }
+                    }
+                }
+
+                // 기프티콘 상태 변경
+                Gift gift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+                gift.changeUsedAfter(); // 기프티콘 상태 변경
+                giftRepository.save(gift);
+
+                // SSE로 성공 응답 보내기
+                if (userId != null) {
+                    Map<String, Object> eventData = new HashMap<>();
+                    eventData.put("status", "SUCCESS");
+                    eventData.put("message", "결제가 성공적으로 처리되었습니다.");
+                    eventData.put("giftId", giftId);
+                    eventData.put("amount", request.getPaymentAmount());
+
+                    String jsonData = new ObjectMapper().writeValueAsString(eventData);
+                    sseService.sendToUser(userId.toString(), jsonData);
+                }
+
+                // Redis에서 사용된 토큰 정보 삭제
+                redisTemplate.delete(key);
+            } else {
+                // 계좌 이체 실패 시 SSE로 실패 응답
+                if (request.getUserId() != null) {
+                    Map<String, Object> eventData = new HashMap<>();
+                    eventData.put("status", "FAIL");
+                    eventData.put("message", "결제 처리 중 은행 오류가 발생했습니다.");
+
+                    String jsonData = new ObjectMapper().writeValueAsString(eventData);
+                    sseService.sendToUser(request.getUserId().toString(), jsonData);
+                }
+
+                // POS로 실패 응답 반환 (컨트롤러에서 처리해야 함)
+                throw new CustomException(ResponseCode.BANK_TRANSACTION_FAILED);
+            }
+        } else {
+            // 토큰 검증 실패 시
+
+            // 프론트로 실패 응답(SSE)
+            if (request.getUserId() != null) {
+                Map<String, Object> eventData = new HashMap<>();
+                eventData.put("status", "FAIL");
+                eventData.put("message", "유효하지 않은 결제 토큰입니다.");
+
+                String jsonData = new ObjectMapper().writeValueAsString(eventData);
+                sseService.sendToUser(request.getUserId().toString(), jsonData);
+            }
+
+            // pos로 실패 응답(컨트롤러에서 처리)
+            throw new CustomException(ResponseCode.INVALID_PAYMENT_TOKEN);
+        }
     }
 
     // 기프티콘 결제 시 비밀번호 조회
@@ -342,6 +437,45 @@ public class PayServiceImpl implements PayService {
             throw new CustomException(ResponseCode.NO_EXIST_DDOPAY);
         }
         return ddoPay.checkPassword(inputPassword);
+    }
+
+    // 같은지 다른지만 확인하고 dto에 결과값 반영해서 응답하기
+    @Override
+    public TokenEqualResponseDto comparePaymentToken(PosRequest request) {
+        String paymentToken = request.getPaymentToken();
+        String key = "token:" + paymentToken;
+        String redisValue = (String) redisTemplate.opsForValue().get(key);
+
+        // Redis에서 필요한 정보 추출
+        Long giftId = null;
+        Long userId = null;
+        Long expectedAmount = null;
+
+        String[] parts = redisValue.split(",");
+        for (String part : parts) {
+            if (part.startsWith("giftId:")) {
+                giftId = Long.valueOf(part.split(":")[1]);
+            }
+            if (part.startsWith("userId:")) {
+                userId = Long.valueOf(part.split(":")[1]);
+            }
+            if (part.startsWith("amount:")) {
+                expectedAmount = Long.valueOf(part.split(":")[1]);
+            }
+        }
+
+        // 금액 검증
+        boolean amountMatches = (expectedAmount != null && expectedAmount == request.getPaymentAmount());
+
+
+        return TokenEqualResponseDto.builder()
+                .result(amountMatches)
+                .paymentToken(paymentToken)
+                .paymentAmount(request.getPaymentAmount())
+                .storeAccount(request.getStoreAccount())
+                .userId(userId)
+                .giftId(giftId)
+                .build();
     }
 
 

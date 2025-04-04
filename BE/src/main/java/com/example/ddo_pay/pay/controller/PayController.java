@@ -1,9 +1,11 @@
 package com.example.ddo_pay.pay.controller;
 
+import com.example.ddo_pay.common.exception.CustomException;
 import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
+import com.example.ddo_pay.pay.dto.bank_request.TokenEqualResponseDto;
 import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
 import com.example.ddo_pay.pay.dto.request.ChargeDdoPayRequest;
 import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
@@ -14,6 +16,7 @@ import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -100,11 +103,46 @@ public class PayController {
     // POS에서 토큰, 결제 금액, 가게 계좌 받기
     @PostMapping("/pos")
     public ResponseEntity<?> posPayment(@RequestBody PosRequest request) {
-        log.info("POS 결제 요청 수신 - 토큰: {}, 금액: {}, 가맹점 계좌: {}",
-                request.getPaymentToken(),
-                request.getPaymentAmount(),
-                request.getStoreAccount());
-        return ResponseEntity.ok("요청 수신 완료");
+        try {
+            // request.getPaymentToken() 값을 들고와서 Redis의 토큰값과 비교한다.
+            TokenEqualResponseDto matchedDto = payService.comparePaymentToken(request);
+
+            log.info(matchedDto.getPaymentToken());
+            log.info(matchedDto.getResult().toString());
+            log.info(String.valueOf(matchedDto.getPaymentAmount()));
+
+            // 같다면, 다음 로직 실행(계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE))
+            payService.posPayment(matchedDto);
+
+            log.info("POS 결제 요청 성공 처리 - 토큰: {}, 금액: {}, 가맹점 계좌: {}",
+                    request.getPaymentToken(),
+                    request.getPaymentAmount(),
+                    request.getStoreAccount());
+
+            return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_PAYMENT, "결제가 성공적으로 처리되었습니다."));
+        } catch (CustomException e) {
+            log.error("POS 결제 요청 실패 - 토큰: {}, 에러: {}",
+                    request.getPaymentToken(),
+                    e.getMessage());
+
+            // CustomException에서 응답 코드를 가져오는 방식에 따라 수정
+            ResponseCode errorCode = ResponseCode.UNKNOWN_ERROR; // 기본값
+
+            // CustomException에서 응답 코드를 가져오는 방법에 따라 아래 코드 변경
+            // 예: e.getCode() 또는 e.getResponseCode() 등
+
+            return new ResponseEntity<>(
+                    Response.create(errorCode, null),
+                    errorCode.getHttpStatus()
+            );
+        } catch (Exception e) {
+            log.error("POS 결제 요청 처리 중 예상치 못한 오류 발생", e);
+
+            return new ResponseEntity<>(
+                    Response.create(ResponseCode.INTERNAL_SERVER_ERROR, null),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
 
