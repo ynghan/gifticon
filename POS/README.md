@@ -1,5 +1,5 @@
 npm install 으로 다음 라이브러리 설치
-smartcard
+pyscard
 requests
 
 main_screen.py 실행하기
@@ -11,4 +11,4 @@ order_data.py에서 메뉴 데이터 수정
 
 - payment_screen.py : 결제 로그 화면과 결제 로직이 있는 파일
 - NfcReader.py : nfc 활성화 / 인식 로직이 있는 파일
-- order_data.py : 메뉴와 주문내역을 관리할 수 있는 파일
+- order_data.py : 메뉴와 주문내역을 관리할 수 있는 파일 
