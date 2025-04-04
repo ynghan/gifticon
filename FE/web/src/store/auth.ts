@@ -1,4 +1,3 @@
-// authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -24,8 +23,8 @@ export const useAuthStore = create(
 
       setTokens: (accessToken, refreshToken) => {
         set({ accessToken, isAuthenticated: !!accessToken });
-
-        // refreshToken은 HTTP-only 쿠키에서 관리되므로 여기서는 저장하지 않음
+        // 쿠키에 토큰 저장
+        document.cookie = `accessToken=${accessToken}; path=/; max-age=86400`; // 24시간
       },
 
       setUserInfo: (info) => {
