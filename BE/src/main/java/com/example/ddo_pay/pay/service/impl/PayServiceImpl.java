@@ -361,7 +361,7 @@ public class PayServiceImpl implements PayService {
             response.setTitle(history.getTitle());
             response.setTime(history.getTime());
             response.setInOutAmount(history.getInOutAmount());
-            response.setType(history.getType().name());
+            response.setType(history.getType());
             return response;
         }).collect(Collectors.toList());
 

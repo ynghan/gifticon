@@ -107,8 +107,9 @@ public class PayController {
 
     // 또페이 결제 내역 조회
     @GetMapping("/history")
-    public ResponseEntity<?> selectHistory(@RequestBody SelectHistoryRequest request) {
+    public ResponseEntity<?> selectHistory(@RequestParam(name = "history_type") String historyType) {
         Long userId = SecurityUtil.getUserId();
+        SelectHistoryRequest request = new SelectHistoryRequest(historyType);
         List<GetHistoryListResponse> responses = payService.selectHistoryList(userId, request);
         return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_SELECT_HISTORY, responses));
     }
