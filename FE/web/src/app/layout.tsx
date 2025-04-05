@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { MSWProvider } from '@/shared/msw';
 import CustomQueryClientProvider from '@/shared/reactQuery/CustomQueryClientProvider';
 import { Suspense } from 'react';
 
