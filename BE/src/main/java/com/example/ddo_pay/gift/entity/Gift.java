@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 public class Gift {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     private String title; // 이름

@@ -164,6 +164,7 @@ public class GiftServiceImpl implements GiftService {
                 // 6. DB 저장
                 giftRepository.save(gift);
             }
+
             GiftSelectResponseDto dto = GiftSelectResponseDto.from(gift);
             dtoList.add(dto);
         }
