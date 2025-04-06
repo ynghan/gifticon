@@ -12,7 +12,7 @@ public class TokenEqualResponseDto {
     @JsonProperty("paymentToken")
     private String paymentToken;
     @JsonProperty("paymentAmount")
-    private int paymentAmount;
+    private Integer paymentAmount;
     @JsonProperty("storeAccount")
     private String storeAccount;
     @JsonProperty("userId")

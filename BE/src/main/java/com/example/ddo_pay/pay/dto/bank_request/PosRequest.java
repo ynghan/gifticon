@@ -18,5 +18,5 @@ public class PosRequest {
     @JsonProperty("paymentToken")
     private String paymentToken; // 토큰
     @JsonProperty("paymentAmount")
-    private int paymentAmount; // 결제 금액
+    private Integer paymentAmount; // 결제 금액
 }

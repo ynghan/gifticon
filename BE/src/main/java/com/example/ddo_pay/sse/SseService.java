@@ -26,7 +26,7 @@ public class SseService {
         return emitter;
     }
 
-    public void sendToUser(String userId, String message) {
+    public void sendToUser(Long userId, String message) {
         SseEmitter emitter = emitterMap.get(userId);
         if(emitter != null) {
             try {

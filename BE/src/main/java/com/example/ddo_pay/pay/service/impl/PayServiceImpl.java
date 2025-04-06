@@ -341,19 +341,26 @@ public class PayServiceImpl implements PayService {
     // 다르면, 프론트로 실패 응답(SSE) + pos로 실패 응답(REST)
     @Override
     public void posPayment(TokenEqualResponseDto request) throws JsonProcessingException {
+        log.info("TokenEqualResponseDto: {}, 금액: {}, 가맹점 계좌: {}",
+                request.getPaymentToken(),
+                request.getPaymentAmount(),
+                request.getStoreAccount());
         // 계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE)
         if(request.getResult()) {
+            log.info("일치된 로직 실행");
             BankDdoPayChargeRequest bankRequest = BankDdoPayChargeRequest.builder()
                     .userAccountNum("9990627419918613") // 법인 계좌
                     .corporationAccountNum(request.getStoreAccount()) // 가게 계좌
-                    .amount(Math.toIntExact(request.getPaymentAmount()))
+                    .amount(request.getPaymentAmount())
                     .build();
 
+            log.info("(또페이 -> 가게) 계좌 이체할 금액 : " + bankRequest.getAmount());
             // 계좌 이체 요청
             ResponseEntity<BankChargeResponseDto> response = bankClient.chargeDdoPay(bankRequest);
 
             // 계좌 이체 성공 확인
             if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("계좌 이체 성공 확인");
                 String paymentToken = request.getPaymentToken();
                 String key = "token:" + paymentToken;
                 String redisValue = (String) redisTemplate.opsForValue().get(key);
@@ -372,22 +379,24 @@ public class PayServiceImpl implements PayService {
                         }
                     }
                 }
-
+                log.info("userId = {}, giftId={}", userId, giftId);
                 // 기프티콘 상태 변경
                 Gift gift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
                 gift.changeUsedAfter(); // 기프티콘 상태 변경
+                log.info("기프티콘 상태 변경 : {}", gift.getUsedStatus());
                 giftRepository.save(gift);
-
+                log.info("기프티콘 저장");
                 // SSE로 성공 응답 보내기
                 if (userId != null) {
                     Map<String, Object> eventData = new HashMap<>();
                     eventData.put("status", "SUCCESS");
                     eventData.put("message", "결제가 성공적으로 처리되었습니다.");
                     eventData.put("giftId", giftId);
-                    eventData.put("amount", request.getPaymentAmount());
+                    eventData.put("amount", bankRequest.getAmount());
 
                     String jsonData = new ObjectMapper().writeValueAsString(eventData);
-                    sseService.sendToUser(userId.toString(), jsonData);
+                    sseService.sendToUser(userId, jsonData);
+                    log.info("sse 응답 완료");
                 }
 
                 // Redis에서 사용된 토큰 정보 삭제
@@ -400,7 +409,7 @@ public class PayServiceImpl implements PayService {
                     eventData.put("message", "결제 처리 중 은행 오류가 발생했습니다.");
 
                     String jsonData = new ObjectMapper().writeValueAsString(eventData);
-                    sseService.sendToUser(request.getUserId().toString(), jsonData);
+                    sseService.sendToUser(request.getUserId(), jsonData);
                 }
 
                 // POS로 실패 응답 반환 (컨트롤러에서 처리해야 함)
@@ -416,7 +425,7 @@ public class PayServiceImpl implements PayService {
                 eventData.put("message", "유효하지 않은 결제 토큰입니다.");
 
                 String jsonData = new ObjectMapper().writeValueAsString(eventData);
-                sseService.sendToUser(request.getUserId().toString(), jsonData);
+                sseService.sendToUser(request.getUserId(), jsonData);
             }
 
             // pos로 실패 응답(컨트롤러에서 처리)
@@ -467,11 +476,11 @@ public class PayServiceImpl implements PayService {
         String paymentToken = request.getPaymentToken();
         String key = "token:" + paymentToken;
         String redisValue = (String) redisTemplate.opsForValue().get(key);
-
+        log.info("레디스에 결제 데이터 있는지 확인 : {}", redisValue);
         // Redis에서 필요한 정보 추출
         Long giftId = null;
         Long userId = null;
-        Long expectedAmount = null;
+        Integer expectedAmount = null;
 
         String[] parts = redisValue.split(",");
         for (String part : parts) {
@@ -482,18 +491,20 @@ public class PayServiceImpl implements PayService {
                 userId = Long.valueOf(part.split(":")[1]);
             }
             if (part.startsWith("amount:")) {
-                expectedAmount = Long.valueOf(part.split(":")[1]);
+                expectedAmount = Integer.parseInt(part.split(":")[1]);
             }
         }
+        log.info("pos에서 결제한 금액 : {}", request.getPaymentAmount());
+        log.info("레디스의 기프티콘 금액 : {}", expectedAmount);
 
         // 금액 검증
-        boolean amountMatches = (expectedAmount != null && expectedAmount == request.getPaymentAmount());
-
+        boolean amountMatches = (expectedAmount != null && expectedAmount.equals(request.getPaymentAmount()));
+        log.info("토큰 금액과 결제 금액이 동일한지 확인 : {}", amountMatches);
 
         return TokenEqualResponseDto.builder()
                 .result(amountMatches)
                 .paymentToken(paymentToken)
-                .paymentAmount(request.getPaymentAmount())
+                .paymentAmount(expectedAmount)
                 .storeAccount(request.getStoreAccount())
                 .userId(userId)
                 .giftId(giftId)

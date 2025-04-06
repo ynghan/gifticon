@@ -105,17 +105,12 @@ public class PayController {
             // request.getPaymentToken() 값을 들고와서 Redis의 토큰값과 비교한다.
             TokenEqualResponseDto matchedDto = payService.comparePaymentToken(request);
 
-            log.info(matchedDto.getPaymentToken());
-            log.info(matchedDto.getResult().toString());
-            log.info(String.valueOf(matchedDto.getPaymentAmount()));
+            log.info("토큰 : {}",matchedDto.getPaymentToken());
+            log.info("일치 여부 : {}", matchedDto.getResult());
+            log.info("일치된 결제 금액 : {}", matchedDto.getPaymentAmount());
 
             // 같다면, 다음 로직 실행(계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE))
             payService.posPayment(matchedDto);
-
-            log.info("POS 결제 요청 성공 처리 - 토큰: {}, 금액: {}, 가맹점 계좌: {}",
-                    request.getPaymentToken(),
-                    request.getPaymentAmount(),
-                    request.getStoreAccount());
 
             return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_PAYMENT, "결제가 성공적으로 처리되었습니다."));
         } catch (CustomException e) {
