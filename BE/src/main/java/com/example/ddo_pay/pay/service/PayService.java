@@ -3,11 +3,12 @@ package com.example.ddo_pay.pay.service;
 
 import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
 import com.example.ddo_pay.pay.dto.request.*;
-
+import com.example.ddo_pay.pay.dto.bank_request.TokenEqualResponseDto;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
 import com.example.ddo_pay.pay.dto.response.GetHistoryListResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,8 +45,9 @@ public interface PayService {
     // 또페이 충전
     void transferDdoPay(Long userId, ChargeDdoPayRequest request);
 
+    TokenEqualResponseDto comparePaymentToken(PosRequest request);
     // 포스 계좌이체
-    void posPayment(PosRequest request);
+    void posPayment(TokenEqualResponseDto request) throws JsonProcessingException;
 
     // 기프티콘 사용 요청 password 확인
     Boolean verifyGiftPassword(Long userId, String inputPassword);

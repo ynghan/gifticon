@@ -59,7 +59,7 @@ public class DdoPayDepositRequestDto {
                 .Header(header)
                 .depositAccountNo(corporationAccountNum)
                 .depositTransactionSummary("(수시입출금) : 입금")
-                .transactionBalance("1")
+                .transactionBalance(String.valueOf(amount))
                 .withdrawalAccountNo(userAccountNum)
                 .withdrawalTransactionSummary("(수시입출금) : 출금(이체)")
                 .build();
