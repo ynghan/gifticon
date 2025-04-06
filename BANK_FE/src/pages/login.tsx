@@ -14,6 +14,9 @@ function LoginPage() {
         email: email,
       });
       console.log("로그인 응답:", response.data);
+      const userId = response.data.data.userId;
+      localStorage.setItem("userId", userId.toString());
+      localStorage.setItem("email", email.toString());
       // 로그인 성공 후 원하는 페이지로 이동
       navigate('/balance');
     } catch (error) {

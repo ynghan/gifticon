@@ -198,7 +198,7 @@ public class BankServiceImpl implements BankService {
         List<TransactionSummaryDto> summaries = historyResponse.getRec().getList().stream()
                 .map(detail -> new TransactionSummaryDto(
                         detail.getTransactionTypeName(),
-                        detail.getTransactionAfterBalance(),
+                        detail.getTransactionBalance(),
                         detail.getTransactionDate(),
                         detail.getTransactionTime()
                 ))
