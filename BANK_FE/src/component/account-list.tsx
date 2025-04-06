@@ -4,7 +4,7 @@ import './account-list.css';
 
 interface Transaction {
   transactionTypeName: string;
-  transactionAfterBalance: number;
+  transactionBalance: string;
   transactionDate: string;
   transactionTime: string;
 }
@@ -26,7 +26,6 @@ function AccountList() {
         });
         setTransactions(sorted);
       })
-      
       .catch((err) => {
         console.error('계좌 내역 조회 실패:', err);
       });
@@ -38,10 +37,10 @@ function AccountList() {
       <div className="account-summary">총 {transactions.length}건</div>
 
       {transactions.map((item, index) => {
-        const isDeposit = item.transactionTypeName === '입금';
-        const sign = isDeposit ? '+' : '-';
-        const className = isDeposit ? 'plus' : 'minus';
-        
+        const isWithdrawal = item.transactionTypeName.startsWith('출금');
+        const sign = isWithdrawal ? '-' : '+';
+        const className = isWithdrawal ? 'minus' : 'plus';
+
         const date = `${parseInt(item.transactionDate.slice(4, 6))}.${parseInt(item.transactionDate.slice(6, 8))}`;
         const time = `${item.transactionTime.slice(0, 2)}:${item.transactionTime.slice(2, 4)}`;
 
@@ -50,7 +49,7 @@ function AccountList() {
             <div className="item-date">{date} {time}</div>
             <div className="item-desc">{item.transactionTypeName}</div>
             <div className={`item-amount ${className}`}>
-              {sign}{Number(1).toLocaleString()}원
+              {sign}{Number(item.transactionBalance).toLocaleString()}원
             </div>
           </div>
         );
