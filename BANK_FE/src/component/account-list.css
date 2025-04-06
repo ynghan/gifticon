@@ -39,11 +39,14 @@
     margin: 0 8px;
   }
   
-  /* 금액 */
   .item-amount {
-    width: 80px;
+    width: 150px;           
     text-align: right;
+    white-space: nowrap;   
+    overflow: hidden;      
+    text-overflow: ellipsis;
   }
+  
   
   /* 입금일 경우 */
   .plus {
