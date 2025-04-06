@@ -3,8 +3,8 @@
     background-color: #fff;
     flex: 1;
     padding: 16px;
-    /* 필요하면 스크롤 처리를 위해 overflow 설정 가능
-       e.g. max-height: calc(100vh - 200px); overflow-y: auto; */
+    max-height: calc(100vh - 200px); /* 헤더 높이 감안해서 조절 */
+  overflow-y: auto;
   }
   
   /* '총 13건' 같은 요약 부분 */
@@ -12,6 +12,9 @@
     font-weight: bold;
     margin-bottom: 8px;
     font-size: 1rem;
+  }
+  .account-list-container {
+    scroll-behavior: smooth;
   }
   
   /* 개별 항목 */

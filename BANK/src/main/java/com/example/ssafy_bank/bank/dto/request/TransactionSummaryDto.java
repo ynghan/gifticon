@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TransactionSummaryDto {
     private String transactionTypeName;
-    private String transactionAfterBalance;
+    private String transactionBalance;
     private String transactionDate;
     private String transactionTime;
 }
