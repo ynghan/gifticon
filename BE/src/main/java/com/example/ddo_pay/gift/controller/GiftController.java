@@ -67,7 +67,7 @@ public class GiftController {
     @GetMapping
     public ResponseEntity<?> selectUserGiftList() {
         Long userId = SecurityUtil.getUserId();
-        List<GiftSelectResponseDto> dtos = giftService.selectMyList(userId);
+        List<GiftSelectResponseDto> dtos = giftService.selectMyList(userId); // 여기 기프티콘 위경도 추가해서 응답하기
 
         return new ResponseEntity<>(Response.create(SUCCESS_LIST_GIFTICON, dtos), SUCCESS_LIST_GIFTICON.getHttpStatus());
     }
