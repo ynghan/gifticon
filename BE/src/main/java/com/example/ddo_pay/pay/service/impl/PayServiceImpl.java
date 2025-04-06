@@ -11,12 +11,10 @@ import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
 import com.example.ddo_pay.pay.dto.bank_request.TokenEqualResponseDto;
 import com.example.ddo_pay.pay.dto.bank_response.BankChargeResponseDto;
 import com.example.ddo_pay.pay.dto.finance.DepositAccountWithdrawRequest;
-import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
-import com.example.ddo_pay.pay.dto.request.ChargeDdoPayRequest;
-import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
-import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
+import com.example.ddo_pay.pay.dto.request.*;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
+import com.example.ddo_pay.pay.dto.response.GetHistoryListResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import com.example.ddo_pay.pay.entity.Account;
 import com.example.ddo_pay.pay.entity.AssetType;
@@ -25,6 +23,7 @@ import com.example.ddo_pay.pay.entity.History;
 import com.example.ddo_pay.pay.finance_api.FinanceClient;
 import com.example.ddo_pay.pay.repository.AccountRepository;
 import com.example.ddo_pay.pay.repository.DdoPayRepository;
+import com.example.ddo_pay.pay.repository.HistoryRepository;
 import com.example.ddo_pay.pay.service.PayService;
 import com.example.ddo_pay.sse.SseService;
 import com.example.ddo_pay.user.entity.User;
@@ -36,7 +35,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -46,7 +44,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -64,6 +61,7 @@ public class PayServiceImpl implements PayService {
     private final AccountRepository accountRepository;
     private final GiftRepository giftRepository;
     private final BankClient bankClient;
+    private final HistoryRepository historyRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final SseService sseService;
 
@@ -437,6 +435,30 @@ public class PayServiceImpl implements PayService {
             throw new CustomException(ResponseCode.NO_EXIST_DDOPAY);
         }
         return ddoPay.checkPassword(inputPassword);
+    }
+
+    // 결제 내역 조회
+    @Override
+    public List<GetHistoryListResponse> selectHistoryList(Long userId, SelectHistoryRequest request) {
+        AssetType assetType;
+        try {
+            assetType = AssetType.valueOf(request.getHistoryType().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("유효하지 않은 결제 내역 타입: " + request.getHistoryType());
+        }
+
+        List<History> histories = historyRepository.findByDdoPay_UserIdAndType(userId, assetType);
+        List<GetHistoryListResponse> responseList = histories.stream().map(history -> {
+            GetHistoryListResponse response = new GetHistoryListResponse();
+            response.setId(history.getId());
+            response.setTitle(history.getTitle());
+            response.setTime(history.getTime());
+            response.setInOutAmount(history.getInOutAmount());
+            response.setType(history.getType());
+            return response;
+        }).collect(Collectors.toList());
+
+        return responseList;
     }
 
     // 같은지 다른지만 확인하고 dto에 결과값 반영해서 응답하기

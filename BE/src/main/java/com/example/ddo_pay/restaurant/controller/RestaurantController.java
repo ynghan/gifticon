@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.ddo_pay.common.config.S3.S3Service;
 import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.restaurant.dto.request.*;
@@ -39,18 +40,23 @@ public class RestaurantController {
 	private final RestaurantService restaurantService; // Service 주입
 	private final RedisTemplate<String, String> redisTemplate;
 	private final NaverCrawlingService naverCrawlingService;
+	private final S3Service s3Service;
 
 
 	/**
 	 * 맛집 등록 (POST /api/restaurants)
+	 *      * - restaurantCreateRequestDto: JSON 데이터 (식당 정보 및 메뉴 정보)
+	 *      * - image: 식당의 메인 이미지 파일 (선택)
+	 *      * - custom_menu_image: custom_menu 배열에 해당하는 파일들 (순서대로 매핑)
 	 */
 	@PostMapping(consumes = "multipart/form-data")
 	public ResponseEntity<?> create(
 		@RequestPart("restaurantCreateRequestDto") RestaurantCreateRequestDto requestDto,
-		@RequestPart(value = "image", required = false) MultipartFile imageFile
+		@RequestPart(value = "image", required = false) MultipartFile mainImageFile,
+		@RequestPart(value = "custom_menu_image", required = false) List<MultipartFile> customMenuImages
 	) {
 		// 실제 DB 연동
-		restaurantService.createRestaurant(requestDto);
+		restaurantService.createRestaurant(requestDto, mainImageFile, customMenuImages);
 
 		return ResponseEntity
 			.status(SUCCESS_CREATE_RESTAURANT.getHttpStatus())  // 204, 혹은 201 등
@@ -167,8 +173,23 @@ public class RestaurantController {
 		// 1) Base64 decode
 		String decodedJson = new String(Base64.getDecoder().decode(data), StandardCharsets.UTF_8);
 
-		// 2) JSON → DTO
-		RestaurantCrawlingRequestDto requestDto = parseJsonToDto(decodedJson);
+		// 2) JSON 배열 파싱 및 DTO 생성
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> dataList;
+		try {
+			dataList = mapper.readValue(decodedJson, new TypeReference<List<String>>() {});
+		} catch (JsonProcessingException e) {
+			return ResponseEntity.badRequest().body("JSON 파싱 에러: " + e.getMessage());
+		}
+
+		// 배열 길이 체크 (최소 2개의 요소 필요)
+		if (dataList.size() < 2) {
+			return ResponseEntity.badRequest().body("요청 데이터 배열의 길이가 부족합니다.");
+		}
+
+		RestaurantCrawlingRequestDto requestDto = new RestaurantCrawlingRequestDto();
+		requestDto.setPlaceName(dataList.get(0));
+		requestDto.setAddressName(dataList.get(1));
 
 		// 3) 크롤링 수행
 		List<RestaurantCrawlingStoreDto> result = naverCrawlingService.getOrLoadCrawlingResult(requestDto);

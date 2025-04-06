@@ -5,13 +5,11 @@ import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.pay.dto.bank_request.PosRequest;
+import com.example.ddo_pay.pay.dto.request.*;
 import com.example.ddo_pay.pay.dto.bank_request.TokenEqualResponseDto;
-import com.example.ddo_pay.pay.dto.request.AccountVerifyRequest;
-import com.example.ddo_pay.pay.dto.request.ChargeDdoPayRequest;
-import com.example.ddo_pay.pay.dto.request.RegisterAccountRequest;
-import com.example.ddo_pay.pay.dto.request.RegisterPasswordRequest;
 import com.example.ddo_pay.pay.dto.response.GetAccountResponse;
 import com.example.ddo_pay.pay.dto.response.GetBalanceResponse;
+import com.example.ddo_pay.pay.dto.response.GetHistoryListResponse;
 import com.example.ddo_pay.pay.dto.response.GetPointResponse;
 import com.example.ddo_pay.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +143,14 @@ public class PayController {
         }
     }
 
-
+    // 또페이 결제 내역 조회
+    @GetMapping("/history")
+    public ResponseEntity<?> selectHistory(@RequestParam(name = "history_type") String historyType) {
+        Long userId = SecurityUtil.getUserId();
+        SelectHistoryRequest request = new SelectHistoryRequest(historyType);
+        List<GetHistoryListResponse> responses = payService.selectHistoryList(userId, request);
+        return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_SELECT_HISTORY, responses));
+    }
 
 
 

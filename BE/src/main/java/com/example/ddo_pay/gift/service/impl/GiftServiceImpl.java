@@ -1,5 +1,6 @@
 package com.example.ddo_pay.gift.service.impl;
 
+import com.example.ddo_pay.common.config.S3.S3Service;
 import com.example.ddo_pay.common.dto.TokenData;
 import com.example.ddo_pay.common.exception.CustomException;
 import com.example.ddo_pay.common.response.ResponseCode;
@@ -26,7 +27,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -50,13 +53,14 @@ public class GiftServiceImpl implements GiftService {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final PayService payService;
+    private final S3Service s3Service;
 
     private static final Logger log = Logger.getLogger(GiftServiceImpl.class.getName());
     private final RedisHandler redisHandler;
 
     /* 맛집 기반으로 기프티콘을 생성할 수 있다. 현재 생성할 때, 같이 이뤄져야 할 결제 로직 빠져있다. */
     @Override
-    public void create(GiftCreateRequestDto dto, Long userId) {
+    public void create(GiftCreateRequestDto dto, Long userId, MultipartFile image) throws IOException {
 
         // 1. 맛집의 메뉴들의 정보와 사용자 커스텀 정보를 받아서 DB에 저장한다.
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
@@ -66,29 +70,32 @@ public class GiftServiceImpl implements GiftService {
 
         log.info("메뉴 조합 : " + dto.getMenuName());
 
+        // S3 이미지 업로드
+        String imageUrl = s3Service.uploadFile(image);
+
         Gift gift = Gift.builder()
                 .title(dto.getTitle())
                 .amount(dto.getAmount())
                 .message(dto.getMessage())
-                .image(dto.getImage().toString())
                 .phoneNum(dto.getPhoneNum())
                 .menuCombination(dto.getMenuName())
                 .user(user)
+                .image(imageUrl)
                 .restaurant(restaurant)
                 .usedStatus(USED.BEFORE_USE)
                 .expirationDate(LocalDateTime.now().plusMonths(3))
                 .build();
 
+
+
         // 기프티콘 저장
         giftRepository.save(gift);
-        log.info(gift.toString());
+//        log.info(gift.toString());
         // 2. 저장된 기프티콘에 대해 받은 기프티콘 목록에 추가하기
         GiftBox giftBox = new GiftBox(user, gift);
-        giftBoxRepository.save(giftBox);
 
         gift.changeGiftBox(giftBox);
-        giftRepository.save(gift);
-
+        giftBoxRepository.save(giftBox);
 
         // 3. 맛집 메뉴들의 총액을 계산 후, 결제자의 또페이 잔고에서 출금한다.
         log.info("메뉴 총 금액 : " + dto.getAmount());
@@ -114,7 +121,11 @@ public class GiftServiceImpl implements GiftService {
         // newUser가 있다면 GiftBox 엔티티 생성 후 저장
         Optional<User> optionalNewUser = userRepository.findByPhoneNum(dto.getPhoneNum());
         if(optionalNewUser.isPresent()) {
-            GiftBox newGiftBox = new GiftBox(optionalNewUser.get(), gift);
+            User newUser = optionalNewUser.get();
+            GiftBox newGiftBox = new GiftBox(newUser, gift);
+
+            gift.changeGiftBox(newGiftBox);
+            newGiftBox.changeGift(gift);
             giftBoxRepository.save(newGiftBox);
         }
     }
@@ -140,7 +151,12 @@ public class GiftServiceImpl implements GiftService {
         // 3. iter giftbox entitiy
         List<GiftSelectResponseDto> dtoList = new ArrayList<>();
         for (GiftBox giftBox : giftBoxList) {
+
             Gift gift = giftBox.getGift();
+            if(gift == null) {
+                log.info(String.valueOf(giftBox.getId()));
+                throw new CustomException(ResponseCode.NO_EXIST_GIFTICON);
+            }
             // 4. 만료 기간, 현재시간 비교
             if(!isGiftOver(gift)) { // 만료일이 지난 경우
                 // 5. 상태 변경
@@ -170,9 +186,9 @@ public class GiftServiceImpl implements GiftService {
 
         // 2. 기프티콘 유효기간 및 사용 가능 여부 확인
         boolean isUsable = isGiftUsable(gift, dto);
-//        if (!isUsable) {
-//            throw new CustomException(ResponseCode.GIFT_NOT_USABLE); // 기프티콘 사용 불가 시 CustomException 발생
-//        }
+        if (!isUsable) {
+            throw new CustomException(ResponseCode.GIFT_NOT_USABLE); // 기프티콘 사용 불가 시 CustomException 발생
+        }
 
         // 3. 비밀번호 확인 로직
         if (!payService.verifyGiftPassword(userId, dto.getGiftUsePassword())) {
@@ -189,14 +205,13 @@ public class GiftServiceImpl implements GiftService {
 
     // 기프티콘 만료 확인 메서드
     private boolean isGiftOver(Gift gift) {
-        // 현재 시각이 만료일보다 이후 시각인 경우 true 반환
         return gift.getExpirationDate().isBefore(LocalDateTime.now());
     }
 
     // 기프티콘 사용 가능 여부 검증 메서드
     private boolean isGiftUsable(Gift gift, GiftCheckRequestDto dto) {
         // 1. 유효기간 만료 확인
-        if (gift.isExpired()) {
+        if (isGiftOver(gift)) {
             return false;
         }
 
