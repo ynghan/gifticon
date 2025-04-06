@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/sse")
+@RequestMapping("/api/sse")
 public class SseController {
 
     private final SseService sseService;
