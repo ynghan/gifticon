@@ -214,23 +214,24 @@ public class GiftServiceImpl implements GiftService {
         if (isGiftOver(gift)) {
             return false;
         }
+        return true;
 
         // 2. 연관된 맛집 조회
-        Restaurant restaurant = gift.getRestaurant();
-        if (restaurant == null) {
-            return false;
-        }
+//        Restaurant restaurant = gift.getRestaurant();
+//        if (restaurant == null) {
+//            return false;
+//        }
 
         // 3. 위치 거리 계산
-        double distance = calculateDistance(
-                Double.parseDouble(dto.getLat()),
-                Double.parseDouble(dto.getLng()),
-                restaurant.getLat(),
-                restaurant.getLng()
-        );
+//        double distance = calculateDistance(
+//                Double.parseDouble(dto.getLatitude()),
+//                Double.parseDouble(dto.getLongitude()),
+//                restaurant.getLat(),
+//                restaurant.getLng()
+//        );
 
         // 4. 거리 검증 (반경 15m 이내)
-        return distance <= 15.0;
+//        return distance <= 15.0;
     }
 
     // Haversine 공식을 이용한 거리 계산 메서드
