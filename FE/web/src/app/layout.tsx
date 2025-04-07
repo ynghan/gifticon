@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import CustomQueryClientProvider from '@/shared/reactQuery/CustomQueryClientProvider';
 import { Suspense } from 'react';
@@ -8,15 +8,11 @@ if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'productio
   const { server } = require('@/shared/msw/mock/http');
   server.listen();
 }
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+// Jalnan2TTF 폰트 추가
+const jalnanFont = localFont({
+  src: '../../public/Jalnan2TTF.ttf',
+  variable: '--font-jalnan',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -31,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-dvw `}>
+      <body className={`${jalnanFont.variable} jalnan antialiased w-dvw `}>
         <CustomQueryClientProvider>
           {/* <MSWProvider> */}
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>

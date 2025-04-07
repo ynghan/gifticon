@@ -20,16 +20,16 @@ export function middleware(request: NextRequest) {
   // );
 
   // 로그인하지 않은 상태에서 보호된 페이지 접근 시도
-  if (!isAuthenticated && !isLoginPage && !isCallbackPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if (!isAuthenticated && !isLoginPage && !isCallbackPage) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
-  // 이미 로그인한 상태에서 로그인 페이지 접근 시도
-  if (isAuthenticated && isLoginPage) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // // 이미 로그인한 상태에서 로그인 페이지 접근 시도
+  // if (isAuthenticated && isLoginPage) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
 
-  return response;
+  // return response;
 }
 
 export const config = {

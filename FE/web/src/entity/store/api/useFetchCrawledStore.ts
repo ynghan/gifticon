@@ -32,6 +32,7 @@ export const useFetchCrawledStore = (data: any) => {
       const res = await axiosInstance.get(`/api/restaurants/crawling?data=${data}`);
       return res.data.stores[0];
     },
+    enabled: !!data,
   });
 
   return { crawledData };
