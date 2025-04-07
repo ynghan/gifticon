@@ -8,6 +8,7 @@ import com.example.ddo_pay.common.util.RedisHandler;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
 import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
+import com.example.ddo_pay.gift.dto.SendGiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftDetailResponseDto;
@@ -38,10 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -177,6 +175,20 @@ public class GiftServiceImpl implements GiftService {
     public GiftDetailResponseDto selectDetail(int giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
         return GiftDetailResponseDto.from(gift);
+    }
+
+    @Override
+    public List<SendGiftSelectResponseDto> selectMySendList(Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        List<Gift> giftList = giftRepository.findByUser(user);
+
+        ArrayList<SendGiftSelectResponseDto> dtos = new ArrayList<>();
+        for (Gift gift : giftList) {
+            dtos.add(SendGiftSelectResponseDto.from(gift));
+        }
+
+        return dtos;
     }
 
     @Override
