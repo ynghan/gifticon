@@ -8,6 +8,9 @@ import {
   checkStoragePermission,
 } from './src/shared/utils/';
 import {handleWebViewMessage} from './src/features/contactServices';
+import {NativeModules} from 'react-native';
+
+const {DdopayNFC} = NativeModules;
 
 function App() {
   const webViewRef = useRef<WebView>(null);
@@ -22,7 +25,16 @@ function App() {
     };
     authorize();
   }, []);
+
   const onMessage = useCallback((event: WebViewMessageEvent) => {
+    const data = JSON.parse(event.nativeEvent.data);
+    if (data.type === 'PAYMENT_REQUEST') {
+      console.log(data.token);
+
+      DdopayNFC.startNfcService(data.token);
+
+      return;
+    }
     handleWebViewMessage(event, message => {
       webViewRef.current?.postMessage(message);
     });
@@ -30,7 +42,7 @@ function App() {
 
   return (
     <WebView
-      source={{uri: 'http://localhost:3000'}}
+      source={{uri: 'https://j12e106.p.ssafy.io'}}
       style={{flex: 1}}
       javaScriptEnabled={true}
       onMessage={onMessage}

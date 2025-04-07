@@ -3,16 +3,24 @@ import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Gift, User, Tag } from 'lucide-react';
+import { useSendValidateGift } from '@/entity/gift/api/useSendValidateGift';
 
 const GivenGiftDetail = (props: {
   image?: string;
   title?: string;
   sendUserName?: string;
+  sendRequest?: () => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { sendValidateGift } = useSendValidateGift();
+
+  const sendRequest = async () => {
+    sendValidateGift();
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
+    sendRequest();
   };
 
   const closeModal = () => {
@@ -23,12 +31,7 @@ const GivenGiftDetail = (props: {
     <div className='space-y-6'>
       {/* 선물 이미지 */}
       <div className='relative aspect-square rounded-xl overflow-hidden'>
-        <Image
-          src={props.image || ''}
-          alt={props.title || ''}
-          fill
-          className='object-cover'
-        />
+        <Image src={props.image || ''} alt={props.title || ''} fill className='object-cover' />
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
       </div>
 

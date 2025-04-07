@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Marker } from '@/features/map/model/marker';
 import { useMapStore } from '@/store/useMapStore';
 import { useMarkersStore } from '@/store/useMarkerStore';
-import Form from 'next/form';
+import { Search } from 'lucide-react';
 import { useRef } from 'react';
 
 export const SearchBar = () => {
@@ -61,11 +61,13 @@ export const SearchBar = () => {
   };
 
   return (
-    <div className="fixed top-0 w-full h-12 z-30 bg-white">
-      <Form action={''} className="flex items-center p-1">
-        <Input ref={keywordRef} type="text" placeholder="검색어를 입력하세요" />
-        <Button onClick={handleSearchBtn}>검색</Button>
-      </Form>
+    <div className='fixed top-0 w-full h-12 z-30 bg-white'>
+      <div className='flex items-center p-1'>
+        <Input ref={keywordRef} type='text' placeholder='검색어를 입력하세요' />
+        <Button onClick={handleSearchBtn} className='bg-[#FBBC05] hover:bg-[#FBBC05]/80'>
+          <Search className='size-6' />
+        </Button>
+      </div>
     </div>
   );
 };

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Map, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { Button } from '@/components/ui/button';
-import useDebounce from '@/shared/utils/useDebounce';
 import Places from './Places';
 import { Coordinates, Marker } from '../model/marker';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -56,13 +55,6 @@ export const KakaoMap = () => {
     setCenter(position);
   };
 
-  const handleCenterChanged = useDebounce(async () => {
-    if (!map) return;
-    if (category === CATEGORY_MAP.STORES) {
-      searchStores();
-    }
-  }, 500);
-
   const searchStores = () => {
     const ps = new kakao.maps.services.Places();
 
@@ -112,54 +104,53 @@ export const KakaoMap = () => {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className='relative w-full h-full'>
       <Map
         center={center}
-        className="w-full h-full"
+        className='w-full h-full'
         level={3}
         onCreate={setMap}
-        onCenterChanged={handleCenterChanged}
         onDrag={handleMapClick}
       >
         <Collapsible
           open={isOpen}
           onOpenChange={setIsOpen}
-          className="absolute top-16 right-2 flex flex-col items-end z-10"
+          className='absolute top-16 right-2 flex flex-col items-end z-10'
         >
           <CollapsibleTrigger asChild>
-            <Button variant="ghost">
-              <SquareMenu className="size-8" />
+            <Button variant='ghost'>
+              <SquareMenu className='size-8' />
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="flex flex-col gap-2 mt-2">
+          <CollapsibleContent className='flex flex-col gap-2 mt-2'>
             <Button
               variant={'ghost'}
-              className="bg-white h-full"
+              className='bg-white h-full'
               onClick={() => handleCategory(CATEGORY_MAP.MY_STORE)}
             >
-              <div className="flex flex-col items-center gap-1">
-                <Image src="/myStore.png" alt="나만의 또갈집" width={24} height={24} />
-                <span className="text-xs">또갈집</span>
+              <div className='flex flex-col items-center gap-1'>
+                <Image src='/myStore.png' alt='나만의 또갈집' width={24} height={24} />
+                <span className='text-xs'>또갈집</span>
               </div>
             </Button>
             <Button
               variant={'ghost'}
-              className="bg-white h-full"
+              className='bg-white h-full'
               onClick={() => handleCategory(CATEGORY_MAP.STORES)}
             >
-              <div className="flex flex-col items-center gap-1">
-                <Image src="/restaurant.png" alt="나만의 또갈집" width={24} height={24} />
-                <span className="text-xs">근처가게</span>
+              <div className='flex flex-col items-center gap-1'>
+                <Image src='/restaurant.png' alt='나만의 또갈집' width={24} height={24} />
+                <span className='text-xs'>근처가게</span>
               </div>
             </Button>
             <Button
               variant={'ghost'}
-              className="bg-white h-full"
+              className='bg-white h-full'
               onClick={() => handleCategory(CATEGORY_MAP.GIFT)}
             >
-              <div className="flex flex-col items-center gap-1">
-                <Image src="/gift.png" alt="나만의 또갈집" width={24} height={24} />
-                <span className="text-xs">기프티콘</span>
+              <div className='flex flex-col items-center gap-1'>
+                <Image src='/gift.png' alt='나만의 또갈집' width={24} height={24} />
+                <span className='text-xs'>기프티콘</span>
               </div>
             </Button>
           </CollapsibleContent>
