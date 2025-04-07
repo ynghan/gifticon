@@ -54,37 +54,31 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 	 */
 	@Override
 	public List<RestaurantCrawlingStoreDto> getCrawlingInfo(RestaurantCrawlingRequestDto requestDto) {
-		// 1) placeName으로 먼저 전체 검색을 수행합니다.
+		// 1) 검색어 구성: placeName과 addressName(앞 두 단어)를 결합
 		String placeNameQuery = requestDto.getPlaceName();
+		String addressName = requestDto.getAddressName();
+		if (addressName != null && !addressName.isEmpty()) {
+			String[] tokens = addressName.trim().split("\\s+");
+			if (tokens.length >= 2) {
+				// 예: "서울 송파구"
+				String shortAddress = tokens[0] + " " + tokens[1];
+				placeNameQuery = placeNameQuery + " " + shortAddress;
+			}
+		}
+
+		// 2) 구성한 검색어로 전체 검색 수행
 		List<Map<String, Object>> searchResults = callAllSearchList(placeNameQuery);
-
-
-		// 검색 결과를 콘솔에 출력
 		log.info("callAllSearchList 결과: {}", searchResults);
 
-		// 검색 결과가 없으면 빈 리스트를 반환합니다.
+		// 검색 결과가 없으면 빈 리스트 반환
 		if (searchResults == null || searchResults.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		// 2) addressName으로 필터링: 검색 결과가 여러 건일 경우 addressName이 포함된 결과를 선택합니다.
-		Map<String, Object> chosenResult = null;
-		if (searchResults.size() > 1) {
-			for (Map<String, Object> result : searchResults) {
-				String address = (String) result.get("res_address");
-				if (address != null && address.contains(requestDto.getAddressName())) {
-					chosenResult = result;
-					break;
-				}
-			}
-		}
-		// 필터링 조건에 맞는 결과가 없으면 첫 번째 결과를 사용합니다.
-		if (chosenResult == null) {
-			chosenResult = searchResults.get(0);
-		}
+		// 3) 검색 결과 중 첫 번째 결과를 선택
+		Map<String, Object> chosenResult = searchResults.get(0);
 
-
-		// 3) 선택된 결과를 기반으로 DTO 구성
+		// 4) 선택된 결과를 기반으로 DTO 구성
 		RestaurantCrawlingStoreDto dto = new RestaurantCrawlingStoreDto();
 		String rawName = (String) chosenResult.get("res_name");
 		String placeName = rawName != null ? rawName.replaceAll("<.*?>", "") : "";
@@ -115,7 +109,7 @@ public class NaverCrawlingServiceImpl implements NaverCrawlingService {
 		String menuStr = (String) chosenResult.get("menu_str");
 		dto.setMenus(parseMenus(menuStr));
 
-		// 4) GraphQL API 호출 (추가 정보 조회 - 로그 출력)
+		// 5) GraphQL API 호출 (추가 정보 조회 - 로그 출력)
 		String placeId = (String) chosenResult.get("place_id");
 		if (placeId != null) {
 			JsonNode gqlNode = callGraphqlForDetail(placeId);
