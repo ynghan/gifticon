@@ -180,7 +180,7 @@ public class GiftServiceImpl implements GiftService {
     @Override
     public GiftCheckResponseDto usedCheck(Long userId, GiftCheckRequestDto dto) {
         // 1. 기프티콘 조회
-        Gift gift = giftRepository.findById(dto.getGiftId())
+        Gift gift = giftRepository.findById(dto.getId())
                 .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
 
         log.info("요청바디: " + dto);
@@ -192,7 +192,7 @@ public class GiftServiceImpl implements GiftService {
         }
 
         // 3. 비밀번호 확인 로직
-        if (!payService.verifyGiftPassword(userId, dto.getGiftUsePassword())) {
+        if (!payService.verifyGiftPassword(userId, dto.getPassword())) {
             throw new CustomException(ResponseCode.INVALID_GIFT_PASSWORD); // 비밀번호 검증 실패 시 CustomException 발생
         }
 
@@ -224,8 +224,8 @@ public class GiftServiceImpl implements GiftService {
 
         // 3. 위치 거리 계산
         double distance = calculateDistance(
-                Double.parseDouble(dto.getLatitude()),
-                Double.parseDouble(dto.getLongitude()),
+                Double.parseDouble(dto.getLat()),
+                Double.parseDouble(dto.getLng()),
                 restaurant.getLat(),
                 restaurant.getLng()
         );
