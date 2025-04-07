@@ -3,8 +3,6 @@ package com.example.ddo_pay.gift.dto.create;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class GiftCreateRequestDto {
 
@@ -20,7 +18,7 @@ public class GiftCreateRequestDto {
     @JsonProperty("phone_num")
     private String phoneNum;
 
-    // 담을 맛집의 메뉴들에 대한 정보
+    // 담을 맛집 아이디
     @JsonProperty("res_id")
     private int resId;
 

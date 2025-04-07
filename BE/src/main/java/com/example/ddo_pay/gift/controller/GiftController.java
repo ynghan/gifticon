@@ -7,6 +7,7 @@ import com.example.ddo_pay.common.util.SecurityUtil;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
 import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
+import com.example.ddo_pay.gift.dto.SendGiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftDetailResponseDto;
@@ -76,6 +77,14 @@ public class GiftController {
     public ResponseEntity<?> selectDetail(@PathVariable int giftId) {
         GiftDetailResponseDto dto = giftService.selectDetail(giftId);
         return new ResponseEntity<>(Response.create(SUCCESS_DETAIL_GIFTICON, dto), SUCCESS_DETAIL_GIFTICON.getHttpStatus());
+    }
+
+    @GetMapping("/send")
+    public ResponseEntity<?> selectSendGiftList() {
+        Long userId = SecurityUtil.getUserId();
+        List<SendGiftSelectResponseDto> dtos = giftService.selectMySendList(userId); //
+
+        return new ResponseEntity<>(Response.create(SUCCESS_SEND_LIST_GIFTICON, dtos), SUCCESS_SEND_LIST_GIFTICON.getHttpStatus());
     }
 
     // 특정 기프티콘의 사용 가능 여부를 알 수 있다.

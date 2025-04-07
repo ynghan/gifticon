@@ -3,6 +3,7 @@ package com.example.ddo_pay.gift.service;
 import com.example.ddo_pay.gift.dto.GiftCheckResponseDto;
 import com.example.ddo_pay.gift.dto.GiftRefundRequestDto;
 import com.example.ddo_pay.gift.dto.GiftSelectResponseDto;
+import com.example.ddo_pay.gift.dto.SendGiftSelectResponseDto;
 import com.example.ddo_pay.gift.dto.create.GiftCreateRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftCheckRequestDto;
 import com.example.ddo_pay.gift.dto.select.GiftDetailResponseDto;
@@ -31,4 +32,6 @@ public interface GiftService {
     GiftCheckResponseDto usedCheck(Long userId, GiftCheckRequestDto dto);
 
     void refund(GiftRefundRequestDto dto, Long userId);
+
+    List<SendGiftSelectResponseDto> selectMySendList(Long userId);
 }

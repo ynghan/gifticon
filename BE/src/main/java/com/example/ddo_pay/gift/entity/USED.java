@@ -1,6 +1,5 @@
 package com.example.ddo_pay.gift.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
