@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.example.ddo_pay.pay.entity.AssetType.BALANCE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -247,6 +249,7 @@ public class PayServiceImpl implements PayService {
 
 
     // 기프티콘 생성 시 또페이 잔액 조회 후 출금(잔액 변경)
+    @Transactional
     @Override
     public void withdrawDdoPay(Long userId, int amount) {
         DdoPay ddoPay = ddoPayRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
@@ -256,22 +259,43 @@ public class PayServiceImpl implements PayService {
         }
 
         ddoPay.decreaseBalance(amount);
+        // 결제 내역 추가
+        History history = History.builder()
+                .title("기프티콘 생성")
+                .time(LocalDateTime.now())
+                .inOutAmount(amount*-1)
+                .type(BALANCE)
+                .ddoPay(ddoPay)
+                .build();
+        ddoPay.getHistoryList().add(history);
         ddoPayRepository.save(ddoPay);
-
+        historyRepository.save(history);
     }
 
     // 기프티콘 취소 환불 시 90% 금액 환불
+    @Transactional
     @Override
     public void depositDdoPay(Long userId, int amount) {
         DdoPay ddoPay = ddoPayRepository.findByUserId(userId).orElseThrow(()
                 -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
 
         ddoPay.increaseBalance(amount);
-        ddoPayRepository.save(ddoPay);
 
+        // 결제 내역 추가
+        History history = History.builder()
+                .title("기프티콘 환불")
+                .time(LocalDateTime.now())
+                .inOutAmount(amount)
+                .type(BALANCE)
+                .ddoPay(ddoPay)
+                .build();
+        ddoPay.getHistoryList().add(history);
+        ddoPayRepository.save(ddoPay);
+        historyRepository.save(history);
     }
 
     // 또페이 충전
+    @Transactional
     @Override
     public void transferDdoPay(Long userId, ChargeDdoPayRequest request) {
         DdoPay ddoPay = ddoPayRepository.findById(userId)
@@ -324,7 +348,7 @@ public class PayServiceImpl implements PayService {
             history.setTitle("또페이 충전");
             history.setTime(LocalDateTime.now());
             history.setInOutAmount(request.getAmount());
-            history.setType(AssetType.BALANCE);
+            history.setType(BALANCE);
             history.setDdoPay(ddoPay);
 
             ddoPay.getHistoryList().add(history);
@@ -339,6 +363,7 @@ public class PayServiceImpl implements PayService {
 
     // 같다면, 다음 로직 실행(계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE))
     // 다르면, 프론트로 실패 응답(SSE) + pos로 실패 응답(REST)
+    @Transactional
     @Override
     public void posPayment(TokenEqualResponseDto request) throws JsonProcessingException {
         log.info("TokenEqualResponseDto: {}, 금액: {}, 가맹점 계좌: {}",
@@ -348,10 +373,12 @@ public class PayServiceImpl implements PayService {
         // 계좌 이체 요청(feignclient) -> 깊티 상태 변경(Service) -> 성공 응답(SSE)
         if(request.getResult()) {
             log.info("일치된 로직 실행");
+
+            int amount = (int) (request.getPaymentAmount() * 0.01);
             BankDdoPayChargeRequest bankRequest = BankDdoPayChargeRequest.builder()
                     .userAccountNum("9990627419918613") // 법인 계좌
                     .corporationAccountNum(request.getStoreAccount()) // 가게 계좌
-                    .amount(request.getPaymentAmount())
+                    .amount(request.getPaymentAmount() - amount)
                     .build();
 
             log.info("(또페이 -> 가게) 계좌 이체할 금액 : " + bankRequest.getAmount());
@@ -361,6 +388,14 @@ public class PayServiceImpl implements PayService {
             // 계좌 이체 성공 확인
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("계좌 이체 성공 확인");
+                Gift gift = giftRepository.findById(request.getGiftId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+
+                // 결제 금액의 0.5%를 기프티콘 발행자에게 포인트로 적립
+                DdoPay ddoPay = gift.getUser().getDdoPay();
+                ddoPay.addPoint(amount / 2);
+                ddoPayRepository.save(ddoPay);
+                log.info("포인트 적립 완료");
+
                 String paymentToken = request.getPaymentToken();
                 String key = "token:" + paymentToken;
                 String redisValue = (String) redisTemplate.opsForValue().get(key);
@@ -381,8 +416,8 @@ public class PayServiceImpl implements PayService {
                 }
                 log.info("userId = {}, giftId={}", userId, giftId);
                 // 기프티콘 상태 변경
-                Gift gift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
-                gift.changeUsedAfter(); // 기프티콘 상태 변경
+                Gift findGift = giftRepository.findById(giftId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+                findGift.changeUsedAfter(); // 기프티콘 상태 변경
                 log.info("기프티콘 상태 변경 : {}", gift.getUsedStatus());
                 giftRepository.save(gift);
                 log.info("기프티콘 저장");
