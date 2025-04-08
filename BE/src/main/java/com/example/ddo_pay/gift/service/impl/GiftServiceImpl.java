@@ -200,7 +200,7 @@ public class GiftServiceImpl implements GiftService {
         log.info("요청바디: " + dto);
 
         // 2. 기프티콘 유효기간 및 사용 가능 여부 확인
-        boolean isUsable = isGiftUsable(gift, dto);
+        boolean isUsable = isGiftUsable(gift);
         if (!isUsable) {
             throw new CustomException(ResponseCode.GIFT_NOT_USABLE); // 기프티콘 사용 불가 시 CustomException 발생
         }
@@ -224,8 +224,14 @@ public class GiftServiceImpl implements GiftService {
     }
 
     // 기프티콘 사용 가능 여부 검증 메서드
-    private boolean isGiftUsable(Gift gift, GiftCheckRequestDto dto) {
-        // 1. 유효기간 만료 확인
+    private boolean isGiftUsable(Gift gift) {
+
+        // 기프티콘 사용여부 확인
+        if(gift.getUsedStatus() != USED.BEFORE_USE) {
+            return false;
+        }
+
+        // 기프티콘 유효기간 만료 확인
         if (isGiftOver(gift)) {
             return false;
         }
