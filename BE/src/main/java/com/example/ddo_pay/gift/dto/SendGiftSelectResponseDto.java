@@ -16,6 +16,7 @@ public class SendGiftSelectResponseDto {
     private int amount;
     private String menuName;
     private String phoneNum;
+    private USED usedStatus;
     private int resId;
     private Position position;
 
@@ -40,6 +41,7 @@ public class SendGiftSelectResponseDto {
         dto.amount = gift.getAmount();
         dto.menuName = gift.getMenuCombination();
         dto.phoneNum = gift.getPhoneNum();
+        dto.usedStatus = gift.getUsedStatus();
         dto.resId = Math.toIntExact(gift.getRestaurant().getId());
         dto.position = new Position(gift.getRestaurant().getLat(), gift.getRestaurant().getLng());
         return dto;
