@@ -4,7 +4,6 @@ import React, { useMemo, useEffect, useCallback } from 'react';
 import { Coordinates, Marker } from '../model/marker';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import { useFetchFavoriteStores } from '@/entity/store/api/useFetchFavoriteStores';
-import Image from 'next/image';
 import Markers from './Markers';
 import { FadeUpContainer } from '@/widgets/fadeUpContainer';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
@@ -114,7 +113,7 @@ export default function MyStores({ changeCenter }: PlacesProps) {
               <ChevronsDown />
             </button>
           </div>
-          <Carousel className='w-full h-full flex items-center pl-2' setApi={setApi}>
+          <Carousel draggable className='w-full h-full flex items-center pl-2' setApi={setApi}>
             <CarouselContent>
               {favoriteStores.length > 0 ? (
                 favoriteStores.map((store) => (
