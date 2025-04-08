@@ -104,7 +104,7 @@ export const KakaoMap = () => {
   };
 
   return (
-    <div className='relative w-full h-full'>
+    <div className='relative w-full h-[calc(100vh-80px)]'>
       <Map
         center={center}
         className='w-full h-full'

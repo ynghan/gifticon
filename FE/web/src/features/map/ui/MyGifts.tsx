@@ -7,7 +7,11 @@ import { TGift } from '@/entity/gift/model/gift';
 import { useFetchGift } from '@/entity/gift/api/useFetchGift';
 import { CustomOverlayMap, MapMarker } from 'react-kakao-maps-sdk';
 import { FadeUpContainer } from '@/widgets/fadeUpContainer';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCarouselWithMarker } from '@/shared/hooks/useCarouselWithMarker';
 import { useMapStore } from '@/store/useMapStore';
@@ -56,7 +60,7 @@ export default function MyGifts({ changeCenter }: PlacesProps) {
         }
       }
     },
-    [api, gifts, changeCenter, setIsVisible, setSelectedItem],
+    [api, gifts, changeCenter, setIsVisible, setSelectedItem]
   );
 
   // 지도 드래그 시 리스트 숨기기
@@ -105,15 +109,25 @@ export default function MyGifts({ changeCenter }: PlacesProps) {
           className={`absolute bottom-0 flex flex-col w-full h-60 p-2 z-10 rounded-lg bg-white overflow-y-auto will-change-transform`}
         >
           <div className='flex justify-center'>
-            <button className='cursor-pointer' onClick={() => setIsVisible(false)}>
+            <button
+              className='cursor-pointer'
+              onClick={() => setIsVisible(false)}
+            >
               <ChevronsDown />
             </button>
           </div>
-          <Carousel className='w-full h-full flex items-center pl-2' setApi={setApi}>
+          <Carousel
+            draggable
+            className='w-full h-full flex items-center pl-2'
+            setApi={setApi}
+          >
             <CarouselContent>
               {gifts.length > 0 ? (
                 gifts.map((gift) => (
-                  <CarouselItem key={`${gift.id}${gift.id}`} className='basis-[90%] p-4'>
+                  <CarouselItem
+                    key={`${gift.id}${gift.id}`}
+                    className='basis-[90%] p-4'
+                  >
                     <Card
                       className='max-h-40'
                       onClick={() => {
@@ -126,7 +140,9 @@ export default function MyGifts({ changeCenter }: PlacesProps) {
                             선물준이: {gift.send_user_name}
                           </h2>
                           <div className='flex flex-col gap-1 mb-1.5'>
-                            <p className='text-gray-600 text-sm'>선물제목: {gift.title}</p>
+                            <p className='text-gray-600 text-sm'>
+                              선물제목: {gift.title}
+                            </p>
                             <p className='text-gray-600 text-sm'>
                               유효기간: {gift.expiration_date}
                             </p>

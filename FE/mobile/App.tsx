@@ -1,13 +1,8 @@
 import React, {useEffect, useRef, useCallback} from 'react';
 import {WebView, WebViewMessageEvent} from 'react-native-webview';
-import {
-  checkCameraAndAudioPermissions,
-  checkContactsPermission,
-  checkLocationPermission,
-  checkNotificationPermission,
-  checkStoragePermission,
-} from './src/shared/utils/';
+
 import {handleWebViewMessage} from './src/features/contactServices';
+import SplashScreen from 'react-native-splash-screen';
 import {NativeModules} from 'react-native';
 
 const {DdopayNFC} = NativeModules;
@@ -16,14 +11,10 @@ function App() {
   const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {
-    const authorize = async () => {
-      await checkLocationPermission();
-      await checkCameraAndAudioPermissions();
-      await checkContactsPermission();
-      await checkNotificationPermission();
-      await checkStoragePermission();
-    };
-    authorize();
+    const timer = setTimeout(() => {
+      SplashScreen.hide();
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const onMessage = useCallback((event: WebViewMessageEvent) => {
@@ -35,9 +26,15 @@ function App() {
 
       return;
     }
-    handleWebViewMessage(event, message => {
-      webViewRef.current?.postMessage(message);
-    });
+    handleWebViewMessage(
+      event,
+      message => {
+        webViewRef.current?.postMessage(message);
+      },
+      () => {
+        webViewRef.current?.reload();
+      },
+    );
   }, []);
 
   return (

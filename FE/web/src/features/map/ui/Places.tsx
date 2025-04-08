@@ -151,7 +151,7 @@ export default function Places({
               <ChevronsDown />
             </button>
           </div>
-          <Carousel className='w-full h-full flex items-center pl-2' setApi={setApi}>
+          <Carousel draggable className='w-full h-full flex items-center pl-2' setApi={setApi}>
             <CarouselContent>
               {markers.length > 0 ? (
                 markers.map((marker) => (

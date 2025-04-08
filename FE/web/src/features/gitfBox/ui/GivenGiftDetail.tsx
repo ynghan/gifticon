@@ -6,6 +6,7 @@ import { Gift, User, Tag } from 'lucide-react';
 import { useSendValidateGift } from '@/entity/gift/api/useSendValidateGift';
 
 const GivenGiftDetail = (props: {
+  id: string;
   image?: string;
   title?: string;
   sendUserName?: string;
@@ -15,7 +16,7 @@ const GivenGiftDetail = (props: {
   const { sendValidateGift } = useSendValidateGift();
 
   const sendRequest = async () => {
-    sendValidateGift();
+    sendValidateGift(props.id);
   };
 
   const openModal = () => {

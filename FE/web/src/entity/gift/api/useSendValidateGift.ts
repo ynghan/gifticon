@@ -3,9 +3,9 @@ import { useMutation } from '@tanstack/react-query';
 
 export const useSendValidateGift = () => {
   const { mutate: sendValidateGift } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (giftId: string) => {
       const response = await axiosInstance.post('/api/gift/check', {
-        id: 5,
+        id: giftId,
         password: '123456',
       });
 
