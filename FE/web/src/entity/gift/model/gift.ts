@@ -12,3 +12,10 @@ export type TGift = {
     lng: number;
   };
 };
+export type TGiftResponse = {
+  status: {
+    code: string;
+    message: string;
+  };
+  content: TGift[];
+};

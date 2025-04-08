@@ -20,7 +20,7 @@ const GivenGiftList = () => {
   const afterUseList: TGift[] = [];
   const expiredList: TGift[] = [];
 
-  gifts.forEach((gift) => {
+  gifts?.forEach((gift) => {
     switch (gift.used_status) {
       case 'BEFORE_USE':
         usableList.push(gift);
