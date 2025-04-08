@@ -185,7 +185,9 @@ public class GiftServiceImpl implements GiftService {
 
         ArrayList<SendGiftSelectResponseDto> dtos = new ArrayList<>();
         for (Gift gift : giftList) {
-            dtos.add(SendGiftSelectResponseDto.from(gift));
+            if(gift.getUsedStatus() != USED.CANCLE) {
+                dtos.add(SendGiftSelectResponseDto.from(gift));
+            }
         }
 
         return dtos;
