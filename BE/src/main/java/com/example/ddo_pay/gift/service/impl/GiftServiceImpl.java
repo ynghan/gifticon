@@ -110,7 +110,7 @@ public class GiftServiceImpl implements GiftService {
     public void assignment(GiftUpdateRequestDto dto, Long userId) {
         /* 받은 기프티콘을 다른 사람에게 양도할 수 있다. */
         /* 다른 User가 우리 회원인 경우에는 회원이 알아서 조회해야 하나? */
-        Gift gift = giftRepository.findById(dto.getGiftId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
+        Gift gift = giftRepository.findById(dto.getId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
 
         // GiftBox가 존재하면 해당 엔티티 삭제
         Optional<GiftBox> giftBox = Optional.ofNullable(gift.getGiftBox());

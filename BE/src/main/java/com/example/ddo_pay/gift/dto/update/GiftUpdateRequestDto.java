@@ -4,9 +4,8 @@ import lombok.Data;
 
 @Data
 public class GiftUpdateRequestDto {
-    private int giftId;
+    private int id;
     private String phoneNum;
 
-    private int userId;
 }
 
