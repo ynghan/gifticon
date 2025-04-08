@@ -6,7 +6,7 @@ export default function BarLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-[calc(100vh-80px)]">
+    <main className='h-[calc(100%-80px)] pb-20'>
       {children}
       <BottomBar />
     </main>

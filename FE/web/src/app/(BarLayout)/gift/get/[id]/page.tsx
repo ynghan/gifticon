@@ -9,10 +9,12 @@ import { Suspense } from 'react';
 function DetailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const title = searchParams.get('title');
   const image = searchParams.get('image');
   const sendUserName = searchParams.get('send_user_name');
   const props = {
+    id: id ?? '',
     title: title ?? '',
     image: image ?? '',
     sendUserName: sendUserName ?? '',
@@ -38,6 +40,7 @@ function DetailPageContent() {
         {/* 선물 상세 정보 */}
         <div className='bg-white rounded-2xl shadow-sm p-6'>
           <GivenGiftDetail
+            id={props.id}
             title={props.title}
             image={props.image}
             sendUserName={props.sendUserName}
