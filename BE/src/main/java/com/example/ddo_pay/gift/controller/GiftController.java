@@ -36,6 +36,7 @@ public class GiftController {
 
     private final GiftService giftService;
 
+    // 기프티콘 생성 요청
     @PostMapping
     public ResponseEntity<?> create(@RequestPart("image") MultipartFile image, @RequestPart("request") String dto) {
 
@@ -56,6 +57,7 @@ public class GiftController {
         }
     }
 
+    // 기프티콘을 다른 대상에게 양도하는 요청
     @PutMapping
     public ResponseEntity<?> assignment(@RequestBody GiftUpdateRequestDto dto) {
 
@@ -65,6 +67,7 @@ public class GiftController {
         return new ResponseEntity<>(Response.create(SUCCESS_ASSIGNMENT_GIFTICON, null), SUCCESS_ASSIGNMENT_GIFTICON.getHttpStatus());
     }
 
+    // 사용자의 받은 기프티콘 리스트 조회 요청
     @GetMapping
     public ResponseEntity<?> selectUserGiftList() {
         Long userId = SecurityUtil.getUserId();
@@ -73,12 +76,14 @@ public class GiftController {
         return new ResponseEntity<>(Response.create(SUCCESS_LIST_GIFTICON, dtos), SUCCESS_LIST_GIFTICON.getHttpStatus());
     }
 
+    // giftId를 가진 기프티콘의 상세 정보 조회 요청
     @GetMapping("/detail/{giftId}")
     public ResponseEntity<?> selectDetail(@PathVariable int giftId) {
         GiftDetailResponseDto dto = giftService.selectDetail(giftId);
         return new ResponseEntity<>(Response.create(SUCCESS_DETAIL_GIFTICON, dto), SUCCESS_DETAIL_GIFTICON.getHttpStatus());
     }
 
+    // 보낸 기프티콘 리스트에 대한 조회 요청
     @GetMapping("/send")
     public ResponseEntity<?> selectSendGiftList() {
         Long userId = SecurityUtil.getUserId();
@@ -96,7 +101,7 @@ public class GiftController {
         return new ResponseEntity<>(Response.create(SUCCESS_CHECK_GIFTICON, respDto), SUCCESS_CHECK_GIFTICON.getHttpStatus());
     }
 
-    // 기프티콘 환불
+    // 기프티콘 환불 요청
     @PostMapping("/refund")
     public ResponseEntity<?> refund(@RequestBody GiftRefundRequestDto dto) {
         Long userId = SecurityUtil.getUserId();

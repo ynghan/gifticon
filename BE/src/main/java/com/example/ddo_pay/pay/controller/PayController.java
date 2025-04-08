@@ -98,11 +98,17 @@ public class PayController {
         return ResponseEntity.ok(Response.create(ResponseCode.SUCCESS_BALANCE_CHARGE, "충전성공"));
     }
 
-    // POS에서 토큰, 결제 금액, 가게 계좌 받기
+    // POS 클라이언트의 토큰, 결제 금액, 가게 계좌 조회 요청
     @PostMapping("/pos")
     public ResponseEntity<?> posPayment(@RequestBody PosRequest request) {
         try {
-            // request.getPaymentToken() 값을 들고와서 Redis의 토큰값과 비교한다.
+            /**
+             * 요청 토큰과 레디스 토큰 일치 여부 검증
+             * request.getPaymentToken() 값을 들고와서 Redis의 토큰값과 비교한다.
+             */
+            log.info("토큰 : {}",request.getPaymentToken());
+            log.info("일치 여부 : {}", request.getStoreAccount());
+            log.info("일치된 결제 금액 : {}", request.getPaymentAmount());
             TokenEqualResponseDto matchedDto = payService.comparePaymentToken(request);
 
             log.info("토큰 : {}",matchedDto.getPaymentToken());

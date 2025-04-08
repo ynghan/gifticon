@@ -389,9 +389,9 @@ public class PayServiceImpl implements PayService {
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("계좌 이체 성공 확인");
                 Gift gift = giftRepository.findById(request.getGiftId()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_GIFTICON));
-
+                log.info("user name: " + gift.getUser().getName());
                 // 결제 금액의 0.5%를 기프티콘 발행자에게 포인트로 적립
-                DdoPay ddoPay = gift.getUser().getDdoPay();
+                DdoPay ddoPay = ddoPayRepository.findByUser(gift.getUser()).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
                 ddoPay.addPoint(amount / 2);
                 ddoPayRepository.save(ddoPay);
                 log.info("포인트 적립 완료");
