@@ -5,9 +5,6 @@ import {
   request,
   RESULTS,
   PermissionStatus,
-  NotificationsResponse,
-  checkNotifications,
-  requestNotifications,
 } from 'react-native-permissions';
 import Cookies from '@react-native-cookies/cookies';
 
@@ -29,67 +26,39 @@ const showSettingsAlert = (permissionType: string): void => {
   );
 };
 
-// 카메라 및 오디오 권한 함께 요청 함수
-export const checkCameraAndAudioPermissions = async (): Promise<boolean> => {
+// 카메라 권한 확인 함수
+export const checkCameraPermission = async (): Promise<boolean> => {
   try {
-    // 카메라 권한 확인
-    const cameraResult: PermissionStatus = await check(
-      PERMISSIONS.ANDROID.CAMERA,
-    );
-    // 오디오 권한 확인
-    const audioResult: PermissionStatus = await check(
-      PERMISSIONS.ANDROID.RECORD_AUDIO,
-    );
-
-    console.log('카메라 권한 상태:', cameraResult);
-    console.log('오디오 권한 상태:', audioResult);
+    const result: PermissionStatus = await check(PERMISSIONS.ANDROID.CAMERA);
+    console.log('카메라 권한 상태:', result);
 
     // 카메라 권한이 필요한 경우
-    if (cameraResult === RESULTS.DENIED) {
+    if (result === RESULTS.DENIED) {
       console.log('카메라 권한 요청 중...');
-      const cameraRequestResult: PermissionStatus = await request(
+      const requestResult: PermissionStatus = await request(
         PERMISSIONS.ANDROID.CAMERA,
       );
-      console.log('카메라 요청 결과:', cameraRequestResult);
-    } else if (cameraResult === RESULTS.BLOCKED) {
+      console.log('카메라 요청 결과:', requestResult);
+    } else if (result === RESULTS.BLOCKED) {
       showSettingsAlert('카메라');
       return false; // 설정으로 이동하는 얼럿이 표시된 경우 함수 종료
     }
 
-    // 오디오 권한이 필요한 경우
-    if (audioResult === RESULTS.DENIED) {
-      console.log('오디오 권한 요청 중...');
-      const audioRequestResult: PermissionStatus = await request(
-        PERMISSIONS.ANDROID.RECORD_AUDIO,
-      );
-      console.log('오디오 요청 결과:', audioRequestResult);
-    } else if (audioResult === RESULTS.BLOCKED) {
-      showSettingsAlert('오디오');
-      return false;
-    }
-
     // 최종 권한 상태 확인
-    const finalCameraResult: PermissionStatus = await check(
+    const finalResult: PermissionStatus = await check(
       PERMISSIONS.ANDROID.CAMERA,
     );
-    const finalAudioResult: PermissionStatus = await check(
-      PERMISSIONS.ANDROID.RECORD_AUDIO,
-    );
-
-    if (
-      finalCameraResult === RESULTS.GRANTED &&
-      finalAudioResult === RESULTS.GRANTED
-    ) {
+    if (finalResult === RESULTS.GRANTED) {
       console.log(
-        '모든 권한이 허용되어 있습니다. 카메라 기능을 사용할 수 있습니다.',
+        '카메라 권한이 허용되어 있습니다. 카메라 기능을 사용할 수 있습니다.',
       );
       return true;
     } else {
-      console.log('일부 권한이 거부되어 있습니다.');
+      console.log('카메라 권한이 거부되어 있습니다.');
       return false;
     }
   } catch (error) {
-    console.error('권한 확인 중 오류 발생:', error);
+    console.error('카메라 권한 확인 중 오류 발생:', error);
     return false;
   }
 };
@@ -210,13 +179,6 @@ export const checkStoragePermission = async (): Promise<boolean> => {
         );
         // 다른 권한들도 이미 허용되어 있는지 확인
         const videoCheck = await check(PERMISSIONS.ANDROID.READ_MEDIA_VIDEO);
-        const audioCheck = await check(PERMISSIONS.ANDROID.READ_MEDIA_AUDIO);
-
-        // 모든 권한이 이미 허용되어 있다면 true 반환
-        if (videoCheck === RESULTS.GRANTED && audioCheck === RESULTS.GRANTED) {
-          console.log('모든 미디어 권한이 이미 허용되어 있습니다.');
-          return true;
-        }
 
         // 일부 권한이 없다면 요청
         console.log('일부 미디어 권한이 없습니다. 권한 요청 중...');
@@ -224,15 +186,8 @@ export const checkStoragePermission = async (): Promise<boolean> => {
           videoCheck !== RESULTS.GRANTED
             ? await request(PERMISSIONS.ANDROID.READ_MEDIA_VIDEO)
             : RESULTS.GRANTED;
-        const missingAudioResult =
-          audioCheck !== RESULTS.GRANTED
-            ? await request(PERMISSIONS.ANDROID.READ_MEDIA_AUDIO)
-            : RESULTS.GRANTED;
 
-        return (
-          missingVideoResult === RESULTS.GRANTED &&
-          missingAudioResult === RESULTS.GRANTED
-        );
+        return missingVideoResult === RESULTS.GRANTED;
 
       default:
         return false;
@@ -296,49 +251,19 @@ export const checkLocationPermission = async (): Promise<boolean> => {
     return false;
   }
 };
-export const checkNotificationPermission = async (): Promise<boolean> => {
-  try {
-    const result: NotificationsResponse = await checkNotifications();
-    console.log('알림 권한 상태:', result.status);
-
-    switch (result.status) {
-      case RESULTS.UNAVAILABLE:
-        console.log('이 기기에서는 알림 기능을 사용할 수 없습니다.');
-        return false;
-
-      case RESULTS.DENIED:
-        console.log('알림 권한 요청 중...');
-        const requestResult: NotificationsResponse =
-          await requestNotifications();
-        console.log('요청 결과:', requestResult);
-        return requestResult.status === RESULTS.GRANTED;
-
-      case RESULTS.GRANTED:
-        console.log('알림 권한이 이미 허용되어 있습니다.');
-        return true;
-
-      default:
-        return false;
-    }
-  } catch (error: unknown) {
-    console.error('알림 권한 확인 중 오류 발생:', error);
-    return false;
-  }
-};
 
 export const requestAllPermissionsAndSetCookie = async (): Promise<boolean> => {
   try {
-    const cameraAudioGranted = await checkCameraAndAudioPermissions();
+    const cameraAudioGranted = await checkCameraPermission();
     const contactsGranted = await checkContactsPermission();
     const storageGranted = await checkStoragePermission();
     const locationGranted = await checkLocationPermission();
-    const notificationGranted = await checkNotificationPermission();
+
     if (
       cameraAudioGranted &&
       contactsGranted &&
       storageGranted &&
-      locationGranted &&
-      notificationGranted
+      locationGranted
     ) {
       console.log(
         '모든 권한이 허용되었습니다. accessPermission 쿠키를 설정합니다.',
