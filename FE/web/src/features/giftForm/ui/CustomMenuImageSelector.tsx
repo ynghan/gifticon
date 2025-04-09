@@ -1,13 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { axiosInstance } from '@/shared/api/axiosInstance';
+import { Label } from '@/components/ui/label';
 
 interface ImageItem {
   src: string;
@@ -15,108 +11,149 @@ interface ImageItem {
 }
 
 interface CustomMenuImageSelectorProps {
-  onImagesChange: (images: ImageItem[]) => void;
+  onImagesChange: (image: ImageItem) => void;
 }
 
-const CustomMenuImageSelector = ({ onImagesChange }: CustomMenuImageSelectorProps) => {
-  const [images, setImages] = useState<ImageItem[]>([]);
+const CustomMenuImageSelector = ({
+  onImagesChange,
+}: CustomMenuImageSelectorProps) => {
+  const [image, setImage] = useState<ImageItem>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileRead = useCallback((file: File): Promise<ImageItem> => {
-    return new Promise((resolve, reject) => {
+  const handleGenerationImage = useCallback(
+    async (theme: string) => {
+      try {
+        // 1. 서버에서 이미지 URL 가져오기
+        const response = await axiosInstance.get(
+          `/api/gift/themeImage?theme=${theme}`
+        );
+        const imageUrl = response.data.content;
+
+        // 2. 이미지 다운로드 및 File 변환
+        const imageResponse = await fetch(imageUrl);
+        if (!imageResponse.ok) throw new Error('이미지 다운로드 실패');
+
+        const blob = await imageResponse.blob();
+        const fileName = imageUrl.split('/').pop() || 'generated_image.jpg';
+
+        // 3. Blob을 Base64로 변환
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string); // Base64 데이터 반환
+          reader.onerror = reject;
+          reader.readAsDataURL(blob); // Blob 데이터를 Base64로 읽음
+        });
+
+        // 3. 상태 업데이트
+        const newImage = {
+          src: base64Data, // Blob URL 생성
+          alt: theme,
+        };
+        setImage(newImage);
+        // 4. 부모 컴포넌트에 File 객체 전달
+        onImagesChange({ src: newImage.src, alt: fileName });
+      } catch (error) {
+        console.error('이미지 생성 오류:', error);
+      }
+    },
+    [onImagesChange]
+  );
+
+  // 파일 읽기 유틸리티 함수
+  const readFile = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && typeof event.target.result === 'string') {
-          resolve({ src: event.target.result, alt: file.name });
-        } else {
-          reject(new Error('이미지 파일을 읽을 수 없습니다.'));
-        }
-      };
-      reader.onerror = () => reject(new Error('파일 읽기 오류가 발생했습니다.'));
+      reader.onload = (e) =>
+        e.target?.result ? resolve(e.target.result.toString()) : reject();
+      reader.onerror = () => reject();
       reader.readAsDataURL(file);
     });
-  }, []);
 
+  // 이미지 업로드 핸들러
   const handleImageUpload = useCallback(async () => {
-    if (!fileInputRef.current) return;
+    const file = fileInputRef.current?.files?.[0];
+    if (!file) return;
 
-    fileInputRef.current.click();
-    fileInputRef.current.onchange = async (e) => {
-      const target = e.target as HTMLInputElement | null;
-      if (!target?.files?.length) return;
+    try {
+      const src = await readFile(file);
+      const newImage = { src, alt: file.name };
+      setImage(newImage);
+      onImagesChange(newImage); // 배열에 단일 이미지 전달
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+    }
+  }, [onImagesChange]);
 
-      try {
-        const newImages = await Promise.all(Array.from(target.files).map(handleFileRead));
-        setImages((prevImages) => {
-          const updatedImages = [...prevImages, ...newImages];
-          console.log('업로드된 이미지 URL:', updatedImages);
-          onImagesChange(updatedImages);
-          return updatedImages;
-        });
-      } catch (error) {
-        console.error('이미지 업로드 중 오류 발생:', error);
-        // TODO: 사용자에게 에러 메시지 표시
-      }
-    };
-  }, [handleFileRead, onImagesChange]);
-
-  const handleDeleteImage = (index: number) => {
-    setImages((prevImages) => {
-      const updatedImages = prevImages.filter((_, i) => i !== index);
-      onImagesChange(updatedImages);
-      return updatedImages;
-    });
+  // 이미지 삭제 핸들러
+  const handleDeleteImage = () => {
+    setImage(undefined);
+    onImagesChange({ src: '', alt: '' }); // 빈 값 전달
+    // input 값을 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // 파일 입력 필드 초기화
+    }
   };
 
   return (
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold'>나만의 메뉴 이미지를 선택해주세요</h3>
-      <Carousel className='w-full max-w-xs'>
-        <CarouselContent>
-          {images.length === 0 ? (
-            <CarouselItem>
-              <div className='p-1'>
-                <Card
-                  onClick={handleImageUpload}
-                  className='cursor-pointer hover:opacity-90 transition-opacity'
-                >
-                  <CardContent className='flex aspect-square items-center justify-center p-6'>
-                    <span className='text-3xl font-semibold text-center'>사진을 넣어주세요!</span>
-                  </CardContent>
-                </Card>
-              </div>
-            </CarouselItem>
+      <h3 className='text-lg font-semibold'>
+        나만의 메뉴 이미지를 선택해주세요
+      </h3>
+      <Card className='relative'>
+        {image && (
+          <button
+            onClick={handleDeleteImage}
+            className='absolute top-2 right-2 z-10 p-1 bg-black/50 rounded-full hover:bg-black/70 transition-colors'
+          >
+            <X className='h-4 w-4 text-white' />
+          </button>
+        )}
+
+        <CardContent
+          onClick={() => fileInputRef.current?.click()}
+          className='flex aspect-square items-center justify-center p-6 cursor-pointer hover:opacity-90 transition-opacity'
+        >
+          {image ? (
+            <img
+              src={image.src}
+              alt={image.alt}
+              className='w-full h-full object-cover rounded-md'
+            />
           ) : (
-            images.map((image, index) => (
-              <CarouselItem key={index}>
-                <div className='p-1'>
-                  <Card className='relative'>
-                    <button
-                      onClick={() => handleDeleteImage(index)}
-                      className='absolute top-2 right-2 z-10 p-1 bg-black/50 rounded-full hover:bg-black/70 transition-colors'
-                    >
-                      <X className='h-4 w-4 text-white' />
-                    </button>
-                    <CardContent
-                      onClick={handleImageUpload}
-                      className='flex aspect-square items-center justify-center p-6 cursor-pointer hover:opacity-90 transition-opacity'
-                    >
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className='w-full h-full object-cover rounded-md'
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))
+            <span className='text-3xl font-semibold text-center'>
+              사진을 넣어주세요!
+            </span>
           )}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
-      <input type='file' accept='image/*' ref={fileInputRef} className='hidden' multiple />
+        </CardContent>
+      </Card>
+      <input
+        type='file'
+        accept='image/*'
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        className='hidden'
+      />
+      <div className='space-y-2'>
+        <Label className='text-sm font-medium text-gray-700'>이미지 생성</Label>
+        <div className='grid grid-cols-2 gap-2'>
+          {[
+            { type: 'birthday', text: '생일' },
+            { type: 'comfort', text: '위로' },
+            { type: 'congratulations', text: '축하' },
+            { type: 'encouragement', text: '응원' },
+          ].map(({ type, text }: { type: string; text: string }) => (
+            <Button
+              onClick={() => handleGenerationImage(type)}
+              key={type}
+              type='button'
+              variant='outline'
+              className='w-full flex items-center justify-center p-4 h-auto text-gray-900 border-gray-300 hover:bg-gray-100'
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
