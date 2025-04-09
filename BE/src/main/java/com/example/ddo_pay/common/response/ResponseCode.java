@@ -89,6 +89,8 @@ public enum ResponseCode {
     EXPIRED_GIFTICON(400, HttpStatus.BAD_REQUEST, "기프티콘의 유효기간이 만료되었습니다."),
     NOT_REFUNDABLE_GIFTICON(400, HttpStatus.BAD_REQUEST, "환불할 수 없는 기프티콘 입니다."),
     GIFT_NOT_USABLE(400, HttpStatus.OK, "기프티콘 사용이 불가능합니다."),
+    INVALID_THEME(400, HttpStatus.BAD_REQUEST, "등록된 테마가 아닙니다."),
+    SUCCESS_GET_THEME_IMAGE(200, HttpStatus.OK, "테마가 조회되었습니다."),
 
 
     INVALID_JSON(400, HttpStatus.BAD_REQUEST, "요청 JSON이 유효하지 않습니다."),
