@@ -505,56 +505,44 @@ public class PayServiceImpl implements PayService {
         String key = "token:" + paymentToken;
         String redisValue = (String) redisTemplate.opsForValue().get(key);
 
-        // ✅ null 체크 추가, 레디스 고치고 나면 주석 풀어야함
-//        if (redisValue == null) {
-//            throw new CustomException(ResponseCode.REDIS_NOT_FOUND, "결제 토큰 데이터 없음", "key: " + key);
-//        }
+        // ✅ null 체크 추가
+        if (redisValue == null) {
+            throw new CustomException(ResponseCode.REDIS_NOT_FOUND, "결제 토큰 데이터 없음", "key: " + key);
+        }
 
-       // log.info("레디스에 결제 데이터 있는지 확인 : {}", redisValue);
-        // Redis에서 필요한 정보 추출, 이거 원래 null이니까 확인 후 수정해야함
-        Long giftId = 17L;
-        Long userId = 1L;
+        log.info("레디스에 결제 데이터 있는지 확인 : {}", redisValue);
+        // Redis에서 필요한 정보 추출
+        Long giftId = null;
+        Long userId = null;
         Integer expectedAmount = null;
 
-        // 레디스 고치고 나면 주석 풀어야함
-//        String[] parts = redisValue.split(",");
-//        for (String part : parts) {
-//            if (part.startsWith("giftId:")) {
-//                giftId = Long.valueOf(part.split(":")[1]);
-//            }
-//            if (part.startsWith("userId:")) {
-//                userId = Long.valueOf(part.split(":")[1]);
-//            }
-//            if (part.startsWith("amount:")) {
-//                expectedAmount = Integer.parseInt(part.split(":")[1]);
-//            }
-//        }
+        String[] parts = redisValue.split(",");
+        for (String part : parts) {
+            if (part.startsWith("giftId:")) {
+                giftId = Long.valueOf(part.split(":")[1]);
+            }
+            if (part.startsWith("userId:")) {
+                userId = Long.valueOf(part.split(":")[1]);
+            }
+            if (part.startsWith("amount:")) {
+                expectedAmount = Integer.parseInt(part.split(":")[1]);
+            }
+        }
         log.info("pos에서 결제한 금액 : {}", request.getPaymentAmount());
         log.info("레디스의 기프티콘 금액 : {}", expectedAmount);
 
-        // 금액 검증
+        // 금액 검증. 이거 금액 달라도 보내지게 변경
        // boolean amountMatches = (expectedAmount != null && expectedAmount.equals(request.getPaymentAmount()));
        // log.info("토큰 금액과 결제 금액이 동일한지 확인 : {}", amountMatches);
 
-
-        // 이거 확인 후 지워야함
         return TokenEqualResponseDto.builder()
                 .result(true)
                 .paymentToken(paymentToken)
-                .paymentAmount(request.getPaymentAmount())
+                .paymentAmount(expectedAmount)
                 .storeAccount(request.getStoreAccount())
                 .userId(userId)
                 .giftId(giftId)
                 .build();
-// 이게 기존의 코드라서 이거 써야함
-//        return TokenEqualResponseDto.builder()
-//                .result(amountMatches)
-//                .paymentToken(paymentToken)
-//                .paymentAmount(expectedAmount)
-//                .storeAccount(request.getStoreAccount())
-//                .userId(userId)
-//                .giftId(giftId)
-//                .build();
     }
 
 
