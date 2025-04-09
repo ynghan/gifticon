@@ -34,9 +34,10 @@ export const GiftForm = () => {
   const [menuQuantities, setMenuQuantities] = useState<Record<number, number>>(
     {}
   );
-  const [customMenuImages, setCustomMenuImages] = useState<
-    { src: string; alt: string }[]
-  >([]);
+  const [customMenuImage, setCustomMenuImage] = useState<{
+    src: string;
+    alt: string;
+  }>();
   const [giftTitle, setGiftTitle] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
 
@@ -69,7 +70,6 @@ export const GiftForm = () => {
   };
 
   const decreaseQuantity = (id: number): void => {
-    console.log('하이');
     if (menuQuantities[id] > 0) {
       setMenuQuantities((prevQuantities) => ({
         ...prevQuantities,
@@ -109,21 +109,19 @@ export const GiftForm = () => {
       const formData = new FormData();
 
       // 이미지 추가
-      customMenuImages.forEach((image, index) => {
+      if (customMenuImage) {
         // Base64 이미지를 Blob으로 변환
-        const base64Data = image.src.split(',')[1];
+        const base64Data = customMenuImage.src.split(',')[1];
         const byteCharacters = atob(base64Data);
-        const byteArrays = [];
+        const byteArray = new Uint8Array(byteCharacters.length);
 
         for (let i = 0; i < byteCharacters.length; i++) {
-          byteArrays.push(byteCharacters.charCodeAt(i));
+          byteArray[i] = byteCharacters.charCodeAt(i);
         }
 
-        const byteArray = new Uint8Array(byteArrays);
         const blob = new Blob([byteArray], { type: 'image/jpeg' });
-
-        formData.append('image', blob, `custom_menu_${index}.jpg`);
-      });
+        formData.append('image', blob, 'custom_menu_0.jpg'); // index 0으로 고정
+      }
 
       // JSON 데이터 추가
       const requestData = {
@@ -152,8 +150,6 @@ export const GiftForm = () => {
 
       const response = await axiosInstance.post('/api/gift', formData);
 
-      console.log('응답 데이터:', response.data);
-
       if (response.data) {
         router.push(
           `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
@@ -172,7 +168,7 @@ export const GiftForm = () => {
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
       {/* 커스텀 메뉴 선택기 */}
-      <CustomMenuImageSelector onImagesChange={setCustomMenuImages} />
+      <CustomMenuImageSelector onImagesChange={setCustomMenuImage} />
       {/* 받는 사람 선택 */}
       <div className='space-y-2'>
         <Label className='text-sm font-medium text-gray-700'>받는 사람</Label>
