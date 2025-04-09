@@ -2,7 +2,6 @@
 
 import { useFetchBalance } from '../api/useFetchMyMoney';
 import { useRouter } from 'next/navigation';
-import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 
 export const MoneyView = () => {
@@ -43,7 +42,6 @@ export const MoneyView = () => {
           결제하기
         </button>
       </div>
-      <Modal isModalOpen={isModalOpen} closeModal={closeModal} />
     </div>
   );
 };
