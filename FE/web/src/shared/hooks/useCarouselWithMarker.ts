@@ -43,14 +43,6 @@ export const useCarouselWithMarker = <T extends { id: string | number; position:
     };
   }, [api]);
 
-  useEffect(() => {
-    if (items.length > 0 && current >= 0 && current < items.length && isVisible) {
-      const item = items[current];
-      setSelectedItem(item);
-      changeCenter(item.position);
-    }
-  }, [current, items, changeCenter, isVisible]);
-
   const handleMarkerClick = (marker: T) => {
     setSelectedItem(marker);
     changeCenter(marker.position);

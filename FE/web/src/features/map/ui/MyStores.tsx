@@ -60,23 +60,16 @@ export default function MyStores({ changeCenter }: PlacesProps) {
     (marker: Marker) => {
       // 먼저 선택된 아이템과 중심 좌표를 설정
       setSelectedItem(marker);
-
-      // 지도 중심 이동
       changeCenter(marker.position);
 
-      // 리스트를 표시
-      setIsVisible(true);
-
-      // 약간의 지연 후 해당 아이템으로 Carousel 스크롤
+      // 리스트를 표시하고 Carousel 스크롤
       if (api) {
         const index = markers.findIndex((item) => item.id === marker.id);
         if (index !== -1) {
-          // setTimeout을 사용하여 상태 업데이트 후 스크롤하도록 보장
-          setTimeout(() => {
-            api.scrollTo(index);
-          }, 50);
+          api.scrollTo(index);
         }
       }
+      setIsVisible(true);
     },
     [api, markers, changeCenter, setIsVisible, setSelectedItem],
   );
