@@ -15,7 +15,7 @@ export const useSendRegisterStore = () => {
       });
     },
     onSuccess: () => {
-      router.push('/');
+      router.push('/?category=my-store&lat=35.11113&lng=128.9632915');
     },
     onError: (error) => {
       console.error('오류 :', error);
