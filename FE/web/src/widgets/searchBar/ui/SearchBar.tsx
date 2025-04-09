@@ -13,7 +13,8 @@ export const SearchBar = () => {
   const { setMarkers } = useMarkersStore();
   const keywordRef = useRef<HTMLInputElement>(null);
 
-  const handleSearchBtn = () => {
+  const handleSearchBtn = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const value = keywordRef.current?.value;
 
     if (!value) return;
@@ -62,12 +63,12 @@ export const SearchBar = () => {
 
   return (
     <div className='fixed top-0 w-full h-12 z-30 bg-white'>
-      <div className='flex items-center p-1'>
+      <form onSubmit={handleSearchBtn} className='flex items-center p-1'>
         <Input ref={keywordRef} type='text' placeholder='검색어를 입력하세요' />
-        <Button onClick={handleSearchBtn} className='bg-[#FBBC05] hover:bg-[#FBBC05]/80'>
+        <Button className='bg-[#FBBC05] hover:bg-[#FBBC05]/80'>
           <Search className='size-6' />
         </Button>
-      </div>
+      </form>
     </div>
   );
 };

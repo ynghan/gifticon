@@ -56,8 +56,8 @@ export default function page() {
       user_intro: '직접 끓인 사골 국물이 일품!',
       star_rating: '4.5',
       visited_count: '0',
-      menus,
-      customMenus,
+      menu: menus,
+      custom_menu: customMenus,
     };
 
     formData.append(
@@ -68,7 +68,7 @@ export default function page() {
   };
 
   return (
-    <FadeUpContainer className='flex flex-col h-full items-center'>
+    <FadeUpContainer className='flex flex-col h-full items-center pb-20'>
       <div className='relative w-full bg-amber-50'>
         <Button variant={'ghost'} className='absolute top-4 left-4' onClick={() => router.back()}>
           <X className='size-6' />
