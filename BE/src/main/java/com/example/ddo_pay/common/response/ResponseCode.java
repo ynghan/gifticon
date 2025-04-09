@@ -94,7 +94,8 @@ public enum ResponseCode {
 
 
     INVALID_JSON(400, HttpStatus.BAD_REQUEST, "요청 JSON이 유효하지 않습니다."),
-    FILE_UPLOAD_FAIL(400, HttpStatus.BAD_REQUEST, "파일 업로드를 실패했습니다.");
+    FILE_UPLOAD_FAIL(400, HttpStatus.BAD_REQUEST, "파일 업로드를 실패했습니다."),
+    UNAUTHORIZED(400, HttpStatus.BAD_REQUEST, "권한이 없습니다"),;
 
     private int code;
     private HttpStatus httpStatus;
