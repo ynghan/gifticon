@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import com.example.ddo_pay.common.config.S3.S3Service;
 import com.example.ddo_pay.restaurant.dto.response.*;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -195,10 +197,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 */
 	@Override
 	@Transactional
-	public void removeRestaurant(RestaurantDeleteRequestDto requestDto) {
+	public void removeRestaurant(Long userId, Long restaurantId) {
 
 		// 1) 사용자 조회
-		User user = userRepo.findById((long) requestDto.getUserId())
+		User user = userRepo.findById(userId)
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_USER,
 				"userId",
@@ -207,19 +209,19 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 		// 2) userId + restaurantId 로 UserRestaurant 조회
 		UserRestaurant userRestaurant = userRestaurantRepository
-			.findByUser_IdAndRestaurant_Id(user.getId(), requestDto.getRestaurantId())
+			.findByUser_IdAndRestaurant_Id(user.getId(), restaurantId)
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_RESTAURANT,
 				"restaurantId",
 				"등록된 맛집 정보가 없습니다."
 			));
 
-		// 3) 관계 해제 + DB에서 삭제
+
+
+		// 3) 관계 해제 및 DB 삭제
 		userRestaurantRepository.delete(userRestaurant);
 
-		log.info("맛집 해제 완료. userId={}, restaurantId={}",
-			user.getId(),
-			requestDto.getRestaurantId());
+		log.info("맛집 해제 완료. userId={}, restaurantId={}", user.getId(), restaurantId);
 	}
 
 	/**
@@ -335,15 +337,28 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 */
 	@Override
 	@Transactional
-	public void createCustomMenu(CustomMenuRequestDto requestDto) {
-		// 예) userId + restaurantId 로 UserRestaurant 조회
+	public void createCustomMenu(Long userId, CustomMenuRequestDto requestDto) {
+		// 인증 토큰에서 전달된 userId를 사용하여 UserRestaurant 조회
 		UserRestaurant userRestaurant = userRestaurantRepository
-			.findByUser_IdAndRestaurant_Id(requestDto.getUserId(), requestDto.getRestaurantId())
+			.findByUser_IdAndRestaurant_Id(userId, requestDto.getRestaurantId())
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_RESTAURANT,
 				"restaurantId",
 				"등록되지 않은 맛집입니다."
 			));
+
+		// 2) 중복 체크: 같은 사용자-맛집 관계에서 동일한 메뉴명이 존재하는지 확인
+		boolean exists = customMenuRepository.existsByUserRestaurantAndCustomMenuName(
+			userRestaurant, requestDto.getCustomMenuName());
+
+		if (exists) {
+			throw new CustomException(
+				ResponseCode.DATA_ALREADY_EXISTS,
+				"customMenuName",
+				"이미 등록된 커스텀 메뉴입니다."
+			);
+		}
+
 
 		CustomMenu customMenu = CustomMenu.builder()
 			.customMenuName(requestDto.getCustomMenuName())
@@ -353,27 +368,31 @@ public class RestaurantServiceImpl implements RestaurantService {
 			.build();
 
 		customMenuRepository.save(customMenu);
-		log.info("커스텀 메뉴 등록 완료. userId={}, restaurantId={}", requestDto.getUserId(), requestDto.getRestaurantId());
+		log.info("커스텀 메뉴 등록 완료. userId={}, restaurantId={}", userId, requestDto.getRestaurantId());
 	}
 
-	/**
-	 * 커스텀 메뉴 삭제
-	 */
 	@Override
 	@Transactional
-	public void deleteCustomMenu(Long customId) {
-		if (!customMenuRepository.existsById(customId)) {
-			// 기존: throw new RuntimeException("해당 커스텀 메뉴가 존재하지 않습니다.");
-			// 수정 후:
-			throw new CustomException(
-				ResponseCode.NO_EXIST_CUSTOM_MENU,  // 혹은 다른 적절한 코드
+	public void deleteCustomMenu(Long customId, Long userId) {
+		// 존재 여부 확인
+		CustomMenu customMenu = customMenuRepository.findById(customId)
+			.orElseThrow(() -> new CustomException(
+				ResponseCode.NO_EXIST_CUSTOM_MENU,
 				"customId",
 				"해당 커스텀 메뉴가 존재하지 않습니다."
+			));
+
+		// 소유자 확인: customMenu가 userId와 일치하는지 검증 (예, customMenu.getUserRestaurant().getUser().getId())
+		if (!customMenu.getUserRestaurant().getUser().getId().equals(userId)) {
+			throw new CustomException(
+				ResponseCode.UNAUTHORIZED,
+				"userId",
+				"해당 메뉴를 삭제할 권한이 없습니다."
 			);
 		}
 
-		customMenuRepository.deleteById(customId);
-		log.info("커스텀 메뉴 삭제 완료. customId={}", customId);
+		customMenuRepository.delete(customMenu);
+		log.info("커스텀 메뉴 삭제 완료. customId={}, userId={}", customId, userId);
 	}
 
 	@Override

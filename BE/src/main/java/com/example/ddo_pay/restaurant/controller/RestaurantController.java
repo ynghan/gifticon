@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.ddo_pay.common.config.S3.S3Service;
+import com.example.ddo_pay.common.config.security.token.CustomUserDetails;
 import com.example.ddo_pay.common.response.Response;
 import com.example.ddo_pay.common.response.ResponseCode;
 import com.example.ddo_pay.restaurant.dto.request.*;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,12 +69,15 @@ public class RestaurantController {
 	 * 맛집 해제(삭제) (DELETE /api/restaurants)
 	 */
 	@DeleteMapping
-	public ResponseEntity<?> removeRestaurant(@RequestBody RestaurantDeleteRequestDto requestDto) {
+	public ResponseEntity<?> removeRestaurant(@RequestBody RestaurantDeleteRequestDto requestDto,
+		@AuthenticationPrincipal CustomUserDetails principal) {
+		// 인증 토큰으로부터 추출한 userId 사용
+		Long userId = principal.getUserId();
 		// 실제 DB 연동
-		restaurantService.removeRestaurant(requestDto);
+		restaurantService.removeRestaurant(userId, requestDto.getRestaurantId());
 
 		return ResponseEntity
-			.status(SUCCESS_REMOVE_RESTAURANT.getHttpStatus())  // 200
+			.status(SUCCESS_REMOVE_RESTAURANT.getHttpStatus())  // 예: 200 OK
 			.body(Response.create(SUCCESS_REMOVE_RESTAURANT, null));
 	}
 
@@ -141,9 +146,12 @@ public class RestaurantController {
 	 * 커스텀 메뉴 등록 (POST /api/restaurants/custom)
 	 */
 	@PostMapping("/custom")
-	public ResponseEntity<?> createCustomMenu(@RequestBody CustomMenuRequestDto requestDto) {
-		// 실제 등록 로직
-		restaurantService.createCustomMenu(requestDto);
+	public ResponseEntity<?> createCustomMenu(@RequestBody CustomMenuRequestDto requestDto,
+		@AuthenticationPrincipal CustomUserDetails principal) {
+
+		Long userId = principal.getUserId();
+		// 기존 requestDto 내의 userId 대신, 인증 토큰에서 받은 userId를 서비스에 전달
+		restaurantService.createCustomMenu(userId, requestDto);
 
 		return ResponseEntity
 			.status(SUCCESS_CREATE_CUSTOM_MENU.getHttpStatus())  // 200
@@ -154,9 +162,13 @@ public class RestaurantController {
 	 * 커스텀 메뉴 삭제 (DELETE /api/restaurants/custom/{customId})
 	 */
 	@DeleteMapping("/custom/{customId}")
-	public ResponseEntity<?> deleteCustomMenu(@PathVariable Long customId) {
-		// 실제 비즈니스 로직
-		restaurantService.deleteCustomMenu(customId);
+	public ResponseEntity<?> deleteCustomMenu(@PathVariable Long customId,
+		@AuthenticationPrincipal CustomUserDetails principal) {
+
+		Long userId = principal.getUserId();
+
+		// 서비스 계층에서 userId와 customId로 본인 메뉴인지 체크할 수 있습니다.
+		restaurantService.deleteCustomMenu(customId, userId);
 
 		return ResponseEntity
 			.status(SUCCESS_DELETE_CUSTOM_MENU.getHttpStatus())  // 200

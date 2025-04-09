@@ -7,7 +7,6 @@ import lombok.Data;
  */
 @Data
 public class CustomMenuRequestDto {
-	private Long userId;
 	private Long restaurantId;
 	private String customMenuName;
 	private int customMenuPrice;

@@ -26,7 +26,7 @@ public interface RestaurantService {
 	 * (2) 맛집 제거
 	 *  DELETE /api/restaurants
 	 */
-	void removeRestaurant(RestaurantDeleteRequestDto requestDto);
+	void removeRestaurant(Long userId, Long restaurantId);
 
 	/**
 	 * (3) 등록 맛집 리스트 조회
@@ -52,13 +52,13 @@ public interface RestaurantService {
 	 * (5) 커스텀 메뉴 등록
 	 *  POST /api/restaurants/custom
 	 */
-	void createCustomMenu(CustomMenuRequestDto requestDto);
+	void createCustomMenu(Long userId, CustomMenuRequestDto requestDto);
 
 	/**
 	 * (6) 커스텀 메뉴 삭제
 	 *  DELETE /api/restaurants/custom/{customId}
 	 */
-	void deleteCustomMenu(Long customId);
+	void deleteCustomMenu(Long customId, Long userId);
 
 	// 크롤링된 StoreDto를 DB에 저장
 	void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId);
