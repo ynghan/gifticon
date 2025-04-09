@@ -1,33 +1,61 @@
 import tkinter as tk
-from table_screen import create_table_screen  # 테이블 화면 함수 임포트
+from table_screen import create_table_screen
 
-# 전역 변수로 화면 크기 설정
-global_wid = 800  # 화면 가로 크기 (수정 가능)
-global_he = 600  # 화면 세로 크기 (수정 가능)
+global_wid = 1024
+global_he = 768
 
-# 메인 화면을 설정하는 함수
 def create_main_screen():
-    # 기본 윈도우 설정
     window = tk.Tk()
-    window.title("Main Screen")  # 윈도우 제목 설정
-    window.geometry(f"{global_wid}x{global_he}")  # 전역변수로 화면 크기 설정
-    
-    # 테이블 버튼
-    table_button1 = tk.Button(window, text="테이블 1", width=30, height=15, relief="solid", borderwidth=3, command=lambda: create_table_screen(1))
-    table_button2 = tk.Button(window, text="테이블 2", width=30, height=15, relief="solid", borderwidth=3, command=lambda: create_table_screen(2))
-    # 아래쪽 버튼. 그냥 만들어 놨음
-    bottom_button1 = tk.Button(window, text="긴 버튼 1", width=50, height=2, relief="solid", borderwidth=3)
-    bottom_button2 = tk.Button(window, text="긴 버튼 2", width=50, height=2, relief="solid", borderwidth=3)
-    
-    table_button1.place(relx=0.3, rely=0.4, anchor="center")  # 좌측에 배치
-    table_button2.place(relx=0.7, rely=0.4, anchor="center")  # 우측에 배치
-    
-    bottom_button1.place(relx=0.25, rely=0.9, anchor="center")  # 왼쪽 버튼 배치
-    bottom_button2.place(relx=0.75, rely=0.9, anchor="center")  # 오른쪽 버튼 배치
+    window.title("Main Screen")
+    window.geometry(f"{global_wid}x{global_he}")
+    window.configure(bg="#f0f2f5")
 
-    # 윈도우 실행
+    # Header
+    header = tk.Label(window, text="POS 테이블 선택", font=("Malgun Gothic", 24, "bold"),
+                      bg="#e6f2ff", fg="#333", pady=20)
+    header.pack(fill="x")
+
+    # 가운데 프레임
+    center_frame = tk.Frame(window, bg="#f0f2f5")
+    center_frame.pack(expand=True)
+
+    # 테이블 버튼 스타일
+    def create_table_btn(text, table_number):
+        return tk.Button(
+            center_frame,
+            text=text,
+            font=("Malgun Gothic", 18, "bold"),
+            width=15, height=8,
+            bg="#ffffff", fg="#000000",
+            relief="raised", bd=3,
+            activebackground="#d0ebff",
+            command=lambda: create_table_screen(table_number)
+        )
+
+    table1 = create_table_btn("🍽 테이블 1", 1)
+    table2 = create_table_btn("🍽 테이블 2", 2)
+
+    table1.grid(row=0, column=0, padx=40, pady=40)
+    table2.grid(row=0, column=1, padx=40, pady=40)
+
+    # 하단 버튼 프레임
+    bottom_frame = tk.Frame(window, bg="#f0f2f5")
+    bottom_frame.pack(pady=30)
+
+    def bottom_btn(text, color="#ffffff"):
+        return tk.Button(
+            bottom_frame,
+            text=text,
+            font=("Malgun Gothic", 14),
+            width=40, height=2,
+            bg=color,
+            relief="ridge", bd=2
+        )
+
+    bottom_btn("🔄 긴 버튼 1", "#e6ffe6").grid(row=0, column=0, padx=20)
+    bottom_btn("⚙ 긴 버튼 2", "#fff5e6").grid(row=0, column=1, padx=20)
+
     window.mainloop()
 
-# 프로그램 실행
 if __name__ == "__main__":
     create_main_screen()
