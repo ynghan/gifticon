@@ -96,9 +96,7 @@ const CustomMenuImageSelector = ({
 
   return (
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold'>
-        나만의 메뉴 이미지를 선택해주세요
-      </h3>
+      <h3 className='text-lg font-normal'>나만의 메뉴 이미지를 선택해주세요</h3>
       <Card className='relative'>
         {image && (
           <button
@@ -120,7 +118,7 @@ const CustomMenuImageSelector = ({
               className='w-full h-full object-cover rounded-md'
             />
           ) : (
-            <span className='text-3xl font-semibold text-center'>
+            <span className='text-2xl font-normal text-center'>
               사진을 넣어주세요!
             </span>
           )}

@@ -54,10 +54,10 @@ export default function SentGiftItem({ list: list }: { list: TSentGift[] }) {
               <span>~{formatServerDate(gift.expiration_date)}</span>
             </div>
             {gift.used_status === 'BEFORE_USE' && (
-              <div className='text-xs px-2 py-1 rounded-full text-primary'>
+              <div className='text-xxs px-2 py-1 rounded-full text-primary'>
                 <button
                   onClick={() => handleRefund(gift.id)}
-                  className='px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600'
+                  className='px-4 py-2 rounded bg-red-400 text-white hover:bg-red-600'
                 >
                   취소하기
                 </button>

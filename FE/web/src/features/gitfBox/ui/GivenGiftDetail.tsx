@@ -1,10 +1,14 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Gift, User, Tag, X, QrCode } from 'lucide-react';
-import { PaymentType, useSendValidateGift } from '@/entity/gift/api/useSendValidateGift';
+import {
+  PaymentType,
+  useSendValidateGift,
+} from '@/entity/gift/api/useSendValidateGift';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { BASE_URL } from '@/shared/constants/url';
 import { TGiftDetail } from '../model/giftDetail';
@@ -26,11 +30,14 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
   const sendRequest = async (type: PaymentType) => {
     sendValidateGift({ giftId: giftDetail.id || 0, type });
 
-    const eventSource = new EventSourcePolyfill(`${BASE_URL}/api/sse/subscribe`, {
-      headers: {
-        'xx-auth': 'acc-tkn',
-      },
-    });
+    const eventSource = new EventSourcePolyfill(
+      `${BASE_URL}/api/sse/subscribe`,
+      {
+        headers: {
+          'xx-auth': 'acc-tkn',
+        },
+      }
+    );
 
     eventSource.addEventListener('connect', (event: any) => {
       console.log('🟢 SSE 연결 완료 메시지:', event.data);
@@ -86,9 +93,14 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
 
         <div className='flex items-center gap-2 text-gray-900'>
           <Gift className='h-5 w-5' />
-          <h2 className='text-xl font-semibold'>{giftDetail?.message}</h2>
+          <h2 className='text-xl font-normal'>{giftDetail?.message}</h2>
         </div>
-        <p>총 가격:{giftDetail.amount}</p>
+        <p>
+          총 가격:
+          {giftDetail?.amount?.toLocaleString('ko-KR', {
+            maximumFractionDigits: 0,
+          }) || '알 수 없음'}
+        </p>
 
         {/* 결제 버튼 */}
         {giftDetail?.used_status === 'BEFORE_USE' && (
@@ -128,7 +140,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
               ) : (
                 <QrCode className='h-5 w-5 text-primary' />
               )}
-              <h2 className='text-xl font-bold text-gray-900'>
+              <h2 className='text-xl font-normal text-gray-900'>
                 {paymentType === 'NFC' ? 'NFC 결제' : 'QR 결제'}
               </h2>
             </div>
@@ -157,10 +169,12 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
 
                 {/* 안내 메시지 */}
                 <div className='text-center space-y-2'>
-                  <p className='text-lg font-medium text-gray-900'>
+                  <p className='text-lg font-normal text-gray-900'>
                     결제를 위해 NFC 태그를 읽혀주세요
                   </p>
-                  <p className='text-sm text-gray-500'>태그를 읽으면 자동으로 결제가 진행됩니다</p>
+                  <p className='text-sm text-gray-500'>
+                    태그를 읽으면 자동으로 결제가 진행됩니다
+                  </p>
                 </div>
 
                 {/* 로딩 인디케이터 */}
@@ -194,7 +208,9 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
 
           {/* 하단 안내 */}
           <div className='mt-6 text-center'>
-            <p className='text-sm text-gray-500'>결제를 취소하려면 모달을 닫아주세요</p>
+            <p className='text-sm text-gray-500'>
+              결제를 취소하려면 모달을 닫아주세요
+            </p>
           </div>
         </div>
       </Modal>

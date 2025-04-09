@@ -16,15 +16,20 @@ const GivenGiftList = () => {
     <div className='space-y-6'>
       {/* 선물 개수 표시 */}
       <div className='text-center space-y-1'>
-        <h2 className='text-xl font-semibold text-gray-900'>사용 가능한 선물이</h2>
-        <p className='text-3xl font-bold text-primary'>
+        <h2 className='text-xl font-normal text-gray-900'>
+          {activeTab === 'BEFORE_USE'
+            ? '사용 가능한 선물이'
+            : activeTab === 'AFTER_USE'
+            ? '사용 완료한 선물이'
+            : '만료된 선물이'}
+        </h2>
+        <p className='text-3xl font-normal text-primary'>
           {filteredGifts.length} <span className='text-lg font-medium'>개</span>
         </p>
-        <p className='text-gray-500'>남아있어요</p>
       </div>
 
       {/* 필터 버튼 */}
-      <div className='flex justify-center gap-2'>
+      <div className='flex justify-center gap-1'>
         {[
           { status: 'BEFORE_USE', label: '사용 가능', icon: Gift },
           { status: 'AFTER_USE', label: '사용 완료', icon: CheckCircle2 },

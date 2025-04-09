@@ -190,7 +190,7 @@ export const GiftForm = () => {
               {selectedContact.name}
             </span>
           </div>
-          <span className='text-sm text-gray-500'>선택하기</span>
+          <span className='text-sm text-gray-700'>선택하기</span>
         </Button>
       </div>
       {isContactListShow && (
@@ -211,11 +211,11 @@ export const GiftForm = () => {
         >
           <div className='flex items-center gap-2'>
             <Store className='h-5 w-5 text-gray-500' />
-            <span className='text-gray-900'>
+            <span className='text-gray-500'>
               {market?.place_name || '또갈집 찾기'}
             </span>
           </div>
-          <span className='text-sm text-gray-500'>선택하기</span>
+          <span className='text-sm text-gray-700'>선택하기</span>
         </Button>
       </div>
 

@@ -25,7 +25,7 @@ function DetailPageContent() {
           >
             <X className='h-5 w-5' />
           </Button>
-          <h1 className='text-2xl font-bold text-gray-900'>선물 상세</h1>
+          <h1 className='text-2xl font-normal text-gray-900'>선물 상세</h1>
           <div className='w-10' /> {/* 균형을 위한 빈 공간 */}
         </div>
 

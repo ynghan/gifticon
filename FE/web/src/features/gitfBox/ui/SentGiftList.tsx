@@ -11,7 +11,9 @@ import SentGiftItem from './SentGiftItem';
 const SentGiftList = () => {
   const [giftNumber, setGiftNumber] = useState(0);
   const [currentList, setCurrentList] = useState<TSentGift[]>([]);
-  const [activeTab, setActiveTab] = useState<'cancelable' | 'nonCancelable'>('cancelable');
+  const [activeTab, setActiveTab] = useState<'cancelable' | 'nonCancelable'>(
+    'cancelable'
+  );
 
   const sentGifts = useFetchSentGift();
 
@@ -31,7 +33,10 @@ const SentGiftList = () => {
     setCurrentList(cancelableList);
   }, [sentGifts?.length]);
 
-  const handleListChange = (newList: TSentGift[], tab: 'cancelable' | 'nonCancelable') => {
+  const handleListChange = (
+    newList: TSentGift[],
+    tab: 'cancelable' | 'nonCancelable'
+  ) => {
     setCurrentList(newList);
     setActiveTab(tab);
   };
@@ -40,8 +45,10 @@ const SentGiftList = () => {
     <div className='space-y-6'>
       {/* 선물 개수 표시 */}
       <div className='text-center space-y-1'>
-        <h2 className='text-xl font-semibold text-gray-900'>친구들에게 보낸 선물이</h2>
-        <p className='text-3xl font-bold text-primary'>{giftNumber}개</p>
+        <h2 className='text-xl font-normal text-gray-900'>
+          친구들에게 보낸 선물이
+        </h2>
+        <p className='text-3xl font-normal text-primary'>{giftNumber}개</p>
         <p className='text-gray-500'>있어요</p>
       </div>
 
