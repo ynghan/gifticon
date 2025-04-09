@@ -1,6 +1,4 @@
 import React from 'react';
-import { X, Tag } from 'lucide-react';
-import Image from 'next/image';
 
 interface ModalProps {
   isModalOpen: boolean; // 모달 열림 여부
