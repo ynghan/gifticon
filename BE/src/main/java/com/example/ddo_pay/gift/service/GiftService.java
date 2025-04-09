@@ -34,4 +34,6 @@ public interface GiftService {
     void refund(GiftRefundRequestDto dto, Long userId);
 
     List<SendGiftSelectResponseDto> selectMySendList(Long userId);
+
+    String getRandomThemeImage(String theme);
 }

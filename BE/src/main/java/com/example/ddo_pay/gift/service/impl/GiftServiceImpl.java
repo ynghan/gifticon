@@ -307,5 +307,15 @@ public class GiftServiceImpl implements GiftService {
         return token;
     }
 
+    @Override
+    public String getRandomThemeImage(String theme) {
+        // 유효한 테마 값인지 검증 (소문자로 비교한다고 가정)
+        List<String> validThemes = List.of("congratulations", "comfort", "birthday", "encouragement");
+        if (!validThemes.contains(theme)) {
+            throw new CustomException(ResponseCode.INVALID_THEME);
+        }
+        // S3Service를 통해 지정된 폴더(테마)의 이미지 중 랜덤으로 URL 반환
+        return s3Service.getRandomImageUrl(theme);
+    }
 
 }

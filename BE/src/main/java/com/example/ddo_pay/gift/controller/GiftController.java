@@ -109,6 +109,15 @@ public class GiftController {
         return new ResponseEntity<>(Response.create(SUCCESS_REFUND_GIFT, null), SUCCESS_REFUND_GIFT.getHttpStatus());
     }
 
+    // 추가: 테마에 따른 랜덤 이미지 URL 반환 엔드포인트
+    @GetMapping("/themeImage")
+    public ResponseEntity<?> getThemeImage(@RequestParam("theme") String theme) {
+        String imageUrl = giftService.getRandomThemeImage(theme);
+        return new ResponseEntity<>(
+            Response.create(ResponseCode.SUCCESS_GET_THEME_IMAGE, imageUrl),
+            ResponseCode.SUCCESS_GET_THEME_IMAGE.getHttpStatus());
+    }
+
 
 }
 
