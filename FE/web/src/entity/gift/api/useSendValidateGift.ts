@@ -1,24 +1,33 @@
 import { axiosInstance } from '@/shared/api/axiosInstance';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export type PaymentType = 'QR' | 'NFC';
 
 export const useSendValidateGift = () => {
-  const { mutate: sendValidateGift } = useMutation({
-    mutationFn: async (giftId: number) => {
+  const queryClient = useQueryClient();
+
+  const { mutate: sendValidateGift, data: paymentToken } = useMutation({
+    mutationFn: async ({ giftId, type }: { giftId: number; type: PaymentType }) => {
       const response = await axiosInstance.post('/api/gift/check', {
         id: giftId,
         password: '123456',
       });
 
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          type: 'PAYMENT_REQUEST',
-          token: response.data.content.token,
-        })
-      );
+      if (type === 'NFC') {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: 'PAYMENT_REQUEST',
+            token: response.data.content.token,
+          }),
+        );
+      }
 
-      return response;
+      return response.data.content.token;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gifts'] });
     },
   });
 
-  return { sendValidateGift };
+  return { sendValidateGift, paymentToken };
 };
