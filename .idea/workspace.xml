@@ -93,9 +93,9 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "BE/#363/Fix/Image",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/SSAFY/Desktop/S12P21E106",
+    "last_opened_file_path": "C:/Users/SSAFY/Desktop/S12P21E106/BE",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -162,6 +162,7 @@
       <workItem from="1743600532609" duration="14000" />
       <workItem from="1744183123260" duration="9000" />
       <workItem from="1744243132926" duration="74000" />
+      <workItem from="1744245512076" duration="664000" />
     </task>
     <servers />
   </component>
