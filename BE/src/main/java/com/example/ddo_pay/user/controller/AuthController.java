@@ -1,5 +1,8 @@
 package com.example.ddo_pay.user.controller;
 
+import java.util.logging.Logger;
+
+import com.example.ddo_pay.gift.service.impl.GiftServiceImpl;
 import com.example.ddo_pay.user.dto.request.SocialLoginRequestDto;
 import com.example.ddo_pay.user.dto.response.SocialLoginResponseDto;
 
@@ -21,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
 	private final KakaoAuthService kakaoAuthService;
-
+	private static final Logger log = Logger.getLogger(GiftServiceImpl.class.getName());
 	/**
 	 * 카카오 인가 코드 받아 로그인 처리
 	 * (GET 예시, POST로 해도 됨)
@@ -41,22 +44,25 @@ public class AuthController {
 //		return ResponseEntity.ok(user);
 		SocialLoginResponseDto responseDto = kakaoAuthService.loginWithKakao(reqDto.getCode());
 
-		// HttpOnly 쿠키 생성 (개발 환경에서는 secure(false); 배포 환경에서는 true로 설정)
-		ResponseCookie accessCookie = ResponseCookie.from("access_token", responseDto.getAccessToken())
-			.httpOnly(true)
-			.secure(true)
-			.path("/")
-			.maxAge(3600)
-			.sameSite("Lax")
-			.build();
+		log.info("소셜 access toekn : " + responseDto.getAccessToken());
+		log.info("소셜 refresh toekn : " + responseDto.getRefreshToken());
 
-		ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", responseDto.getRefreshToken())
-			.httpOnly(true)
-			.secure(true)
-			.path("/")
-			.maxAge(86400)
-			.sameSite("Lax")
-			.build();
+		// HttpOnly 쿠키 생성 (개발 환경에서는 secure(false); 배포 환경에서는 true로 설정)
+		// ResponseCookie accessCookie = ResponseCookie.from("access_token", responseDto.getAccessToken())
+		// 	.httpOnly(true)
+		// 	.secure(true)
+		// 	.path("/")
+		// 	.maxAge(3600)
+		// 	.sameSite("Lax")
+		// 	.build();
+		//
+		// ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", responseDto.getRefreshToken())
+		// 	.httpOnly(true)
+		// 	.secure(true)
+		// 	.path("/")
+		// 	.maxAge(86400)
+		// 	.sameSite("Lax")
+		// 	.build();
 
 		// 응답 헤더에 쿠키 추가
 		// response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
