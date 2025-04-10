@@ -20,31 +20,48 @@ export const CustomMenuForm = ({ addCustomMenu }: Props) => {
     }
 
     addCustomMenu(name, price);
+
+    // 입력 필드 초기화
+    if (nameRef.current) nameRef.current.value = '';
+    if (priceRef.current) priceRef.current.value = '';
   };
 
   return (
-    <section className="flex justify-between items-center w-full px-8">
-      <div className="flex flex-col w-2/5">
-        <Label htmlFor="menuName">메뉴 이름</Label>
-        <Input
-          ref={nameRef}
-          type="text"
-          id="menuName"
-          name="menuName"
-          placeholder="메뉴 이름이 뭔가요?"
-        />
+    <div className='border rounded-lg p-6 bg-white shadow-sm w-full'>
+      <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-2'>
+          <Label htmlFor='menuName' className='text-gray-700'>
+            메뉴 이름
+          </Label>
+          <Input
+            ref={nameRef}
+            type='text'
+            id='menuName'
+            name='menuName'
+            placeholder='메뉴 이름을 입력해주세요'
+            className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
+          />
+        </div>
+        <div className='flex flex-col gap-2'>
+          <Label htmlFor='menuPrice' className='text-gray-700'>
+            가격
+          </Label>
+          <Input
+            ref={priceRef}
+            type='number'
+            id='menuPrice'
+            name='menuPrice'
+            placeholder='가격을 입력해주세요'
+            className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
+          />
+        </div>
+        <Button
+          onClick={handleButton}
+          className='w-full bg-gray-800 hover:bg-gray-700 text-white py-2 h-12'
+        >
+          메뉴 추가하기
+        </Button>
       </div>
-      <div className="flex flex-col w-2/5">
-        <Label htmlFor="menuPrice">가격</Label>
-        <Input
-          ref={priceRef}
-          type="number"
-          id="menuPrice"
-          name="menuPrice"
-          placeholder="가격 형성이 어떻게 되어있쬬?"
-        />
-      </div>
-      <Button onClick={handleButton}>추가</Button>
-    </section>
+    </div>
   );
 };

@@ -125,7 +125,9 @@ export default function MyStores({ changeCenter }: PlacesProps) {
                           <h2 className='text-xl font-semibold mb-1'>{store.place_name}</h2>
                           <div className='flex items-center gap-1 mb-1.5'>
                             <span className='mx-1 text-gray-300'>•</span>
-                            <span className='text-gray-600 text-sm'>{store.address_name}</span>
+                            <span className='text-gray-600 text-sm truncate max-w-[200px]'>
+                              {store.address_name}
+                            </span>
                           </div>
                           <div className='flex items-center gap-1 mb-1.5'>
                             <span className='mx-1 text-gray-300'>•</span>
