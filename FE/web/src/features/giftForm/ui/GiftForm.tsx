@@ -10,7 +10,7 @@ import CustomMenuImageSelector from './CustomMenuImageSelector';
 import { User, Store, Plus, Minus, Gift, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TCustomMenu, TMarketResponse, TMenu } from '@/entity/store/model/menu';
-import { axiosInstance } from '@/shared/api/axiosInstance';
+import { useFormStore } from '@/store/form';
 import { Input } from '@/components/ui/input';
 import { useFetchMenu } from '../api/useFetchMenu';
 
@@ -39,6 +39,7 @@ export const GiftForm = () => {
   }>();
   const [giftTitle, setGiftTitle] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
+  const setFormData = useFormStore((state) => state.setFormData);
 
   useEffect(() => {
     if (menuData) {
@@ -149,12 +150,13 @@ export const GiftForm = () => {
 
       // const response = await axiosInstance.post('/api/gift', formData);
 
+      // Zustand에 formData 저장
+      setFormData(formData);
+
       router.push(
         `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
           selectedContact.name
-        }&storeName=${
-          market?.place_name || '선택된 가게 없음'
-        }&giftForm=${formData}`
+        }&storeName=${market?.place_name || '선택된 가게 없음'}`
       );
     } catch (error) {
       console.error('기프티콘 생성 실패:', error);
