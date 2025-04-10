@@ -10,16 +10,11 @@ export function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
   // 응답 생성
   const response = NextResponse.next();
-
-  // 보안 헤더 설정
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; connect-src 'self' https://j12e106.p.ssafy.io https://kauth.kakao.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com; style-src 'self' 'unsafe-inline';"
-  );
-
+  const { pathname } = request.nextUrl;
+  // 0. splashImage.jpeg 요청은 무조건 허용 (다른 조건 무시)
+  if (pathname === '/splashImage.jpeg') {
+    return NextResponse.next();
+  }
   // 1. 접근 권한이 없는 경우: /permission 페이지로 강제 이동 (단, 이미 /permission이면 통과)
   if (!accessPermission && currentPath !== '/permission') {
     return NextResponse.redirect(new URL('/permission', request.url));
@@ -42,9 +37,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // return response;
+  return response;
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api/|_next/|favicon.ico).*)'],
 };
