@@ -79,7 +79,7 @@ const FavoriteMarketList = ({
               <div className='flex items-center gap-3'>
                 <div className='relative w-16 h-16 rounded-lg overflow-hidden'>
                   <Image
-                    src={market.main_image_url}
+                    src={market.main_image_url || '/defaultImage'}
                     alt={market.place_name}
                     fill
                     className='object-cover'

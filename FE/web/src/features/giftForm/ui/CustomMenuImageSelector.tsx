@@ -112,7 +112,7 @@ const CustomMenuImageSelector = ({
         >
           {image ? (
             <img
-              src={image.src}
+              src={image.src || 'defaultImage'}
               alt={image.alt}
               className='w-full h-full object-cover rounded-md'
             />

@@ -23,7 +23,7 @@ const GivenGifiItem = ({ list }: { list: TGift[] }) => {
             <Card className='overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow'>
               <div className='relative aspect-square'>
                 <Image
-                  src={gift.image}
+                  src={gift.image || 'defaultImage'}
                   alt={gift.title}
                   fill
                   className='object-cover'
