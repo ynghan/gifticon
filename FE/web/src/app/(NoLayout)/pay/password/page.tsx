@@ -17,7 +17,7 @@ function PayPassword() {
   const amount = searchParams.get('amount');
   const recipient = searchParams.get('recipient');
   const storeName = searchParams.get('storeName');
-  const formData = useFormStore((state) => state.formData);
+  const formData = useFormStore((state: any) => state.formData);
 
   const handleKeyPress = (key: string) => {
     if (input.length < 6) {
