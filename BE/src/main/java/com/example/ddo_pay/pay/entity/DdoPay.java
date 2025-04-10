@@ -50,7 +50,7 @@ public class DdoPay {
     }
 
     public void increaseBalance(int amount) {
-        this.balance = (int)(this.balance + (amount * 0.9f));
+        this.balance = (int)(this.balance + amount);
     }
 
     public void plueBalance(int amount) {
