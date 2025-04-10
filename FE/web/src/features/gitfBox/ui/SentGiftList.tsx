@@ -48,7 +48,7 @@ const SentGiftList = () => {
         <h2 className='text-xl font-normal text-gray-900'>
           친구들에게 보낸 선물이
         </h2>
-        <p className='text-3xl font-normal text-primary'>{giftNumber}개</p>
+        <p className='text-3xl font-normal text-[#FBBC05]'>{giftNumber}개</p>
         <p className='text-gray-500'>있어요</p>
       </div>
 
@@ -56,11 +56,15 @@ const SentGiftList = () => {
       <div className='flex justify-center gap-2'>
         <Button
           variant={activeTab === 'cancelable' ? 'default' : 'outline'}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
-            activeTab === 'cancelable'
-              ? 'bg-primary text-white shadow-sm'
-              : 'bg-white text-gray-700 hover:bg-gray-50'
-          }`}
+          className='flex items-center gap-2 px-4 py-2 rounded-full transition-all'
+          style={{
+            backgroundColor: activeTab === 'cancelable' ? '#FBBC05' : '#FFFFFF', // 활성화된 버튼 배경색
+            color: activeTab === 'cancelable' ? '#FFFFFF' : '#000000', // 텍스트 색상
+            boxShadow:
+              activeTab === 'cancelable'
+                ? '0px 1px 3px rgba(0, 0, 0, 0.2)'
+                : undefined, // 그림자 효과
+          }}
           onClick={() => handleListChange(cancelableList, 'cancelable')}
         >
           <RefreshCw className='h-4 w-4' />
@@ -68,11 +72,16 @@ const SentGiftList = () => {
         </Button>
         <Button
           variant={activeTab === 'nonCancelable' ? 'default' : 'outline'}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
-            activeTab === 'nonCancelable'
-              ? 'bg-primary text-white shadow-sm'
-              : 'bg-white text-gray-700 hover:bg-gray-50'
-          }`}
+          className='flex items-center gap-2 px-4 py-2 rounded-full transition-all'
+          style={{
+            backgroundColor:
+              activeTab === 'nonCancelable' ? '#FBBC05' : '#FFFFFF', // 활성화된 버튼 배경색
+            color: activeTab === 'nonCancelable' ? '#FFFFFF' : '#000000', // 텍스트 색상
+            boxShadow:
+              activeTab === 'nonCancelable'
+                ? '0px 1px 3px rgba(0, 0, 0, 0.2)'
+                : undefined, // 그림자 효과
+          }}
           onClick={() => handleListChange(nonCancelableList, 'nonCancelable')}
         >
           <CheckCircle2 className='h-4 w-4' />
