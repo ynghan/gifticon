@@ -40,24 +40,30 @@ export default function GiftPage() {
         <div className='flex justify-center gap-4 mb-8'>
           <Button
             variant={!isShowSendGift ? 'default' : 'outline'}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
-              !isShowSendGift
-                ? 'bg-primary text-white shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-            onClick={handleClickGivenBtn}
+            className='flex items-center gap-2 px-6 py-2 rounded-full transition-all text-gray-700 hover:bg-gray-50'
+            style={{
+              backgroundColor: !isShowSendGift ? '#FBBC05' : '#FFFFFF', // 활성화된 버튼의 색상 설정
+              color: !isShowSendGift ? '#FFFFFF' : '#000000', // 텍스트 색상 설정
+              boxShadow: !isShowSendGift
+                ? '0px 1px 3px rgba(0, 0, 0, 0.2)'
+                : undefined, // 그림자 효과
+            }}
+            onClick={() => setIsShowSendGift(false)} // 받은 선물함 버튼 클릭 시 상태 변경
           >
             <Gift className='h-4 w-4' />
             받은 선물함
           </Button>
           <Button
             variant={isShowSendGift ? 'default' : 'outline'}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
-              isShowSendGift
-                ? 'bg-primary text-white shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-            onClick={handleClickSendBtn}
+            className='flex items-center gap-2 px-6 py-2 rounded-full transition-all text-gray-700 hover:bg-gray-50'
+            style={{
+              backgroundColor: isShowSendGift ? '#FBBC05' : '#FFFFFF', // 활성화된 버튼의 색상 설정
+              color: isShowSendGift ? '#FFFFFF' : '#000000', // 텍스트 색상 설정
+              boxShadow: isShowSendGift
+                ? '0px 1px 3px rgba(0, 0, 0, 0.2)'
+                : undefined, // 그림자 효과
+            }}
+            onClick={() => setIsShowSendGift(true)} // 내가 보낸 선물 버튼 클릭 시 상태 변경
           >
             <Send className='h-4 w-4' />
             내가 보낸 선물

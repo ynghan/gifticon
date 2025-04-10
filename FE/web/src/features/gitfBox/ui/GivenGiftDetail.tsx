@@ -14,6 +14,7 @@ import { BASE_URL } from '@/shared/constants/url';
 import { TGiftDetail } from '../model/giftDetail';
 import QRCode from 'react-qr-code';
 import { useRouter } from 'next/navigation';
+import { getCookieValue } from '@/shared/api/axiosInstance';
 
 type GivenGiftDetailProps = {
   sendRequest?: () => void;
@@ -26,7 +27,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
   const router = useRouter();
 
   const { sendValidateGift, paymentToken } = useSendValidateGift();
-
+  const accessToken = getCookieValue('accessToken');
   const sendRequest = async (type: PaymentType) => {
     sendValidateGift({ giftId: giftDetail.id || 0, type });
 
@@ -34,8 +35,9 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
       `${BASE_URL}/api/sse/subscribe`,
       {
         headers: {
-          'xx-auth': 'acc-tkn',
+          'xx-auth': `Bearer ${accessToken}`,
         },
+        withCredentials: true,
       }
     );
 
@@ -117,7 +119,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
             <div>
               <Button
                 onClick={() => openModal('NFC')}
-                className='w-full flex items-center justify-center gap-2 py-6 text-lg bg-primary hover:bg-primary/90'
+                className='w-full flex items-center justify-center gap-2 py-6 text-lg bg-primary hover:bg-primary/90 text-[#FBBC05]'
               >
                 <Tag className='h-5 w-5' />
                 NFC 태그하기

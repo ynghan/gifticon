@@ -1,5 +1,7 @@
+import { getCookieValue } from '@/shared/api/axiosInstance';
 import axios from 'axios';
 
+const accessToken = getCookieValue('accessToken');
 export async function fetchKakaoLogin(code: string) {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/kakao/callback`,
@@ -8,8 +10,7 @@ export async function fetchKakaoLogin(code: string) {
     },
     {
       headers: {
-        'Content-Type': 'application/json',
-        'xx-auth': 'acc-tkn',
+        'xx-auth': `Bearer ${accessToken}`,
       },
       withCredentials: true,
     }

@@ -7,6 +7,7 @@ import { useHandleContacts } from '../api/HandleContacts';
 
 interface Contact {
   firstName?: string;
+  lastName?: string;
   phoneNumbers?: { value: string }[];
 }
 
@@ -20,7 +21,10 @@ interface ContactListProps {
   setIsContactListShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const ContactList = ({ setSelectedContact, setIsContactListShow }: ContactListProps) => {
+export const ContactList = ({
+  setSelectedContact,
+  setIsContactListShow,
+}: ContactListProps) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [query, setQuery] = useState<string>('');
   const { contacts: nativeContacts, isLoading } = useHandleContacts();
@@ -48,7 +52,10 @@ export const ContactList = ({ setSelectedContact, setIsContactListShow }: Contac
           { name: '이영희', phoneNumber: '010-8765-4321' },
           { name: '박민수', phoneNumber: '010-5555-6666' },
         ];
-        localStorage.setItem('dummyContacts', JSON.stringify(defaultDummyContacts));
+        localStorage.setItem(
+          'dummyContacts',
+          JSON.stringify(defaultDummyContacts)
+        );
         setContacts(
           defaultDummyContacts.map((contact) => ({
             firstName: contact.name,
@@ -77,27 +84,42 @@ export const ContactList = ({ setSelectedContact, setIsContactListShow }: Contac
 
   // React Native 환경에서 contacts 상태 업데이트
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ReactNativeWebView && nativeContacts) {
+    if (
+      typeof window !== 'undefined' &&
+      window.ReactNativeWebView &&
+      nativeContacts
+    ) {
       setContacts(nativeContacts);
     }
   }, [nativeContacts]);
 
   const sortedContacts = [...contacts].sort((a, b) => {
-    const nameA = a.firstName ? a.firstName : '';
-    const nameB = b.firstName ? b.firstName : '';
+    const nameA = a.firstName || ''; // firstName이 없으면 빈 문자열
+    const nameB = b.firstName || ''; // firstName이 없으면 빈 문자열
 
-    // 한글이 영어보다 먼저 오도록 정렬 로직 변경
+    const phoneNumberA = a.phoneNumbers?.[0]?.value || ''; // 첫 번째 phoneNumber 값
+    const phoneNumberB = b.phoneNumbers?.[0]?.value || ''; // 첫 번째 phoneNumber 값
+
+    // 한글이 영어보다 먼저 오도록 정렬
     const testerA = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(nameA);
     const testerB = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(nameB);
 
+    if (!phoneNumberA && phoneNumberB) {
+      return 1; // a의 phoneNumber가 없고 b는 있으면 b가 먼저
+    }
+    if (phoneNumberA && !phoneNumberB) {
+      return -1; // b의 phoneNumber가 없고 a는 있으면 a가 먼저
+    }
+
     if (testerA && !testerB) {
       return -1; // a가 한글이고 b가 영문이면 a를 먼저 정렬
-    } else if (!testerA && testerB) {
-      return 1; // b가 한글이고 a가 영문이면 b를 먼저 정렬
-    } else {
-      // 둘 다 한글이거나 둘 다 영문인 경우 localeCompare로 정렬
-      return nameA.localeCompare(nameB, 'ko');
     }
+    if (!testerA && testerB) {
+      return 1; // b가 한글이고 a가 영문이면 b를 먼저 정렬
+    }
+
+    // 둘 다 한글이거나 둘 다 영문인 경우 localeCompare로 정렬
+    return nameA.localeCompare(nameB, 'ko');
   });
 
   const handleContact = (name: string, phoneNumber: string) => {
@@ -106,11 +128,11 @@ export const ContactList = ({ setSelectedContact, setIsContactListShow }: Contac
   };
 
   const filteredContacts = sortedContacts.filter((contact) => {
-    const firstName = contact.firstName || ''; // firstName이 undefined일 경우 빈 문자열 할당
-    return (
-      typeof firstName === 'string' && // firstName이 문자열인지 확인
-      firstName.includes(query)
-    );
+    // query가 빈 문자열이면 전체 목록 반환
+    if (!query.trim()) {
+      return true;
+    }
+    return contact?.firstName?.includes(query);
   });
 
   return (
@@ -144,7 +166,9 @@ export const ContactList = ({ setSelectedContact, setIsContactListShow }: Contac
       {/* 연락처 목록 */}
       <div className='space-y-4 max-h-[400px] overflow-y-auto'>
         {filteredContacts.length === 0 ? (
-          <div className='text-center text-gray-500 py-4'>연락처가 없습니다.</div>
+          <div className='text-center text-gray-500 py-4'>
+            연락처가 없습니다.
+          </div>
         ) : (
           filteredContacts.map((contact) => (
             <Button
@@ -152,15 +176,22 @@ export const ContactList = ({ setSelectedContact, setIsContactListShow }: Contac
               variant='ghost'
               className='w-full justify-start p-4 hover:bg-gray-50'
               onClick={() =>
-                handleContact(contact.firstName || '', contact.phoneNumbers?.[0]?.value || '')
+                handleContact(
+                  contact.firstName || '',
+                  contact.phoneNumbers?.[0]?.value || ''
+                )
               }
             >
               <div className='flex items-center gap-3'>
                 <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
-                  <span className='text-primary font-medium'>{contact.firstName?.[0] || '?'}</span>
+                  <span className='text-primary font-medium'>
+                    {contact.firstName?.[0] || '?'}
+                  </span>
                 </div>
                 <div className='text-left'>
-                  <p className='font-medium text-gray-900'>{contact.firstName || '이름 없음'}</p>
+                  <p className='font-medium text-gray-900'>
+                    {contact.firstName || '이름 없음'}
+                  </p>
                   <p className='text-sm text-gray-500'>
                     {contact.phoneNumbers?.[0]?.value || '전화번호 없음'}
                   </p>
