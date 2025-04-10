@@ -40,7 +40,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
         // 예외 URL 처리 (예: /api/users/social/kakao/login)
         if (!request.getRequestURI().equals("/api/users/social/kakao/login") &&
-            !request.getRequestURI().equals("/api/auth/kakao/callback")) {
+            !request.getRequestURI().equals("/api/auth/kakao/callback") &&
+            !request.getRequestURI().equals("/api/pay/pos")) {
             // "Authorization" 헤더에서 JWT 토큰 추출 (형식: "Bearer <token>")
             String authHeader = request.getHeader("xx-auth");
             log.info("authHeader : " + authHeader);
