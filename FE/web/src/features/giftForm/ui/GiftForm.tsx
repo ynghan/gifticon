@@ -39,7 +39,7 @@ export const GiftForm = () => {
   }>();
   const [giftTitle, setGiftTitle] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
-  const setFormData = useFormStore((state) => state.setFormData);
+  const setFormData = useFormStore((state: any) => state.setFormData);
 
   useEffect(() => {
     if (menuData) {
