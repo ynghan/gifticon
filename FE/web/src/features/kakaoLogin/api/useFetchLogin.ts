@@ -1,6 +1,5 @@
 import { getCookieValue } from '@/shared/api/axiosInstance';
 import axios from 'axios';
-  const accessToken = getCookieValue('accessToken')
 
 const accessToken = getCookieValue('accessToken');
 export async function fetchKakaoLogin(code: string) {

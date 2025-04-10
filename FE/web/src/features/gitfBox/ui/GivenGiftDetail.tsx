@@ -76,7 +76,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
       {/* 선물 이미지 */}
       <div className='relative aspect-square rounded-xl overflow-hidden'>
         <Image
-          src={giftDetail?.image || ''}
+          src={giftDetail?.image || 'defaultImage'}
           alt={giftDetail?.title || ''}
           fill
           className='object-cover'
