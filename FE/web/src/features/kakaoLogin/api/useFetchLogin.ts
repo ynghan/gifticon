@@ -7,12 +7,6 @@ export async function fetchKakaoLogin(code: string) {
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/kakao/callback`,
     {
       code,
-    },
-    {
-      headers: {
-        'xx-auth': `Bearer ${accessToken}`,
-      },
-      withCredentials: true,
     }
   );
   if (!response.data.accessToken) {
