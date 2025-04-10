@@ -34,7 +34,8 @@ export const useAuthStore = create(
       logout: () => {
         set({ accessToken: null, isAuthenticated: false, userInfo: null });
         // 서버에 로그아웃 요청 보내기
-        fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        // fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        document.cookie = `accessToken=; path=/; expires=${new Date(0).toUTCString()}`;
       },
     }),
     {
