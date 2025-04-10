@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { axiosInstance } from '@/shared/api/axiosInstance';
 import { API_URL } from '@/shared/constants/url';
 import { TCharge } from '@/entity/store/model/charge';
+import { useFormStore } from '@/store/form';
 
 function PayPassword() {
   const router = useRouter();
@@ -16,7 +17,8 @@ function PayPassword() {
   const amount = searchParams.get('amount');
   const recipient = searchParams.get('recipient');
   const storeName = searchParams.get('storeName');
-  const formData = searchParams.get('formData');
+  const formData = useFormStore((state) => state.formData);
+
   const handleKeyPress = (key: string) => {
     if (input.length < 6) {
       setInput((prevInput) => prevInput + key);
