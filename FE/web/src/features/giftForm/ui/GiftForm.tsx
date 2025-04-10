@@ -147,17 +147,15 @@ export const GiftForm = () => {
         }
       }
 
-      const response = await axiosInstance.post('/api/gift', formData);
+      // const response = await axiosInstance.post('/api/gift', formData);
 
-      if (response.data) {
-        router.push(
-          `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
-            selectedContact.name
-          }&storeName=${market?.place_name || '선택된 가게 없음'}&giftId=${
-            response.data.giftId
-          }`
-        );
-      }
+      router.push(
+        `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
+          selectedContact.name
+        }&storeName=${
+          market?.place_name || '선택된 가게 없음'
+        }&giftForm=${formData}`
+      );
     } catch (error) {
       console.error('기프티콘 생성 실패:', error);
       alert('기프티콘 생성에 실패했습니다. 다시 시도해주세요.');
