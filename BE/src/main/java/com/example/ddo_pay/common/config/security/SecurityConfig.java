@@ -38,7 +38,7 @@ public class SecurityConfig {
                     .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/kakao/callback").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                     )
                     .addFilterBefore(new CustomAuthenticationFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);
