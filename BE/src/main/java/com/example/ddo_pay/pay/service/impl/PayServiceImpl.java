@@ -483,8 +483,9 @@ public class PayServiceImpl implements PayService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("유효하지 않은 결제 내역 타입: " + request.getHistoryType());
         }
-
-        List<History> histories = historyRepository.findByDdoPay_UserIdAndType(userId, assetType);
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        Long payId = findUser.getDdoPay().getId();
+        List<History> histories = historyRepository.findByDdoPay_IdAndType(payId, assetType);
         List<GetHistoryListResponse> responseList = histories.stream().map(history -> {
             GetHistoryListResponse response = new GetHistoryListResponse();
             response.setId(history.getId());

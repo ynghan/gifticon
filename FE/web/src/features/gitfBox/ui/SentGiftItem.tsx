@@ -31,7 +31,7 @@ export default function SentGiftItem({ list: list }: { list: TSentGift[] }) {
         >
           <div className='relative aspect-square'>
             <Image
-              src={gift.image}
+              src={gift.image || 'defaultImage'}
               alt={gift.title}
               fill
               className='object-cover'

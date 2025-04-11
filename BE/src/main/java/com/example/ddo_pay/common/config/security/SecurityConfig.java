@@ -16,37 +16,33 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.ddo_pay.common.util.JwtUtil;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
         // 인증 등록 부분
         @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        public JwtUtil jwtUtil() {
+                return new JwtUtil();
+        }
+
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
                 http
-                                // Cors 설정. Webconfig 에서 설정되었다면 기본 설정(withDefault)
-                                .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-
-                                // Csrf 설정. 뭔지 모름. 끄기(disable)
-                                .csrf((cf) -> cf.disable())
-                                // basic 세션방식이 아니라 토큰방식이라 끄자고 한다.(disable)
-                                .httpBasic((hB) -> hB.disable())
-
-                                // 세션기반이 아님을 선언. 뭔지 모름
-                                .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                                // http 요청의 엔드포인트 확인
-                                .authorizeHttpRequests((aHR) -> aHR
-                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                .requestMatchers(
-                                                                new AntPathRequestMatcher("/**"))
-                                                .permitAll()
-                                                // 그 외의 경로들은 인증
-                                                .anyRequest()
-                                                .authenticated())
-                                .addFilterBefore(new CustomAuthenticationFilter(),
-                                                UsernamePasswordAuthenticationFilter.class);
-
+                    .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                    .csrf(csrf -> csrf.disable())
+                    .httpBasic(httpBasic -> httpBasic.disable())
+                    .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/kakao/callback").permitAll()
+                        .requestMatchers("/api/pay/pos").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().permitAll()
+                    )
+                    .addFilterBefore(new CustomAuthenticationFilter(jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
 
@@ -56,12 +52,12 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration corsconfig = new CorsConfiguration();
-                // corsconfig.setAllowedOrigins(
-                // Arrays.asList("http://j12e106.p.ssafy.io",
-                // "http://j12e106.p.ssafy.io:3000",
-                // "https://j12e106.p.ssafy.io",
-                // "https://j12e106.p.ssafy.io:3000",
-                // "http://localhost:3000"));
+                corsconfig.setAllowedOrigins(
+                Arrays.asList("http://j12e106.p.ssafy.io",
+                "http://j12e106.p.ssafy.io:3000",
+                "https://j12e106.p.ssafy.io",
+                "https://j12e106.p.ssafy.io:3000",
+                "http://localhost:3000"));
                 corsconfig.setAllowedOriginPatterns(Collections.singletonList("*"));
                 corsconfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsconfig.setAllowedHeaders(Collections.singletonList("*"));

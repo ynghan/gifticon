@@ -208,9 +208,9 @@ public class GiftServiceImpl implements GiftService {
         }
 
         // 3. 비밀번호 확인 로직
-        if (!payService.verifyGiftPassword(userId, dto.getPassword())) {
-            throw new CustomException(ResponseCode.INVALID_GIFT_PASSWORD); // 비밀번호 검증 실패 시 CustomException 발생
-        }
+//        if (!payService.verifyGiftPassword(userId, dto.getPassword())) {
+//            throw new CustomException(ResponseCode.INVALID_GIFT_PASSWORD); // 비밀번호 검증 실패 시 CustomException 발생
+//        }
 
         // 4. UUID 토큰 생성 및 Redis에 저장 (5분 만료)
         String token = generateUUIDToken(gift, userId);

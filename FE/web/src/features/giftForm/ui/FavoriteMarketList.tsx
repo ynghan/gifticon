@@ -27,7 +27,9 @@ const FavoriteMarketList = ({
   console.log(favoriteStores);
   const [query, setQuery] = useState<string>('');
 
-  const filteredMarkets = favoriteStores?.filter((market) => market.place_name.includes(query));
+  const filteredMarkets = favoriteStores?.filter((market) =>
+    market.place_name.includes(query)
+  );
 
   const handleMarketSelect = (market: TMarketResponse) => {
     setSelectedMarketId(market.id);
@@ -71,16 +73,22 @@ const FavoriteMarketList = ({
             <Button
               key={market.id}
               variant='ghost'
-              className='w-full justify-start p-4 hover:bg-gray-50'
+              className='w-full h-16 justify-start p-4 hover:bg-gray-50'
               onClick={() => handleMarketSelect(market)}
             >
               <div className='flex items-center gap-3'>
                 <div className='relative w-16 h-16 rounded-lg overflow-hidden'>
-                  // Fixme, 이미지 주소 수정필요
-                  <Image src='' alt={market.place_name} fill className='object-cover' />
+                  <Image
+                    src={market.main_image_url || '/defaultImage'}
+                    alt={market.place_name}
+                    fill
+                    className='object-cover'
+                  />
                 </div>
                 <div className='text-left'>
-                  <p className='font-medium text-gray-900'>{market.place_name}</p>
+                  <p className='font-medium text-gray-900'>
+                    {market.place_name}
+                  </p>
                   <p className='text-sm text-gray-500'>{market.address_name}</p>
                 </div>
               </div>

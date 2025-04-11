@@ -69,12 +69,13 @@ export default function page() {
 
   return (
     <FadeUpContainer className='flex flex-col h-full items-center pb-20'>
-      <div className='relative w-full bg-amber-50'>
+      <div className='relative w-full '>
         <Button variant={'ghost'} className='absolute top-4 left-4' onClick={() => router.back()}>
           <X className='size-6' />
         </Button>
         <h1 className='my-4 text-2xl font-bold text-center'>맛집 등록</h1>
       </div>
+      <Separator className='w-full size-2 mb-4' />
       {!crawledData && (
         <div className='w-full animate-pulse'>
           {/* 가게 이미지 스켈레톤 */}
@@ -89,21 +90,28 @@ export default function page() {
         </div>
       )}
       <CrawledStore crawledData={crawledData} />
-      <h2 className='font-semibold text-lg mb-2'>나만의 메뉴</h2>
-      <div className='flex flex-col w-full max-h-96 px-8 overflow-y-auto'>
-        <ul>
-          {customMenu.map((menu) => (
-            <li key={menu.menu_name}>
-              <h3 className='font-bold text-xl'>{menu.menu_name}</h3>
-              <p>{menu.menu_price}원</p>
-              <Separator className='my-2' />
-            </li>
-          ))}
-        </ul>
+      <div className='w-full px-8 mt-4'>
+        <div className='border rounded-lg p-6 bg-white shadow-sm'>
+          <h2 className='text-xl font-bold mb-4 text-center'>나만의 메뉴</h2>
+          <div className='space-y-3'>
+            {customMenu.length > 0 ? (
+              customMenu.map((menu) => (
+                <div key={menu.menu_name} className='flex justify-between items-center py-2'>
+                  <span className='text-gray-800'>{menu.menu_name}</span>
+                  <span className='text-gray-600'>{menu.menu_price.toLocaleString()}원</span>
+                </div>
+              ))
+            ) : (
+              <div className='text-center text-gray-500'>나만의 메뉴가 없습니다</div>
+            )}
+          </div>
+        </div>
       </div>
-      <h2 className='font-semibold text-lg mb-2'>나만의 메뉴 추가하기</h2>
-      <CustomMenuForm addCustomMenu={addCustomMenu} />
-      <Button className='fixed bottom-0 w-full h-20' onClick={submitStore}>
+      <div className='w-full px-8 my-6'>
+        <h2 className='text-lg font-semibold mb-4'>나만의 메뉴 추가하기</h2>
+        <CustomMenuForm addCustomMenu={addCustomMenu} />
+      </div>
+      <Button className='w-full h-20 bg-[#FBBC02] hover:bg-[#FBBC02]/90' onClick={submitStore}>
         등록하기
       </Button>
     </FadeUpContainer>

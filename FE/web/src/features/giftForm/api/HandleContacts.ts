@@ -9,6 +9,7 @@ export const handleMessageToRn = () => {
       { name: '김철수', phoneNumber: '010-1234-5678' },
       { name: '이영희', phoneNumber: '010-8765-4321' },
       { name: '박민수', phoneNumber: '010-5555-6666' },
+      { name: '이상혁', phoneNumber: '010-0000-0002' }
     ];
 
     // 더미 데이터를 localStorage에 저장

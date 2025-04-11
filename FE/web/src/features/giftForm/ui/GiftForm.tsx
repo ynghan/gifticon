@@ -6,12 +6,11 @@ import { Button } from '@/components/ui/button';
 import { handleMessageToRn } from '../api/HandleContacts';
 import { ContactList } from './ContactList';
 import FavoriteMarketList from './FavoriteMarketList';
-import Image from 'next/image';
 import CustomMenuImageSelector from './CustomMenuImageSelector';
-import { User, Store, Plus, Minus, Gift } from 'lucide-react';
+import { User, Store, Plus, Minus, Gift, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TCustomMenu, TMarketResponse, TMenu } from '@/entity/store/model/menu';
-import { axiosInstance } from '@/shared/api/axiosInstance';
+import { useFormStore } from '@/store/form';
 import { Input } from '@/components/ui/input';
 import { useFetchMenu } from '../api/useFetchMenu';
 
@@ -40,6 +39,7 @@ export const GiftForm = () => {
   }>();
   const [giftTitle, setGiftTitle] = useState('');
   const [giftMessage, setGiftMessage] = useState('');
+  const setFormData = useFormStore((state: any) => state.setFormData);
 
   useEffect(() => {
     if (menuData) {
@@ -148,17 +148,16 @@ export const GiftForm = () => {
         }
       }
 
-      const response = await axiosInstance.post('/api/gift', formData);
+      // const response = await axiosInstance.post('/api/gift', formData);
 
-      if (response.data) {
-        router.push(
-          `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
-            selectedContact.name
-          }&storeName=${market?.place_name || '선택된 가게 없음'}&giftId=${
-            response.data.giftId
-          }`
-        );
-      }
+      // Zustand에 formData 저장
+      setFormData(formData);
+
+      router.push(
+        `/pay/password?from=giftForm&amount=${totalPrice}&recipient=${
+          selectedContact.name
+        }&storeName=${market?.place_name || '선택된 가게 없음'}`
+      );
     } catch (error) {
       console.error('기프티콘 생성 실패:', error);
       alert('기프티콘 생성에 실패했습니다. 다시 시도해주세요.');
@@ -171,7 +170,7 @@ export const GiftForm = () => {
       <CustomMenuImageSelector onImagesChange={setCustomMenuImage} />
       {/* 받는 사람 선택 */}
       <div className='space-y-2'>
-        <Label className='text-sm font-medium text-gray-700'>받는 사람</Label>
+        <Label className='text-sm font-medium text-[#FBBC05]'>받는 사람</Label>
         <Button
           variant='outline'
           className='w-full flex items-center justify-between p-4 h-auto'
@@ -190,7 +189,9 @@ export const GiftForm = () => {
               {selectedContact.name}
             </span>
           </div>
-          <span className='text-sm text-gray-700'>선택하기</span>
+          <span className='text-sm text-gray-500'>
+            <ChevronDown />
+          </span>
         </Button>
       </div>
       {isContactListShow && (
@@ -202,7 +203,9 @@ export const GiftForm = () => {
 
       {/* 가게 선택 */}
       <div className='space-y-2'>
-        <Label className='text-sm font-medium text-gray-700'>선물할 가게</Label>
+        <Label className='text-sm font-medium text-[#FBBC05]'>
+          선물할 가게
+        </Label>
         <Button
           variant='outline'
           className='w-full flex items-center justify-between p-4 h-auto'
@@ -211,17 +214,24 @@ export const GiftForm = () => {
         >
           <div className='flex items-center gap-2'>
             <Store className='h-5 w-5 text-gray-500' />
-            <span className='text-gray-500'>
+            <span
+              className={market?.place_name ? 'text-primary' : 'text-gray-500'} // 조건부 클래스 설정
+            >
               {market?.place_name || '또갈집 찾기'}
             </span>
           </div>
-          <span className='text-sm text-gray-700'>선택하기</span>
+
+          <span className='text-sm text-gray-500'>
+            <ChevronDown />
+          </span>
         </Button>
       </div>
 
       {/* 메뉴 목록 */}
       <div className='space-y-4'>
-        <Label className='text-sm font-medium text-gray-700'>선택한 메뉴</Label>
+        <Label className='text-sm font-medium text-[#FBBC05]'>
+          선택한 메뉴
+        </Label>
         <div className='space-y-4'>
           {[...(menuList || []), ...(customMenuList || [])].map((menu) => (
             <div
@@ -229,22 +239,6 @@ export const GiftForm = () => {
               className='flex items-center justify-between p-4 bg-gray-50 rounded-lg'
             >
               <div className='flex items-center gap-4'>
-                <div className='relative w-16 h-16 rounded-lg overflow-hidden'>
-                  <Image
-                    src={
-                      'menu_image' in menu
-                        ? menu.menu_image
-                        : menu.custom_menu_image
-                    }
-                    alt={
-                      'menu_name' in menu
-                        ? menu.menu_name
-                        : menu.custom_menu_name
-                    }
-                    fill
-                    className='object-cover'
-                  />
-                </div>
                 <div>
                   <h3 className='font-medium text-gray-900'>
                     {'menu_name' in menu
@@ -253,8 +247,11 @@ export const GiftForm = () => {
                   </h3>
                   <p className='text-sm text-gray-500'>
                     {'menu_price' in menu
-                      ? menu.menu_price
+                      ? new Intl.NumberFormat('ko-KR', {
+                          maximumFractionDigits: 0,
+                        }).format(parseInt(menu.menu_price.replace(/,/g, '')))
                       : menu.custom_menu_price}
+                    원
                   </p>
                 </div>
               </div>
@@ -298,7 +295,7 @@ export const GiftForm = () => {
 
       {/* 선물 이름 */}
       <div className='space-y-2'>
-        <Label className='text-sm font-medium text-gray-700'>선물 이름</Label>
+        <Label className='text-sm font-normal text-[#FBBC05]'>선물 이름</Label>
         <Input
           type='text'
           placeholder='선물 이름을 입력해주세요.'
@@ -310,7 +307,9 @@ export const GiftForm = () => {
 
       {/* 선물 메시지 */}
       <div className='space-y-2 mb-30'>
-        <Label className='text-sm font-medium text-gray-700'>선물 메세지</Label>
+        <Label className='text-sm font-normal text-[#FBBC05]'>
+          선물 메세지
+        </Label>
         <Input
           type='text'
           placeholder='선물 메세지를 입력해주세요.'
@@ -331,7 +330,7 @@ export const GiftForm = () => {
             </div>
             <Button
               type='submit'
-              className='w-full flex items-center justify-center gap-2 py-6 text-lg bg-primary hover:bg-primary/90'
+              className='w-full flex items-center justify-center gap-2 py-6 text-lg bg-[#FBBC05] hover:bg-primary/90'
             >
               <Gift className='h-5 w-5' />
               선물하기

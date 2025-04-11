@@ -53,21 +53,22 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void createRestaurant(RestaurantCreateRequestDto requestDto) {
-
-		if (requestDto.getUserId() == null) {
+		// 프론트엔드에서 따로 userId를 전달하지 않아도, SecurityContext에서 인증된 사용자의 ID를 사용
+		Long currentUserId = SecurityUtil.getUserId();
+		if (currentUserId == null) {
 			throw new CustomException(
 				ResponseCode.NO_EXIST_USER,
 				"userId",
-				"user_id가 누락되었습니다."
+				"인증된 사용자가 존재하지 않습니다."
 			);
 		}
 
-		// 1) 사용자 조회
-		User user = userRepo.findById((long) requestDto.getUserId())
+		// 1) 사용자 조회 (현재 인증된 사용자)
+		User user = userRepo.findById(currentUserId)
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_USER,
 				"userId",
-				"해당 user가 존재하지 않습니다."
+				"해당 사용자가 존재하지 않습니다."
 			));
 
 		// 2) (placeName, addressName)로 Restaurant 조회
@@ -118,8 +119,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 		userRestaurantRepository.save(userRestaurant);
 
 		// 5) Menu 목록 등록
-		//   만약 “Restaurant가 처음 생겼을 때만 Menu를 추가”한다면,
-		//   “if (!existingRestaurantOpt.isPresent()) { ... }” 조건으로 분기할 수도 있음.
 		if (requestDto.getMenu() != null && !requestDto.getMenu().isEmpty()) {
 			requestDto.getMenu().forEach(menuDto -> {
 				Menu menu = Menu.builder()
@@ -133,7 +132,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 		}
 
 		// 6) CustomMenu 목록 등록
-		//   마찬가지로 “if userRestaurant가 새로 생겼을 때만” 등 정책에 따라 분기 가능
 		if (requestDto.getCustomMenu() != null && !requestDto.getCustomMenu().isEmpty()) {
 			requestDto.getCustomMenu().forEach(customDto -> {
 				CustomMenu customMenu = CustomMenu.builder()
@@ -149,6 +147,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 		log.info("맛집 등록 완료. restaurantId={}, userId={}",
 			restaurant.getId(), user.getId());
 	}
+
 
 
 	/**
@@ -198,9 +197,15 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void removeRestaurant(Long userId, Long restaurantId) {
-
-		// 1) 사용자 조회
-		User user = userRepo.findById(userId)
+		Long currentUserId = SecurityUtil.getUserId();
+		if(currentUserId == null) {
+			throw new CustomException(
+				ResponseCode.NO_EXIST_USER,
+				"userId",
+				"인증된 사용자가 존재하지 않습니다."
+			);
+		}
+		User user = userRepo.findById(currentUserId)
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_USER,
 				"userId",
@@ -338,9 +343,17 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void createCustomMenu(Long userId, CustomMenuRequestDto requestDto) {
+		Long currentUserId = SecurityUtil.getUserId();
 		// 인증 토큰에서 전달된 userId를 사용하여 UserRestaurant 조회
+		if (currentUserId == null) {
+			throw new CustomException(
+				ResponseCode.NO_EXIST_USER,
+				"userId",
+				"인증된 사용자가 존재하지 않습니다."
+			);
+		}
 		UserRestaurant userRestaurant = userRestaurantRepository
-			.findByUser_IdAndRestaurant_Id(userId, requestDto.getRestaurantId())
+			.findByUser_IdAndRestaurant_Id(currentUserId, requestDto.getRestaurantId())
 			.orElseThrow(() -> new CustomException(
 				ResponseCode.NO_EXIST_RESTAURANT,
 				"restaurantId",
@@ -374,6 +387,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void deleteCustomMenu(Long customId, Long userId) {
+		Long currentUserId = SecurityUtil.getUserId();
 		// 존재 여부 확인
 		CustomMenu customMenu = customMenuRepository.findById(customId)
 			.orElseThrow(() -> new CustomException(
@@ -381,16 +395,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 				"customId",
 				"해당 커스텀 메뉴가 존재하지 않습니다."
 			));
-
-		// 소유자 확인: customMenu가 userId와 일치하는지 검증 (예, customMenu.getUserRestaurant().getUser().getId())
-		if (!customMenu.getUserRestaurant().getUser().getId().equals(userId)) {
+		if (!customMenu.getUserRestaurant().getUser().getId().equals(currentUserId)) {
 			throw new CustomException(
 				ResponseCode.UNAUTHORIZED,
 				"userId",
 				"해당 메뉴를 삭제할 권한이 없습니다."
 			);
 		}
-
 		customMenuRepository.delete(customMenu);
 		log.info("커스텀 메뉴 삭제 완료. customId={}, userId={}", customId, userId);
 	}
@@ -398,8 +409,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void saveCrawlingStoreData(RestaurantCrawlingStoreDto storeDto, Long userId) {
+		Long currentUserId = SecurityUtil.getUserId();
 		// 1) 사용자 조회
-		User user = userRepo.findById(userId)
+		User user = userRepo.findById(currentUserId)
 			.orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
 
 		// 2) storeDto에서 placeId 추출

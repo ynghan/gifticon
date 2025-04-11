@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { axiosInstance } from '@/shared/api/axiosInstance';
 import { API_URL } from '@/shared/constants/url';
 import { TCharge } from '@/entity/store/model/charge';
+import { useFormStore } from '@/store/form';
 
 function PayPassword() {
   const router = useRouter();
@@ -16,6 +17,7 @@ function PayPassword() {
   const amount = searchParams.get('amount');
   const recipient = searchParams.get('recipient');
   const storeName = searchParams.get('storeName');
+  const formData = useFormStore((state: any) => state.formData);
 
   const handleKeyPress = (key: string) => {
     if (input.length < 6) {
@@ -33,6 +35,8 @@ function PayPassword() {
 
   const handleSubmit = async () => {
     if (from === 'giftForm') {
+      const response = await axiosInstance.post('/api/gift', formData);
+      if (response.data.status.code !== 200) return;
       router.push(
         `/pay/completed?from=giftForm&amount=${amount}&recipient=${recipient}&storeName=${storeName}`
       );
@@ -80,7 +84,9 @@ function PayPassword() {
             <div className='flex justify-center'>
               <Lock className='h-8 w-8 text-primary' />
             </div>
-            <p className='text-gray-600'>결제를 진행하기 위해 비밀번호를 입력해주세요</p>
+            <p className='text-gray-600'>
+              결제를 진행하기 위해 비밀번호를 입력해주세요
+            </p>
           </div>
 
           {/* 비밀번호 표시 */}
@@ -140,7 +146,9 @@ export default function PinDemo() {
       fallback={
         <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
           <div className='text-center'>
-            <h2 className='text-xl font-semibold text-gray-900 mb-2'>로딩 중...</h2>
+            <h2 className='text-xl font-semibold text-gray-900 mb-2'>
+              로딩 중...
+            </h2>
             <p className='text-gray-600'>잠시만 기다려주세요.</p>
           </div>
         </div>

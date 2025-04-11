@@ -96,7 +96,6 @@ const CustomMenuImageSelector = ({
 
   return (
     <div className='space-y-4'>
-      <h3 className='text-lg font-normal'>나만의 메뉴 이미지를 선택해주세요</h3>
       <Card className='relative'>
         {image && (
           <button
@@ -113,13 +112,13 @@ const CustomMenuImageSelector = ({
         >
           {image ? (
             <img
-              src={image.src}
+              src={image.src || 'defaultImage'}
               alt={image.alt}
               className='w-full h-full object-cover rounded-md'
             />
           ) : (
             <span className='text-2xl font-normal text-center'>
-              사진을 넣어주세요!
+              <span className='text-[#FBBC05]'>사진</span>을 넣어주세요!
             </span>
           )}
         </CardContent>
@@ -132,7 +131,9 @@ const CustomMenuImageSelector = ({
         className='hidden'
       />
       <div className='space-y-2'>
-        <Label className='text-sm font-medium text-gray-700'>이미지 생성</Label>
+        <Label className='text-sm font-normal text-[#FBBC05]'>
+          이미지 생성
+        </Label>
         <div className='grid grid-cols-2 gap-2'>
           {[
             { type: 'birthday', text: '생일' },
@@ -145,7 +146,8 @@ const CustomMenuImageSelector = ({
               key={type}
               type='button'
               variant='outline'
-              className='w-full flex items-center justify-center p-4 h-auto text-gray-900 border-gray-300 hover:bg-gray-100'
+              // hover가 모바일에서는 active처럼 동작하는 것을 역으로 이용했습니다.
+              className='w-full flex items-center justify-center p-4 h-auto text-gray-500 border-gray-300 hover:bg-[#FBBC05]'
             >
               {text}
             </Button>

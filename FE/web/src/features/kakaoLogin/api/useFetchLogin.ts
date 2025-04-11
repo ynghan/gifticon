@@ -5,13 +5,6 @@ export async function fetchKakaoLogin(code: string) {
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/kakao/callback`,
     {
       code,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'xx-auth': 'acc-tkn',
-      },
-      withCredentials: true,
     }
   );
   if (!response.data.accessToken) {
