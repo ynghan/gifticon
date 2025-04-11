@@ -27,7 +27,7 @@ export default function Login() {
     <div className='min-h-screen flex flex-col items-center justify-center bg-white'>
       <div className='w-full max-w-md px-6 flex flex-col items-center'>
         <Image
-          src='/splash_image.png'
+          src='/splashImage.jpeg'
           alt='logo'
           width={150}
           height={150}

@@ -37,6 +37,7 @@ public class SecurityConfig {
                     .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/kakao/callback").permitAll()
+                        .requestMatchers("/api/pay/pos").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll()
                     )
