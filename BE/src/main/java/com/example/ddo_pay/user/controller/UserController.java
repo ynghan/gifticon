@@ -1,5 +1,8 @@
 package com.example.ddo_pay.user.controller;
 
+import com.example.ddo_pay.common.response.ResponseCode;
+import com.example.ddo_pay.gift.service.GiftService;
+import com.example.ddo_pay.user.dto.request.UpdatePhoneRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
+    private final GiftService giftService;
 
     // 소셜 로그인
     // Request - SocialLoginRequestDto
@@ -84,5 +88,17 @@ public class UserController {
 
         return new ResponseEntity<>(Response.create(SUCCESS_LOGOUT, null),
                 SUCCESS_LOGOUT.getHttpStatus());
+    }
+
+    // 전화번호 업데이트 API
+    @PutMapping("/phone")
+    public ResponseEntity<?> updatePhone(@RequestBody UpdatePhoneRequestDto dto) {
+        Long userId = SecurityUtil.getUserId();
+        // 1. 사용자 테이블에 전화번호 업데이트
+        userService.updateUserPhoneNumber(userId, dto.getPhoneNum());
+        // 2. 해당 전화번호로 GiftRepository를 조회하여 gift 연동 처리
+        giftService.linkGiftsToUserByPhone(dto.getPhoneNum(), userId);
+        return new ResponseEntity<>(Response.create(ResponseCode.SUCCESS_UPDATE_PHONE, null),
+                ResponseCode.SUCCESS_UPDATE_PHONE.getHttpStatus());
     }
 }

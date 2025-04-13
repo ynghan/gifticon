@@ -2,6 +2,9 @@ package com.example.ddo_pay.user.service;
 
 import java.util.Optional;
 
+import com.example.ddo_pay.common.exception.CustomException;
+import com.example.ddo_pay.common.response.ResponseCode;
+import com.example.ddo_pay.user.service.impl.UserRepository;
 import org.springframework.stereotype.Service;
 
 import com.example.ddo_pay.user.dto.UserDto;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     @Override
     public SocialLoginResponseDto socialUserLogin(SocialLoginRequestDto reqDto) {
@@ -70,4 +74,18 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void updateUserPhoneNumber(Long userId, String phoneNumber) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        // UserDto에 phoneNum 세팅
+        UserDto dto = UserDto.builder()
+                .phoneNum(phoneNumber)
+                .build();
+
+        // 엔티티의 메서드를 통해 phoneNum 변경
+        user.changePrivateInfo(dto);
+
+        userRepository.save(user);
+    }
 }

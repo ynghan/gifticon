@@ -67,9 +67,6 @@ public class GiftServiceImpl implements GiftService {
 
         log.info("메뉴 조합 : " + dto.getMenuName());
 
-        // 해당 유저의 또페이 계정의 잔고에서 출금되는 로직이라고 가정. + 결제내역 추가
-        payService.withdrawDdoPay(userId, dto.getAmount());
-
         // S3 이미지 업로드
         String imageUrl = s3Service.uploadFile(image);
 
@@ -102,6 +99,9 @@ public class GiftServiceImpl implements GiftService {
 
         // 3. 맛집 메뉴들의 총액을 계산 후, 결제자의 또페이 잔고에서 출금한다.
         log.info("메뉴 총 금액 : " + dto.getAmount());
+
+        // 해당 유저의 또페이 계정의 잔고에서 출금되는 로직이라고 가정. + 결제내역 추가
+        payService.withdrawDdoPay(userId, dto.getAmount());
 
     }
 
@@ -208,9 +208,9 @@ public class GiftServiceImpl implements GiftService {
         }
 
         // 3. 비밀번호 확인 로직
-//        if (!payService.verifyGiftPassword(userId, dto.getPassword())) {
-//            throw new CustomException(ResponseCode.INVALID_GIFT_PASSWORD); // 비밀번호 검증 실패 시 CustomException 발생
-//        }
+        if (!payService.verifyGiftPassword(userId, dto.getPassword())) {
+            throw new CustomException(ResponseCode.INVALID_GIFT_PASSWORD); // 비밀번호 검증 실패 시 CustomException 발생
+        }
 
         // 4. UUID 토큰 생성 및 Redis에 저장 (5분 만료)
         String token = generateUUIDToken(gift, userId);
@@ -318,4 +318,21 @@ public class GiftServiceImpl implements GiftService {
         return s3Service.getRandomImageUrl(theme);
     }
 
+    @Override
+    public void linkGiftsToUserByPhone(String phoneNumber, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
+        // phoneNumber로 연관된 모든 Gift 조회
+        List<Gift> gifts = giftRepository.findAllByPhoneNum(phoneNumber);
+        for (Gift gift : gifts) {
+            // 이미 giftBox가 연결되어 있지 않은 경우에 한해서 GiftBox 생성
+            if (gift.getGiftBox() == null) {
+                GiftBox giftBox = new GiftBox(user);
+                // 양쪽 연결 설정 (Gift와 GiftBox)
+                giftBox.changeGift(gift);
+                gift.changeGiftBox(giftBox);
+                giftBoxRepository.save(giftBox);
+            }
+        }
+    }
 }

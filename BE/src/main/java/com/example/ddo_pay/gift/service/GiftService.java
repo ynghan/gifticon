@@ -36,4 +36,6 @@ public interface GiftService {
     List<SendGiftSelectResponseDto> selectMySendList(Long userId);
 
     String getRandomThemeImage(String theme);
+
+    void linkGiftsToUserByPhone(String phoneNumber, Long userId);
 }

@@ -22,6 +22,7 @@ public enum ResponseCode {
 
     // 회원 정보 수정
     SUCCESS_UPDATE_USER_INFO(204, HttpStatus.OK, "회원 정보 수정 성공"),
+    SUCCESS_UPDATE_PHONE(200, HttpStatus.OK, "전화번호 업데이트에 성공했습니다."),
 
     // 로그아웃
     SUCCESS_LOGOUT(204, HttpStatus.OK, "로그아웃 성공"),
@@ -78,7 +79,7 @@ public enum ResponseCode {
 
 
     // 기프티콘
-    SUCCESS_CREATE_GIFTICON(200, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),
+    SUCCESS_CREATE_GIFTICON(201, HttpStatus.CREATED, "기프티콘이 성공적으로 생성되었습니다."),
     SUCCESS_ASSIGNMENT_GIFTICON(200, HttpStatus.OK, "기프티콘이 성공적으로 양도되었습니다."),
     SUCCESS_LIST_GIFTICON(200, HttpStatus.OK, "받은 기프티콘 리스트가 조회되었습니다."),
     SUCCESS_SEND_LIST_GIFTICON(200, HttpStatus.OK, "보낸 기프티콘 리스트가 조회되었습니다."),
