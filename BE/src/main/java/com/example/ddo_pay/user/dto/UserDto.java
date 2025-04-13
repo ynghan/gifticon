@@ -1,5 +1,6 @@
 package com.example.ddo_pay.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 

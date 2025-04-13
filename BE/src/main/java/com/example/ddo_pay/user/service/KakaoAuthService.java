@@ -122,11 +122,13 @@ public class KakaoAuthService {
 		String jwtAccessToken = jwtUtil.generateAccessToken(user);
 		String jwtRefreshToken = jwtUtil.generateRefreshToken(user);
 
-		// 6) SocialLoginResponseDto에 JWT 토큰 세팅 후 반환
+		// 6) SocialLoginResponseDto에 JWT 토큰과 사용자 이름, 전화번호 여부 플래그 세팅 후 반환
 		SocialLoginResponseDto responseDto = new SocialLoginResponseDto();
 		responseDto.setAccessToken(jwtAccessToken);
 		responseDto.setRefreshToken(jwtRefreshToken);
 		responseDto.setName(user.getName());
+		// 전화번호가 null 또는 빈 문자열이면 플래그 true 설정
+		responseDto.setPhoneNumberMissing(user.getPhoneNum() == null || user.getPhoneNum().trim().isEmpty());
 		return responseDto;
 	}
 

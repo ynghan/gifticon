@@ -13,4 +13,6 @@ public class SocialLoginResponseDto {
     private String refreshToken;
 
     private String name;
+    // 추가: 전화번호가 없는 경우 프론트에 알려주기 위한 플래그
+    private boolean phoneNumberMissing;
 }

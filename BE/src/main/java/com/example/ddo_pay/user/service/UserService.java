@@ -36,4 +36,6 @@ public interface UserService {
      * @param reqDto userId 필수
      */
     void logoutUser(UserDto reqDto);
+
+    void updateUserPhoneNumber(Long userId, String phoneNumber);
 }
