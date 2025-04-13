@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 import Image from 'next/image';
-import { Gift, User, Tag, X, QrCode } from 'lucide-react';
+import { Gift, User, Tag, X, QrCode, Store } from 'lucide-react';
 import {
   PaymentType,
   useSendValidateGift,
@@ -25,6 +25,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paymentType, setPaymentType] = useState<PaymentType | null>(null);
   const router = useRouter();
+  console.log(giftDetail);
 
   const { sendValidateGift, paymentToken } = useSendValidateGift();
   const accessToken = getCookieValue('accessToken');
@@ -76,7 +77,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
       {/* 선물 이미지 */}
       <div className='relative aspect-square rounded-xl overflow-hidden'>
         <Image
-          src={giftDetail?.image || 'defaultImage'}
+          src={giftDetail?.image || '/defaultImage.png'}
           alt={giftDetail?.title || ''}
           fill
           className='object-cover'
@@ -93,12 +94,19 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
           </span>
         </div>
 
+        <div className='flex items-center gap-2 text-gray-600'>
+          <Store className='h-5 w-5' />
+          <span className='text-lg'>
+            사용처: {giftDetail.restaurant_name || '알 수 없는 사용처'}
+          </span>
+        </div>
+
         <div className='flex items-center gap-2 text-gray-900'>
           <Gift className='h-5 w-5' />
           <h2 className='text-xl font-normal'>{giftDetail?.message}</h2>
         </div>
         <p>
-          총 가격:
+          총 가격 :
           {giftDetail?.amount?.toLocaleString('ko-KR', {
             maximumFractionDigits: 0,
           }) || '알 수 없음'}

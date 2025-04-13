@@ -25,6 +25,7 @@ function KakaoCallbackContent() {
         if (data.accessToken) {
           console.log('data.accessToken', data.accessToken);
           setTokens(data.accessToken);
+          // 여기서 해당 유저의 전화번호 유무에 따라 분기처리가 필요합니다.
           router.push('/');
         } else {
           throw new Error('토큰이 없습니다.');
@@ -41,7 +42,9 @@ function KakaoCallbackContent() {
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50'>
       <div className='text-center'>
-        <h2 className='text-xl font-semibold text-gray-900 mb-2'>로그인 처리 중...</h2>
+        <h2 className='text-xl font-semibold text-gray-900 mb-2'>
+          로그인 처리 중...
+        </h2>
         <p className='text-gray-600'>잠시만 기다려주세요.</p>
       </div>
     </div>
@@ -54,7 +57,9 @@ export default function KakaoCallback() {
       fallback={
         <div className='min-h-screen flex items-center justify-center bg-gray-50'>
           <div className='text-center'>
-            <h2 className='text-xl font-semibold text-gray-900 mb-2'>로딩 중...</h2>
+            <h2 className='text-xl font-semibold text-gray-900 mb-2'>
+              로딩 중...
+            </h2>
             <p className='text-gray-600'>잠시만 기다려주세요.</p>
           </div>
         </div>

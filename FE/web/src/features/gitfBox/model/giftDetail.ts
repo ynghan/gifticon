@@ -9,6 +9,6 @@ export type TGiftDetail = {
   send_user_name: string;
   message: string;
   restaurant_id: number;
-  restraunt_name: string;
+  restaurant_name: string;
   position: { lat: number; lng: number };
 };

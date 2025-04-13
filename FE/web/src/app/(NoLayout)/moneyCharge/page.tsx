@@ -78,7 +78,7 @@ export default function Page() {
           ))}
           <button
             onClick={handleClear}
-            className='h-20 text-xl font-medium rounded-xl bg-gray-50 hover:bg-gray-100 border text-gray-600'
+            className='h-20 text-xl font-medium rounded-xl bg-rose-100 hover:bg-rose-200 border text-gray-600'
           >
             C
           </button>
