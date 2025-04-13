@@ -270,7 +270,6 @@ public class PayServiceImpl implements PayService {
                 .build();
         ddoPay.getHistoryList().add(history);
         ddoPayRepository.save(ddoPay);
-        historyRepository.save(history);
     }
 
     // 기프티콘 취소 환불 시 90% 금액 환불
