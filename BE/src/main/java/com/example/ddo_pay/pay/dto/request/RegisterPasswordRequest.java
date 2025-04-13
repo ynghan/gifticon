@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RegisterPasswordRequest {
-    private Long userId;
     private String password; // 6자리 숫자
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ChargeDdoPayRequest {
-    private Long userId;
+
     private int amount;
     private String password;
 }

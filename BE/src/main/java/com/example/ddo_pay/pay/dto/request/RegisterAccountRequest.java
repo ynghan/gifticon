@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterAccountRequest {
-    private Long userId;
+
     @JsonProperty("randomWord")
     private String randomWord;
 }

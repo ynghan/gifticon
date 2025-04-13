@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountVerifyRequest {
-    private Long userId;
+
     private String accountNo;
 }

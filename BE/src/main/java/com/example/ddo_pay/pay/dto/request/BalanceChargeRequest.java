@@ -16,5 +16,5 @@ public class BalanceChargeRequest {
     private int amount;
     private String payPassword;
 
-    private Long userId;
+
 }
