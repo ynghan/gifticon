@@ -29,6 +29,7 @@ public class DdoPay {
     @OneToMany(mappedBy = "ddoPay", cascade = CascadeType.ALL)
     private List<History> historyList = new ArrayList<>();
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -40,9 +41,6 @@ public class DdoPay {
         this.point = point;
         this.payPassword = payPassword;
         this.user = user;
-    }
-
-    public void setUser(User user) {
     }
 
     public void decreaseBalance(int amount) {
