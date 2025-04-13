@@ -213,6 +213,7 @@ public class PayServiceImpl implements PayService {
     // 잔고 조회
     @Override
     public GetBalanceResponse selectBalance(Long userId) {
+        log.debug("🔍 [selectBalance] 잔고 조회 요청 - userId: {}", userId);
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_USER));
         int balance = findUser.getDdoPay().getBalance();
