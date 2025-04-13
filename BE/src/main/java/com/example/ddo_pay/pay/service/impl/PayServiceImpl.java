@@ -1,4 +1,4 @@
-package com.example.ddo_pay.pay.service.impl;
+package com.example.ddo_pay.pay.service.Impl;
 
 import com.example.ddo_pay.client.BankClient;
 import com.example.ddo_pay.common.exception.CustomException;
@@ -299,7 +299,7 @@ public class PayServiceImpl implements PayService {
     @Transactional
     @Override
     public void transferDdoPay(Long userId, ChargeDdoPayRequest request) {
-        DdoPay ddoPay = ddoPayRepository.findById(userId)
+        DdoPay ddoPay = ddoPayRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NO_EXIST_DDOPAY));
 
         // 비밀번호가 일치하지 않다면,
