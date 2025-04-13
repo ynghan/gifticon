@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RandomWordRequest {
-    private Long userId;
+
     private String randomWord;
 }
