@@ -43,18 +43,19 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Agreement agreement; // 동의항목과 1 대 1
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Gift> giftList = new ArrayList<>(); // 기프티콘과 1 대 다
-
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<GiftBox> giftBoxList = new ArrayList<>(); // 받은 기프티콘과 1 대 다
-
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Followee> followeeList = new ArrayList<>(); // 팔로위와 1 대 다
-
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Alarm> alarmList = new ArrayList<>(); // 알림과 1 대 다
-
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRestaurant> userRestaurantList = new ArrayList<>(); // 맛집 리스트와 1 대 다
 
