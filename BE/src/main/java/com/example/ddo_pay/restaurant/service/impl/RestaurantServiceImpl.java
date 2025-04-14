@@ -53,100 +53,102 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	@Transactional
 	public void createRestaurant(RestaurantCreateRequestDto requestDto) {
-		// 프론트엔드에서 따로 userId를 전달하지 않아도, SecurityContext에서 인증된 사용자의 ID를 사용
+		// 1) 인증된 사용자 조회
 		Long currentUserId = SecurityUtil.getUserId();
 		if (currentUserId == null) {
 			throw new CustomException(
-				ResponseCode.NO_EXIST_USER,
-				"userId",
-				"인증된 사용자가 존재하지 않습니다."
+					ResponseCode.NO_EXIST_USER,
+					"userId",
+					"인증된 사용자가 존재하지 않습니다."
 			);
 		}
 
-		// 1) 사용자 조회 (현재 인증된 사용자)
 		User user = userRepo.findById(currentUserId)
-			.orElseThrow(() -> new CustomException(
-				ResponseCode.NO_EXIST_USER,
-				"userId",
-				"해당 사용자가 존재하지 않습니다."
-			));
+				.orElseThrow(() -> new CustomException(
+						ResponseCode.NO_EXIST_USER,
+						"userId",
+						"해당 사용자가 존재하지 않습니다."
+				));
 
-		// 2) (placeName, addressName)로 Restaurant 조회
+		// 2) 식당 존재 여부 조회 (placeName, addressName 기준)
 		Optional<Restaurant> existingRestaurantOpt = restaurantRepository.findByPlaceNameAndAddressName(
-			requestDto.getPlaceName(),
-			requestDto.getAddressName()
+				requestDto.getPlaceName(),
+				requestDto.getAddressName()
 		);
 
 		Restaurant restaurant;
+		boolean isNewRestaurant = false; // 새 식당 여부 플래그
+
 		if (existingRestaurantOpt.isPresent()) {
-			// 이미 같은 식당 존재 → 재사용
+			// 이미 존재하는 식당이면 재사용 (메뉴 등록은 생략)
 			restaurant = existingRestaurantOpt.get();
 		} else {
-			// 새로운 식당 엔티티 생성
+			// 신규 식당 생성
 			restaurant = Restaurant.builder()
-				.placeName(requestDto.getPlaceName())
-				.addressName(requestDto.getAddressName())
-				.lat(requestDto.getPosition().getLat())
-				.lng(requestDto.getPosition().getLng())
-				.mainImageUrl(requestDto.getMainImageUrl())
-				.userIntro(requestDto.getUserIntro())
-				.starRating(requestDto.getStarRating())
-				.build();
+					.placeName(requestDto.getPlaceName())
+					.addressName(requestDto.getAddressName())
+					.lat(requestDto.getPosition().getLat())
+					.lng(requestDto.getPosition().getLng())
+					.mainImageUrl(requestDto.getMainImageUrl())
+					.userIntro(requestDto.getUserIntro())
+					.starRating(requestDto.getStarRating())
+					.build();
 
 			restaurantRepository.save(restaurant);
+			isNewRestaurant = true;
 		}
 
-		// 3) UserRestaurant 중복 체크: 같은 user + 같은 restaurant id?
+		// 3) UserRestaurant 중복 체크
 		Optional<UserRestaurant> existingUserRes = userRestaurantRepository
-			.findByUser_IdAndRestaurant_Id(user.getId(), restaurant.getId());
+				.findByUser_IdAndRestaurant_Id(user.getId(), restaurant.getId());
 
 		if (existingUserRes.isPresent()) {
-			// 이미 이 유저가 해당 식당을 등록한 상태
 			throw new CustomException(
-				ResponseCode.DATA_ALREADY_EXISTS,
-				"userId,restaurantId",
-				"이미 등록된 맛집입니다."
+					ResponseCode.DATA_ALREADY_EXISTS,
+					"userId,restaurantId",
+					"이미 등록된 맛집입니다."
 			);
 		}
 
 		// 4) UserRestaurant 새로 생성
 		UserRestaurant userRestaurant = UserRestaurant.builder()
-			.user(user)
-			.restaurant(restaurant)
-			.visitedCount(requestDto.getVisitedCount()) // 기본값 0
-			.build();
+				.user(user)
+				.restaurant(restaurant)
+				.visitedCount(requestDto.getVisitedCount())
+				.build();
 
 		userRestaurantRepository.save(userRestaurant);
 
-		// 5) Menu 목록 등록
-		if (requestDto.getMenu() != null && !requestDto.getMenu().isEmpty()) {
+		// 5) **신규 식당일 경우에만 Menu 목록 등록**
+		if (isNewRestaurant && requestDto.getMenu() != null && !requestDto.getMenu().isEmpty()) {
 			requestDto.getMenu().forEach(menuDto -> {
 				Menu menu = Menu.builder()
-					.menuName(menuDto.getMenuName())
-					.menuPrice(menuDto.getMenuPrice())
-					.menuImage(menuDto.getMenuImage())
-					.restaurant(restaurant) // 재사용 or 새로 만든 Restaurant
-					.build();
+						.menuName(menuDto.getMenuName())
+						.menuPrice(menuDto.getMenuPrice())
+						.menuImage(menuDto.getMenuImage())
+						.restaurant(restaurant)
+						.build();
 				menuRepository.save(menu);
 			});
 		}
 
-		// 6) CustomMenu 목록 등록
+		// 6) CustomMenu 목록 등록 (UserRestaurant에 묶여 있으므로 항상 등록)
 		if (requestDto.getCustomMenu() != null && !requestDto.getCustomMenu().isEmpty()) {
 			requestDto.getCustomMenu().forEach(customDto -> {
 				CustomMenu customMenu = CustomMenu.builder()
-					.customMenuName(customDto.getCustomMenuName())
-					.customMenuPrice(customDto.getCustomMenuPrice())
-					.customMenuImage(customDto.getCustomMenuImage())
-					.userRestaurant(userRestaurant)
-					.build();
+						.customMenuName(customDto.getCustomMenuName())
+						.customMenuPrice(customDto.getCustomMenuPrice())
+						.customMenuImage(customDto.getCustomMenuImage())
+						.userRestaurant(userRestaurant)
+						.build();
 				customMenuRepository.save(customMenu);
 			});
 		}
 
 		log.info("맛집 등록 완료. restaurantId={}, userId={}",
-			restaurant.getId(), user.getId());
+				restaurant.getId(), user.getId());
 	}
+
 
 
 
