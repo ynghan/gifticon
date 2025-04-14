@@ -23,10 +23,13 @@ function KakaoCallbackContent() {
         const data = await fetchKakaoLogin(code);
         console.log('data', data);
         if (data.accessToken) {
-          console.log('data.accessToken', data.accessToken);
           setTokens(data.accessToken);
           // 여기서 해당 유저의 전화번호 유무에 따라 분기처리가 필요합니다.
-          router.push('/');
+          if (data.phone_number_missing === true) {
+            router.push('/phone');
+          } else {
+            router.push('/');
+          }
         } else {
           throw new Error('토큰이 없습니다.');
         }

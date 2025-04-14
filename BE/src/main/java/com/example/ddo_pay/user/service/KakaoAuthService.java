@@ -97,8 +97,8 @@ public class KakaoAuthService {
 					User updatedUser = existingUser.toBuilder()
 							.name(finalName)
 							.email(email)
-							.phoneNum(phone)
-							.birthday(birthdayDate != null ? birthdayDate : existingUser.getBirthday())
+							// .phoneNum(phone)
+							// .birthday(birthdayDate != null ? birthdayDate : existingUser.getBirthday())
 							.refreshToken(kakaoRefreshToken)  // 카카오 리프레시 토큰 저장
 							.build();
 					userRepository.save(updatedUser);
@@ -109,8 +109,8 @@ public class KakaoAuthService {
 							.loginId(null)  // 카카오 로그인 시 별도의 loginId 필요 없음
 							.name(finalName)
 							.email(email)
-							.phoneNum(phone)
-							.birthday(birthdayDate)
+							// .phoneNum(phone)
+							// .birthday(birthdayDate)
 							.kakaoId(kakaoId)
 							.refreshToken(kakaoRefreshToken)  // 신규 사용자에도 카카오 리프레시 토큰 저장
 							.build();
@@ -129,6 +129,7 @@ public class KakaoAuthService {
 		responseDto.setName(user.getName());
 		// 전화번호가 null 또는 빈 문자열이면 플래그 true 설정
 		responseDto.setPhoneNumberMissing(user.getPhoneNum() == null || user.getPhoneNum().trim().isEmpty());
+		System.out.println("SocialLoginResponseDto: " + responseDto);
 		return responseDto;
 	}
 
