@@ -49,6 +49,7 @@ export const FavoriteStores = () => {
         restaurant_id: selectedId,
       },
     });
+    window.location.reload();
   };
 
   return (

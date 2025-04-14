@@ -36,7 +36,7 @@ function PayPassword() {
   const handleSubmit = async () => {
     if (from === 'giftForm') {
       const response = await axiosInstance.post('/api/gift', formData);
-      if (response.data.status.code !== 200) return;
+      if (response.data.status.code !== 201) return;
       router.push(
         `/pay/completed?from=giftForm&amount=${amount}&recipient=${recipient}&storeName=${storeName}`
       );
