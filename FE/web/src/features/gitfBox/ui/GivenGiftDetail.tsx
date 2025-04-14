@@ -105,12 +105,16 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
           <Gift className='h-5 w-5' />
           <h2 className='text-xl font-normal'>{giftDetail?.message}</h2>
         </div>
-        <p>
-          <HandCoins className='h-5 w-5' />총 가격 :
-          {giftDetail?.amount?.toLocaleString('ko-KR', {
-            maximumFractionDigits: 0,
-          }) || '알 수 없음'}
-        </p>
+        <div className='flex items-center gap-2 text-gray-600'>
+          <HandCoins className='h-5 w-5' />
+          <h2 className='text-xl font-normal'>
+            총 가격 :
+            {giftDetail?.amount?.toLocaleString('ko-KR', {
+              maximumFractionDigits: 0,
+            }) || '알 수 없음'}
+            원
+          </h2>
+        </div>
 
         {/* 결제 버튼 */}
         {giftDetail?.used_status === 'BEFORE_USE' && (
