@@ -291,7 +291,6 @@ public class PayServiceImpl implements PayService {
                 .build();
         ddoPay.getHistoryList().add(history);
         ddoPayRepository.save(ddoPay);
-        historyRepository.save(history);
     }
 
     // 또페이 충전
