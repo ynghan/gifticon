@@ -30,6 +30,7 @@ public enum ResponseCode {
     // User
     NO_EXIST_USER(400, HttpStatus.BAD_REQUEST, "등록된 사용자가 아닙니다."),
     INVALID_GIFTICON_OWNER(400, HttpStatus.BAD_REQUEST, "기프티콘 소유자가 아닙니다."),
+    ALREADY_EXIST_PHONE(400, HttpStatus.BAD_REQUEST, "이미 존재하는 번호입니다"),
     // Restaurant
 	SUCCESS_CREATE_RESTAURANT(204, HttpStatus.NO_CONTENT, "맛집 등록 성공."),
 	SUCCESS_REMOVE_RESTAURANT(200, HttpStatus.OK, "맛집으로 등록된 가게를 해제했습니다."),
@@ -96,7 +97,7 @@ public enum ResponseCode {
 
     INVALID_JSON(400, HttpStatus.BAD_REQUEST, "요청 JSON이 유효하지 않습니다."),
     FILE_UPLOAD_FAIL(400, HttpStatus.BAD_REQUEST, "파일 업로드를 실패했습니다."),
-    UNAUTHORIZED(400, HttpStatus.BAD_REQUEST, "권한이 없습니다"),;
+    UNAUTHORIZED(400, HttpStatus.BAD_REQUEST, "권한이 없습니다");
 
     private int code;
     private HttpStatus httpStatus;

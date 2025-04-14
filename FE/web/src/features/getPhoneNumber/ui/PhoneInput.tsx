@@ -1,4 +1,5 @@
 'use client';
+import { axiosInstance } from '@/shared/api/axiosInstance';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -28,7 +29,7 @@ export default function PhoneInput() {
     setphoneNumber('');
   };
 
-  const handleCharge = () => {
+  const handleCharge = async () => {
     const isValidPhoneNumber = (number: string) => {
       const phoneRegex = /^01([0|1|6|7|8|9])(\d{7,8})$/;
       return phoneRegex.test(number);
@@ -36,6 +37,11 @@ export default function PhoneInput() {
 
     if (phoneNumber && isValidPhoneNumber(phoneNumber)) {
       // API 통신 로직이 들어갑니다.
+      const response = await axiosInstance.put('/api/users/phone', {
+        phone_num: phoneNumber,
+      });
+      console.log(response.data)
+      if (response.data.status.code !== 200) return;
       router.push(`/`);
     } else {
       alert('유효한 전화번호를 입력해주세요.');
