@@ -128,7 +128,7 @@ export const GiftForm = () => {
         title: giftTitle,
         amount: totalPrice,
         message: giftMessage,
-        phone_num: selectedContact.phoneNumber,
+        phone_num: selectedContact.phoneNumber.replace(/-/g, ''),
         res_id: market?.id,
         position: {
           lat: market?.position.lat,
