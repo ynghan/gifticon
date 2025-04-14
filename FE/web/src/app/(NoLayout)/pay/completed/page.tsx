@@ -30,7 +30,9 @@ function CompletedPageContent() {
                 {from === 'moneyCharge' ? '충전 완료' : '선물하기 완료'}
               </h2>
               <p className='text-gray-600'>
-                {from === 'moneyCharge' ? '충전이 완료되었습니다' : '선물하기가 완료되었습니다'}
+                {from === 'moneyCharge'
+                  ? '충전이 완료되었습니다'
+                  : '선물하기가 완료되었습니다'}
               </p>
             </div>
           </div>
@@ -39,7 +41,9 @@ function CompletedPageContent() {
           <div className='space-y-4'>
             <div className='flex items-center justify-between p-4 bg-gray-50 rounded-lg'>
               <span className='text-gray-600'>금액</span>
-              <span className='font-semibold'>{amount}원</span>
+              <span className='font-semibold'>
+                {amount ? parseInt(amount).toLocaleString() : '0'}원
+              </span>
             </div>
             {from !== 'moneyCharge' && (
               <>
@@ -61,7 +65,11 @@ function CompletedPageContent() {
               홈으로
             </Button>
             {from !== 'moneyCharge' && (
-              <Button variant='outline' className='w-full' onClick={() => router.push('/gift/get')}>
+              <Button
+                variant='outline'
+                className='w-full'
+                onClick={() => router.push('/gift/get')}
+              >
                 선물함으로
               </Button>
             )}
@@ -78,7 +86,9 @@ export default function Page() {
       fallback={
         <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
           <div className='text-center'>
-            <h2 className='text-xl font-semibold text-gray-900 mb-2'>로딩 중...</h2>
+            <h2 className='text-xl font-semibold text-gray-900 mb-2'>
+              로딩 중...
+            </h2>
             <p className='text-gray-600'>잠시만 기다려주세요.</p>
           </div>
         </div>
