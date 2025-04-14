@@ -103,11 +103,11 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
 
         <div className='flex items-center gap-2 text-gray-600'>
           <Gift className='h-5 w-5' />
-          <h2 className='text-xl font-normal'>{giftDetail?.message}</h2>
+          <h2 className='text-lg font-normal'>{giftDetail?.message}</h2>
         </div>
         <div className='flex items-center gap-2 text-gray-600'>
           <HandCoins className='h-5 w-5' />
-          <h2 className='text-xl font-normal'>
+          <h2 className='text-lg font-normal'>
             총 가격 :
             {giftDetail?.amount?.toLocaleString('ko-KR', {
               maximumFractionDigits: 0,
