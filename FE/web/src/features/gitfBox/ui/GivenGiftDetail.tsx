@@ -5,10 +5,7 @@ import Modal from '@/shared/modal/Modal';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Gift, User, Tag, X, QrCode, Store, HandCoins } from 'lucide-react';
-import {
-  PaymentType,
-  useSendValidateGift,
-} from '@/entity/gift/api/useSendValidateGift';
+import { PaymentType, useSendValidateGift } from '@/entity/gift/api/useSendValidateGift';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { BASE_URL } from '@/shared/constants/url';
 import { TGiftDetail } from '../model/giftDetail';
@@ -32,15 +29,12 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
   const sendRequest = async (type: PaymentType) => {
     sendValidateGift({ giftId: giftDetail.id || 0, type });
 
-    const eventSource = new EventSourcePolyfill(
-      `${BASE_URL}/api/sse/subscribe`,
-      {
-        headers: {
-          'xx-auth': `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      }
-    );
+    const eventSource = new EventSourcePolyfill(`${BASE_URL}/api/sse/subscribe`, {
+      headers: {
+        'xx-auth': `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
 
     eventSource.addEventListener('connect', (event: any) => {
       console.log('🟢 SSE 연결 완료 메시지:', event.data);
@@ -56,7 +50,8 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
     });
 
     eventSource.onerror = (error: Event) => {
-      console.error('SSE Error:', error);
+      closeModal();
+      router.push(`/gift/get`);
       eventSource.close();
     };
   };
@@ -186,9 +181,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
                   <p className='text-lg font-normal text-gray-900'>
                     결제를 위해 NFC 태그를 읽혀주세요
                   </p>
-                  <p className='text-sm text-gray-500'>
-                    태그를 읽으면 자동으로 결제가 진행됩니다
-                  </p>
+                  <p className='text-sm text-gray-500'>태그를 읽으면 자동으로 결제가 진행됩니다</p>
                 </div>
 
                 {/* 로딩 인디케이터 */}
@@ -222,9 +215,7 @@ const GivenGiftDetail = ({ giftDetail }: GivenGiftDetailProps) => {
 
           {/* 하단 안내 */}
           <div className='mt-6 text-center'>
-            <p className='text-sm text-gray-500'>
-              결제를 취소하려면 모달을 닫아주세요
-            </p>
+            <p className='text-sm text-gray-500'>결제를 취소하려면 모달을 닫아주세요</p>
           </div>
         </div>
       </Modal>
