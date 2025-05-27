@@ -45,12 +45,12 @@
 ## 👥 팀 소개
 <table style="text-align: center;" width="100%">
   <tr>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/cheon.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/min.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/jeong.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/lee.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/choi.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/member/sin.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/cheon.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/min.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/jeong.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/lee.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/choi.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/sin.png" width="150" height="150"/></th>
   </tr>
   <tr>
     <td style="text-align: center;" width="16.66%">천세윤<br/><a href="https://github.com/yooniverse7">@yooniverse7</a></td>
@@ -158,10 +158,10 @@
     <th style="text-align: center;" width="25%">기프티콘 지도 페이지</th>
   </tr>
   <tr>
-    <td style="text-align: center;" width="25%"><img height="400" alt="기프티콘 커스텀 페이지" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/custom/custom-gift.jpg" ></td>
-    <td style="text-align: center;" width="25%"><img height="400" alt="받은 선물함 페이지" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/custom/recieved-gift.jpg"></td>
-    <td style="text-align: center;" width="25%"><img height="400" alt="보낸 선물함 페이지" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/custom/send-gift.jpg"></td>
-    <td style="text-align: center;" width="25%"><img height="400" alt="기프티콘 지도 페이지" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/custom/gifticon-map.jpg"></td>
+    <td style="text-align: center;" width="25%"><img height="400" alt="기프티콘 커스텀 페이지" src="./exec/readme_assets/custom/custom-gift.jpg" ></td>
+    <td style="text-align: center;" width="25%"><img height="400" alt="받은 선물함 페이지" src="./exec/readme_assets/custom/recieved-gift.jpg"></td>
+    <td style="text-align: center;" width="25%"><img height="400" alt="보낸 선물함 페이지" src="./exec/readme_assets/custom/send-gift.jpg"></td>
+    <td style="text-align: center;" width="25%"><img height="400" alt="기프티콘 지도 페이지" src="./exec/readme_assets/custom/gifticon-map.jpg"></td>
   </tr>
 </table>
 </details>
@@ -176,9 +176,9 @@
     <th style="text-align: center;" width="33%">QR 코드</th>
   </tr>
   <tr>
-    <td style="text-align: center;" width="33%"><img height="400" alt="결제 방식 선택 페이지" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/pay/nfc_or_qrcode.jpg"></td>
-    <td style="text-align: center;" width="33%"><img height="400" alt="NFC" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/pay/nfc.jpg"></td>
-    <td style="text-align: center;" width="33%"><img height="400" alt="QRCODE" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/pay/qrcode.jpg"></td>
+    <td style="text-align: center;" width="33%"><img height="400" alt="결제 방식 선택 페이지" src="./exec/readme_assets/pay/nfc_or_qrcode.jpg"></td>
+    <td style="text-align: center;" width="33%"><img height="400" alt="NFC" src="./exec/readme_assets/pay/nfc.jpg"></td>
+    <td style="text-align: center;" width="33%"><img height="400" alt="QRCODE" src="./exec/readme_assets/pay/qrcode.jpg"></td>
  </tr>
 </table>
 
@@ -196,11 +196,11 @@
     <th style="text-align: center;" width="20%">또갈집 확인 화면</th>
   </tr>
   <tr>
-    <td style="text-align: center;" width="20%"><img height="400" alt="맛집 지도 화면" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ddostore_register/dstore-map.jpg" ></td>
-    <td style="text-align: center;" width="20%"><img height="400" alt="맛집 등록 화면" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ddostore_register/dstore-register.jpg"></td>
-    <td style="text-align: center;" width="20%"><img height="400" alt="나만의 메뉴" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ddostore_register/ddostore-add-menu.jpg"></td>
-    <td style="text-align: center;" width="20%"><img height="400" alt="또갈집 지도 화면" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ddostore_register/ddostore-map.jpg"></td>
-   <td style="text-align: center;" width="20%"><img height="400" alt="또갈집 확인 화면" src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ddostore_register/ddostore-check.jpg"></td>
+    <td style="text-align: center;" width="20%"><img height="400" alt="맛집 지도 화면" src="./exec/readme_assets/ddostore_register/dstore-map.jpg" ></td>
+    <td style="text-align: center;" width="20%"><img height="400" alt="맛집 등록 화면" src="./exec/readme_assets/ddostore_register/dstore-register.jpg"></td>
+    <td style="text-align: center;" width="20%"><img height="400" alt="나만의 메뉴" src="./exec/readme_assets/ddostore_register/ddostore-add-menu.jpg"></td>
+    <td style="text-align: center;" width="20%"><img height="400" alt="또갈집 지도 화면" src="./exec/readme_assets/ddostore_register/ddostore-map.jpg"></td>
+   <td style="text-align: center;" width="20%"><img height="400" alt="또갈집 확인 화면" src="./exec/readme_assets/ddostore_register/ddostore-check.jpg"></td>
   </tr>
 </table>
 </details>
@@ -460,29 +460,29 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
 <details>
   <summary><strong>요구사항 명세서</strong></summary>
   <h3>🔹 유저 및 지도 관리</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/requirements/re1.png" alt="요구사항명세서">
+  <img src="./exec/readme_assets/requirements/re1.png" alt="요구사항명세서">
   <h3>🔹 기프티콘 및 친구 관리</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/requirements/re2.png" alt="요구사항명세서">
+  <img src="./exec/readme_assets/requirements/re2.png" alt="요구사항명세서">
 </details>
 
 <details>
   <summary><strong>ERD</strong></summary>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/ERD.png" alt="erd">
+  <img src="./exec/readme_assets/ERD.png" alt="erd">
 </details>
 
 
 <details>
   <summary><strong>API 명세서</strong></summary>
   <h3>🔹 유저 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/user-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/user-domain.png" alt="api명세서">
   <h3>🔹 기프티콘 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/gift-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/gift-domain.png" alt="api명세서">
   <h3>🔹 페이 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/pay-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/pay-domain.png" alt="api명세서">
   <h3>🔹 맛집 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/restaurant-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/restaurant-domain.png" alt="api명세서">
   <h3>🔹 포스 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/pos-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/pos-domain.png" alt="api명세서">
   <h3>🔹 은행 도메인</h3>
-  <img src="https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106/-/raw/readme/exec/readme_assets/domain/bank-domain.png" alt="api명세서">
+  <img src="./exec/readme_assets/domain/bank-domain.png" alt="api명세서">
 </details>
