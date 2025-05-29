@@ -1,0 +1,133 @@
+pipeline {
+    agent any
+
+    environment {
+        MATTERMOST_WEBHOOK = "https://meeting.ssafy.com/hooks/kd8p46dntiys5xc9tukqedt9jr"
+        IMAGE_NAME = "daum4572/s12p21e106"
+        TAG = "latest"
+        CONTAINER_NAME = "s12p21e106-backend"
+        CONFIG_PATH = "BE/src/main/resources/application.yml"
+        DOCKER_CONFIG_PATH = "/home/ubuntu/Project/S12P21E106/BE/config/application.yml"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/develop']],
+                    userRemoteConfigs: [[
+                        url: 'https://lab.ssafy.com/s12-fintech-finance-sub1/S12P21E106.git',
+                        credentialsId: 'gitlab-credentials'
+                    ]]
+                ])
+                updateGitlabCommitStatus name: 'build', state: 'pending'
+            }
+        }
+
+        stage('Copy Secret File') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
+                        dir('BE'){
+                            sh 'cp $APP_YML ./src/main/resources/application.yml'
+                            sh 'echo "[DEBUG] application.yml 적용됨:"'
+                            sh 'cat ./src/main/resources/application.yml | grep ddl-auto'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('BE') {
+                    sh 'echo "[DEBUG] 빌드 전 application.yml 확인:"'
+                    sh 'cat ./src/main/resources/application.yml | grep ddl-auto'
+                    sh 'chmod +x ./gradlew' // ✅ 요거 추가!!
+                    sh './gradlew clean build -x test'
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    dir('BE') {
+                        sh "docker build -t ${IMAGE_NAME}:${TAG} ."
+                    }
+                    withCredentials([usernamePassword(
+                        credentialsId: 'docker-hub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                    }
+                    sh "docker push ${IMAGE_NAME}:${TAG}"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                    ]) {
+                        sh """
+                            echo "[INFO] 컨테이너 및 이미지 정리"
+                            docker container rm -f ${CONTAINER_NAME} || true
+                            docker image rm -f ${IMAGE_NAME}:${TAG} || true
+                            docker rmi -f \$(docker images -f "dangling=true" -q) || true
+
+                            echo "[INFO] 도커 이미지 pull"
+                            docker pull ${IMAGE_NAME}:${TAG}
+
+                            echo "[INFO] 네트워크 존재 확인 및 생성"
+                            docker network inspect s12p21e106-network >/dev/null 2>&1 || docker network create s12p21e106-network
+
+                            echo "[INFO] 백엔드 컨테이너 실행 (서울 시간 포함)"
+                            docker run -d \\
+                                --name ${CONTAINER_NAME} \\
+                                -p 8082:8080 \\
+                                --network s12p21e106-network \\
+                                -v /etc/localtime:/etc/localtime:ro \\
+                                -v /etc/timezone:/etc/timezone:ro \\
+                                -e TZ=Asia/Seoul \\
+                                -e SPRING_PROFILES_ACTIVE=default \\
+                                -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \\
+                                -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \\
+                                ${IMAGE_NAME}:${TAG}
+                        """
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+    post {
+        success {
+            script {
+                sh """
+                    curl -X POST -H 'Content-Type: application/json' --data '{
+                        "text": "✅ [Spring Boot] Jenkins Build & Deployment Success! 🎉\\n🔹 프로젝트: S12P21E106\\n🔹 서비스: Backend (Spring Boot + Docker)\\n🔹 상태: 성공 ✅"
+                    }' ${MATTERMOST_WEBHOOK}
+                """
+                updateGitlabCommitStatus name: 'build', state: 'success'
+            }
+        }
+        failure {
+            script {
+                sh """
+                    curl -X POST -H 'Content-Type: application/json' --data '{
+                        "text": "❌ [Spring Boot] Jenkins Build Failed! 🔥\\n🔹 프로젝트: S12P21E106\\n🔹 서비스: Backend (Spring Boot + Docker)\\n🔹 상태: 실패 ❌"
+                    }' ${MATTERMOST_WEBHOOK}
+                """
+                updateGitlabCommitStatus name: 'build', state: 'failed'
+            }
+        }
+    }
+}

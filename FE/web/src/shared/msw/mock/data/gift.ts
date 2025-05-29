@@ -1,0 +1,86 @@
+export const gifticons = [
+  {
+    id: 1,
+    title: '맛있는 조합',
+    send_user_name: '김철수',
+    expiration_date: '2025-12-31T23:59:59',
+    image: '',
+    used_status: 'BEFORE_USE',
+    position: {
+      lat: 35.083371,
+      lng: 128.903883,
+    },
+  },
+  {
+    id: 2,
+    title: '초밥 많이 드세요',
+    send_user_name: '이영희',
+    expiration_date: '2025-12-31T23:59:59',
+    image: '',
+    used_status: 'AFTER_USE',
+    position: {
+      lat: 35.083371,
+      lng: 128.903883,
+    },
+  },
+  {
+    id: 3,
+    title: '삼겹살, 김치찌개 조합',
+    send_user_name: '박민수',
+    expiration_date: '2025-12-31T23:59:59',
+    image: '',
+    used_status: 'EXPIRED',
+    position: {
+      lat: 35.083371,
+      lng: 128.903883,
+    },
+  },
+  {
+    id: 4,
+    title: '달콤한 아이스크림 세트',
+    send_user_name: '정다은',
+    expiration_date: '2025-11-30T23:59:59',
+    image: '',
+    used_status: 'BEFORE_USE',
+    position: {
+      lat: 37.566535,
+      lng: 126.977969,
+    },
+  },
+  {
+    id: 5,
+    title: '따뜻한 아메리카노 한 잔',
+    send_user_name: '홍길동',
+    expiration_date: '2025-10-15T23:59:59',
+    image: '',
+    used_status: 'AFTER_USE',
+    position: {
+      lat: 37.456255,
+      lng: 126.705206,
+    },
+  },
+  {
+    id: 6,
+    title: '바삭한 치킨 세트',
+    send_user_name: '최유진',
+    expiration_date: '2026-01-15T23:59:59',
+    image: '',
+    used_status: 'BEFORE_USE',
+    position: {
+      lat: 37.541,
+      lng: 126.986,
+    },
+  },
+  {
+    id: 7,
+    title: '시원한 맥주 한 잔',
+    send_user_name: '이민호',
+    expiration_date: '2025-08-20T23:59:59',
+    image: '',
+    used_status: 'AFTER_USE',
+    position: {
+      lat: 35.1796,
+      lng: 129.0756,
+    },
+  },
+];
