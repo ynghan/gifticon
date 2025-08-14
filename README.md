@@ -1,40 +1,9 @@
 ![first-screen.png](exec%2Freadme_assets%2Ffirst-screen.png)
 <br />
 
-<!-- Notion 배지 -->
-<a href="https://relic-sea-1e3.notion.site/1a412a0174e780b4870bd63cd477cac6" target="_blank" style="text-decoration:none;">
-  <span style="
-    display:inline-flex;align-items:center;gap:8px;
-    background:linear-gradient(90deg,#ff5a7a,#ff8a5b);
-    padding:8px 14px;border-radius:12px;
-    font-weight:600;color:#fff;">
-    <img src="./exec/readme_assets/notion-icon.png" width="18" height="18" style="border-radius:4px;" alt="Notion"/>
-    Notion
-  </span>
-</a>
-&nbsp; <!-- 간격 -->
-<!-- 배포 배지 -->
-<a href="https://j12e106.p.ssafy.io" target="_blank" style="text-decoration:none;">
-  <span style="display:inline-flex;align-items:center;gap:8px;
-               background:linear-gradient(90deg,#AAA007,#FFB300);
-               padding:8px 14px;border-radius:12px;
-               font-weight:600;color:#fff;">
-    <img src="./exec/readme_assets/store-icon.png" width="18" height="18" style="border-radius:4px;" alt="Store"/>
-    또가게
-  </span>
-</a>
-&nbsp; <!-- 간격 -->
-<!-- 발표자료 배지 -->
-<a href="https://www.canva.com/design/DAGj4Cf_xWE/_Rcu9Lm_w1HBxPY1ytvvGQ/view?utm_content=DAGj4Cf_xWE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h840401bd48" target="_blank" style="text-decoration:none;">
-  <span style="
-    display:inline-flex;align-items:center;gap:8px;
-    background:linear-gradient(90deg,#4f6ae6,#5aa6ff);
-    padding:8px 14px;border-radius:12px;
-    font-weight:600;color:#fff;">
-    <img src="./exec/readme_assets/ppt-icon.png" width="18" height="18" style="border-radius:4px;" alt="Store"/>
-    발표자료
-  </span>
-</a>
+[![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)](https://relic-sea-1e3.notion.site/1a412a0174e780b4870bd63cd477cac6)
+[![또가게](https://img.shields.io/badge/%EB%98%90%EA%B0%80%EA%B2%8C-FFB300?style=for-the-badge)](https://j12e106.p.ssafy.io)
+[![발표자료](https://img.shields.io/badge/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C-4F6AE6?style=for-the-badge&logo=googleslides&logoColor=white)](https://www.canva.com/design/DAGj4Cf_xWE/_Rcu9Lm_w1HBxPY1ytvvGQ/view?utm_content=DAGj4Cf_xWE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h840401bd48)
 
 ## <img src="./exec/readme_assets/store-icon.png" width="18" height="18" style="border-radius:4px;" alt="Store"/> 또가게
 
@@ -169,6 +138,10 @@ GitLab 연동을 통해 자동화된 CI/CD 파이프라인을 구축.
 API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최적화 구성에 기여.
 
 </details>
+
+### FrontEnd
+
+![skill.png](./exec/readme_assets/FrontEnd.png)
 
 ## 🚀 프로젝트 소개
 
