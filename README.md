@@ -143,6 +143,10 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
 
 ![skill.png](./exec/readme_assets/FrontEnd.png)
 
+## 🗺️ 기술 아키텍처
+
+![ddo-store-architecture](./exec/readme_assets/또가게%20앱%20서버.jpg)
+
 ## 🚀 프로젝트 소개
 
 **_SSAFY 12기 2학기 공통 프로젝트_**
@@ -270,10 +274,6 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
     -   `float16`과 4비트 양자화를 적용하여 GPU 메모리 사용량이 감소, 동일 서버에서 더 많은 작업을 동시에 처리할 수 있게 됨.
 
 </details>
-
-## 🗺️ 기술 아키텍처
-
-![ddo-store-architecture](./exec/readme_assets/ddo-store-architecture.png)
 
 ## 📂 프로젝트 구조
 
