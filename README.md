@@ -12,10 +12,14 @@
 
 </div>
 
+<div align="center">
+
 [![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)](https://relic-sea-1e3.notion.site/1a412a0174e780b4870bd63cd477cac6)
 [![또가게](https://img.shields.io/badge/%EB%98%90%EA%B0%80%EA%B2%8C-FFB300?style=for-the-badge)](https://j12e106.p.ssafy.io)
 [![발표자료](https://img.shields.io/badge/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C-4F6AE6?style=for-the-badge&logo=googleslides&logoColor=white)](https://www.canva.com/design/DAGj4Cf_xWE/_Rcu9Lm_w1HBxPY1ytvvGQ/view?utm_content=DAGj4Cf_xWE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h840401bd48)
 [![발표영상](https://img.shields.io/badge/%EB%B0%9C%ED%91%9C%EC%98%81%EC%83%81-34A853?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1KMUg1nCRlpERWugAJ2aPaE8FoP9dPdUt/view)
+
+</div>
 
 ## <img src="./exec/readme_assets/store-icon.png" width="18" height="18" style="border-radius:4px;" alt="Store"/> 또가게
 
@@ -146,58 +150,13 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
 
 ### FrontEnd
 
-![skill.png](./exec/readme_assets/FrontEnd.png)
+<p align="center">
+  <img src="./exec/readme_assets/FrontEnd.png" width="500" />
+</p>
 
 ## 🗺️ 기술 아키텍처
 
 ![ddo-store-architecture](./exec/readme_assets/또가게%20앱%20서버.jpg)
-
-## 👥 팀 소개
-
-<table style="text-align: center;" width="100%">
-  <tr>
-    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/cheon.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/jeong.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/lee.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/min.png" width="150" height="150"/></th>
-    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/choi.png" width="150" height="150"/></th>
-  </tr>
-  <tr>
-    <td style="text-align: center;" width="16.66%"><a href="https://github.com/yooniverse7" target="_blank">천세윤(팀장)</a></td>
-    <td style="text-align: center;" width="16.66%"><a href="https://github.com/ynghan" target="_blank">정영한</a></td>
-    <td style="text-align: center;" width="16.66%"><a href="https://github.com/leesanghyeok523" target="_blank">이상혁</a></td>
-    <td style="text-align: center;" width="16.66%"><a href="https://github.com/Steadystudy" target="_blank">민상기</a></td>
-    <td style="text-align: center;" width="16.66%"><a href="https://github.com/jinmoon23" target="_blank">최진문</a></td>
-  </tr>
-<tr>
-  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
-  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 / 인프라 개발</td>
-  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
-  <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
-  <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
-</tr>
-  <tr>
-    <td style="text-align: center;" width="16.66%">NFC 및 POS</td>
-    <td style="text-align: center;" width="16.66%">Jenkins pipeline</td>
-    <td style="text-align: center;" width="16.66%">맛집 API</td>
-    <td style="text-align: center;" width="16.66%">지도 및 NFC</td>
-    <td style="text-align: center;" width="16.66%">React-Native 통신</td>
-  </tr>
-  <tr>
-    <td style="text-align: center;" width="16.66%">결제 API</td>
-    <td style="text-align: center;" width="16.66%">Kakao Login</td>
-    <td style="text-align: center;" width="16.66%">Naver API 크롤링</td>
-    <td style="text-align: center;" width="16.66%">QR 결제 담당</td>
-    <td style="text-align: center;" width="16.66%">기프티콘 생성</td>
-  </tr>
-  <tr>
-    <td style="text-align: center; width:16.66%; border-bottom: solid;">은행 API</td>
-    <td style="text-align: center; width:16.66%; border-bottom: solid;">기프티콘 API</td>
-    <td style="text-align: center; width:16.66%; border-bottom: solid;">AI Serving</td>
-    <td style="text-align: center; width:16.66%; border-bottom: solid;"></td>
-    <td style="text-align: center; width:16.66%; border-bottom: solid;">마이페이지 담당</td>
-  </tr>
-</table>
 
 ## 🚀 주요 기술
 
@@ -477,3 +436,50 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
   <h3>🔹 은행 도메인</h3>
   <img src="./exec/readme_assets/domain/bank-domain.png" alt="api명세서">
 </details>
+
+## 👥 팀 소개
+
+<table style="text-align: center;" width="100%">
+  <tr>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/cheon.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/jeong.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/lee.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/min.png" width="150" height="150"/></th>
+    <th style="text-align: center;" width="16.66%"><img src="./exec/readme_assets/member/choi.png" width="150" height="150"/></th>
+  </tr>
+  <tr>
+    <td style="text-align: center;" width="16.66%"><a href="https://github.com/yooniverse7" target="_blank">천세윤(팀장)</a></td>
+    <td style="text-align: center;" width="16.66%"><a href="https://github.com/ynghan" target="_blank">정영한</a></td>
+    <td style="text-align: center;" width="16.66%"><a href="https://github.com/leesanghyeok523" target="_blank">이상혁</a></td>
+    <td style="text-align: center;" width="16.66%"><a href="https://github.com/Steadystudy" target="_blank">민상기</a></td>
+    <td style="text-align: center;" width="16.66%"><a href="https://github.com/jinmoon23" target="_blank">최진문</a></td>
+  </tr>
+<tr>
+  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
+  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 / 인프라 개발</td>
+  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
+  <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
+  <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
+</tr>
+  <tr>
+    <td style="text-align: center;" width="16.66%">NFC 및 POS</td>
+    <td style="text-align: center;" width="16.66%">Jenkins pipeline</td>
+    <td style="text-align: center;" width="16.66%">맛집 API</td>
+    <td style="text-align: center;" width="16.66%">지도 및 NFC</td>
+    <td style="text-align: center;" width="16.66%">React-Native 통신</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;" width="16.66%">결제 API</td>
+    <td style="text-align: center;" width="16.66%">Kakao Login</td>
+    <td style="text-align: center;" width="16.66%">Naver API 크롤링</td>
+    <td style="text-align: center;" width="16.66%">QR 결제 담당</td>
+    <td style="text-align: center;" width="16.66%">기프티콘 생성</td>
+  </tr>
+  <tr>
+    <td style="text-align: center; width:16.66%; border-bottom: solid;">은행 API</td>
+    <td style="text-align: center; width:16.66%; border-bottom: solid;">기프티콘 API</td>
+    <td style="text-align: center; width:16.66%; border-bottom: solid;">AI Serving</td>
+    <td style="text-align: center; width:16.66%; border-bottom: solid;"></td>
+    <td style="text-align: center; width:16.66%; border-bottom: solid;">마이페이지 담당</td>
+  </tr>
+</table>
