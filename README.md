@@ -171,21 +171,21 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
   </tr>
 <tr>
   <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
-  <td style="text-align: center; width:16.66%; border-top: solid;">인프라 개발</td>
+  <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 / 인프라 개발</td>
   <td style="text-align: center; width:16.66%; border-top: solid;">백엔드 개발</td>
   <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
   <td style="text-align: center; width:16.66%; border-top: solid;">프론트 개발</td>
 </tr>
   <tr>
     <td style="text-align: center;" width="16.66%">NFC 및 POS</td>
-    <td style="text-align: center;" width="16.66%">Jenkins pipeline </td>
+    <td style="text-align: center;" width="16.66%">Jenkins pipeline</td>
     <td style="text-align: center;" width="16.66%">맛집 API</td>
     <td style="text-align: center;" width="16.66%">지도 및 NFC</td>
     <td style="text-align: center;" width="16.66%">React-Native 통신</td>
   </tr>
   <tr>
     <td style="text-align: center;" width="16.66%">결제 API</td>
-    <td style="text-align: center;" width="16.66%">OAuth2 Login</td>
+    <td style="text-align: center;" width="16.66%">Kakao Login</td>
     <td style="text-align: center;" width="16.66%">Naver API 크롤링</td>
     <td style="text-align: center;" width="16.66%">QR 결제 담당</td>
     <td style="text-align: center;" width="16.66%">기프티콘 생성</td>
