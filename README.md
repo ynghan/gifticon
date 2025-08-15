@@ -1,9 +1,21 @@
 ![first-screen.png](exec%2Freadme_assets%2Ffirst-screen.png)
 <br />
 
+<div align="center">
+
+**✨ 내 손으로 만드는 로컬 기프티콘 ✨**<br />
+
+이제 기프티콘은 기업만 발행하는 시대는 끝! <br/>
+누구나 직접 기프티콘을 제작하여, 일반 가맹점의 메뉴를 쉽게 선물할 수 있어요!<br/>
+기프티콘을 선물을 받아 복잡한 절차 없이 간편한 결제 서비스를 경험해보세요!<br/>
+가맹점은 별도의 수수료 없이도 고객을 확보하고, 지역 매장 접근성과 선물 문화 확대 가능해요!<br/>
+
+</div>
+
 [![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)](https://relic-sea-1e3.notion.site/1a412a0174e780b4870bd63cd477cac6)
 [![또가게](https://img.shields.io/badge/%EB%98%90%EA%B0%80%EA%B2%8C-FFB300?style=for-the-badge)](https://j12e106.p.ssafy.io)
 [![발표자료](https://img.shields.io/badge/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C-4F6AE6?style=for-the-badge&logo=googleslides&logoColor=white)](https://www.canva.com/design/DAGj4Cf_xWE/_Rcu9Lm_w1HBxPY1ytvvGQ/view?utm_content=DAGj4Cf_xWE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h840401bd48)
+[![발표영상](https://img.shields.io/badge/%EB%B0%9C%ED%91%9C%EC%98%81%EC%83%81-34A853?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1KMUg1nCRlpERWugAJ2aPaE8FoP9dPdUt/view)
 
 ## <img src="./exec/readme_assets/store-icon.png" width="18" height="18" style="border-radius:4px;" alt="Store"/> 또가게
 
@@ -54,13 +66,6 @@
 </table>
 
 <br/>
-
-**✨ 내 손으로 만드는 로컬 기프티콘**<br />
-
-이제 기프티콘은 기업만 발행하는 시대는 끝! <br/>
-누구나 직접 기프티콘을 제작하여, 일반 가맹점의 메뉴를 쉽게 선물할 수 있어요!<br/>
-기프티콘을 선물을 받아 복잡한 절차 없이 간편한 결제 서비스를 경험해보세요!<br/>
-가맹점은 별도의 수수료 없이도 고객을 확보하고, 지역 매장 접근성과 선물 문화 확대 가능해요!<br/>
 
 ## 🔧 기술 스택
 
@@ -146,18 +151,6 @@ API 요청 라우팅, SSL 인증서 설정, 로드밸런싱 등 웹 서버 최�
 ## 🗺️ 기술 아키텍처
 
 ![ddo-store-architecture](./exec/readme_assets/또가게%20앱%20서버.jpg)
-
-## 🚀 프로젝트 소개
-
-**_SSAFY 12기 2학기 공통 프로젝트_**
-
-> ⌛ 프로젝트 기간 : 2025.02.28 ~ 2025.04.11 (6주)
-
-> 📆 상세 기간 : 기획 2주 + 개발 3주 + 버그 해결 1주
-
-###
-
-**😻 NFC 결제**<br />
 
 ## 👥 팀 소개
 
